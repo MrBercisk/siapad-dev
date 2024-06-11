@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class RelBphtb extends CI_Controller {
+class Lrabulanan extends CI_Controller {
 	private $data = [];
 	public function __construct() {
         parent::__construct();
-		$this->load->model('laporan/MLapBphtb');
+		$this->load->model('laporan/Mlradaerah');
     }
 	public function index()
 	{	
@@ -21,8 +21,8 @@ class RelBphtb extends CI_Controller {
 		$data['jstable']	= NULL;
 	 	$data['jsedit']		= NULL;
 	 	$data['jsdelete']	= NULL;
-		$data['forminsert'] = implode($this->MLapBphtb->formInsert());
-		$this->load->view('laporan/relbphtb',$data);
+		$data['forminsert'] = implode($this->Mlradaerah->formInsert2());
+		$this->load->view('laporan/rladaerah',$data);
 	}
 	public function cetak() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
@@ -37,12 +37,12 @@ class RelBphtb extends CI_Controller {
     $data['link'] 	  = $setpage->link;
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
-    $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
-	$tanggal = $this->input->post('tanggal');
-	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
-
+    $data['jstable']  = '';
+    $tanggal = $this->input->post('tanggal');
+	$data['tablenya'] = $this->Mlradaerah->get_data_bulanan($tanggal);
+    
     ob_start();
-    $this->load->view('laporan/printbphtb', $data);
+    $this->load->view('laporan/printlap', $data);
     echo ob_get_clean();
 }
 

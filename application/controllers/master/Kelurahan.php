@@ -1,7 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class Kelurahan extends CI_Controller {
 	public function __construct() {
-        parent::__construct();	
+        parent::__construct();
+		$this->load->model('backend/Location');
+		$this->load->model('master/Mkelurahan');
     }
 	public function index()
 	{	$Jssetup	= $this->Jssetup;
@@ -20,14 +22,14 @@ class Kelurahan extends CI_Controller {
 	 	$data['jsedit']		= $Jssetup->jsModal('#edit','Edit','master/Kelurahan/myModal','#modalkuE');
 	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','master/Kelurahan/myModal','#modalkuD');
 	 	$data['jskecamatan']= $Jssetup->jsKecamatan('master/Kecamatan/json_Kecamatan');
-		$data['forminsert'] = implode($this->formInsert());
+		$data['forminsert'] = implode($this->Mkelurahan->formInsert());
 		$this->load->view('master/kelurahan',$data);
 	}
 	public function getKel(){
         $this->Datatables->setTable('mst_kelurahan');
-        $this->Datatables->setSelectColumn(array('mst_kelurahan.id AS idkel', 'mst_kelurahan.kode AS kodekkel','mst_kelurahan.nama AS nama_kelurahan','mst_kecamatan.nama AS nama_kecamatan'));
-        $this->Datatables->setOrderColumn(array(null, 'mst_kelurahan.kode','mst_kelurahan.nama'));
-        $this->Datatables->setSearchColumns(array('mst_kelurahan.nama', 'mst_kelurahan.nomor'));
+        $this->Datatables->setSelectColumn(['mst_kelurahan.id AS idkel', 'mst_kelurahan.kode AS kodekkel','mst_kelurahan.nama AS nama_kelurahan','mst_kecamatan.nama AS nama_kecamatan']);
+        $this->Datatables->setOrderColumn([null, 'mst_kelurahan.kode','mst_kelurahan.nama']);
+        $this->Datatables->setSearchColumns(['mst_kelurahan.nama', 'mst_kelurahan.nomor']);
         $this->Datatables->addJoin('mst_kecamatan', 'mst_kecamatan.id= mst_kelurahan.idkecamatan');
 		$data = array();
 		$no   = 1;
@@ -55,6 +57,8 @@ class Kelurahan extends CI_Controller {
 	public function myModal(){
 		$wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:'.site_url('404'));
 		$kode = $this->Crud->ambilSatu('mst_kelurahan', ['id' => $this->input->post('idnya')]);
+		
+		
 		switch($wadi){
 			case 'Edit':
 				$form [] = '
@@ -83,33 +87,7 @@ class Kelurahan extends CI_Controller {
 			break;
 		}
 	}
-	public function formInsert(){
-		$form[] = '
-		<form action="'.site_url('master/Kelurahan/aksi').'" method="post" enctype="multipart/form-data" >
-				<div class="row">
-					<div class="col-md-6 offset-3">
-				   '.implode($this->Form->inputText('kode','Kode')).
-				   '</div>
-					<div class="col-md-6 offset-3">'
-					.implode($this->Form->selectText('kecamatan-select','Kecamatan')).
-				   '</div>
-				   <div class="col-md-6 offset-3">
-				   '.implode($this->Form->inputText('nama','Kelurahan')).
-				   '</div>
-					<div class="col-md-12 text-center">
-						<div class="btn-group">
-							<button class="btn btn-outline-danger mr-1" type="reset">
-								<i class="fa fa-undo"></i> Reset
-							</button>
-							<button class="btn btn-outline-primary" type="submit" name="AKSI" value="Save">
-								<i class="fa fa-save"></i> Simpan
-							</button>
-						</div>
-					</div>
-				</div>
-        </form>';
-		return $form;
-	}
+	
 	public function aksi(){
     $aksi = isset($_POST['AKSI']) ? $_POST['AKSI'] : header('location:'.site_url('404'));
     $this->load->model('backend/Crud'); 
@@ -118,7 +96,7 @@ class Kelurahan extends CI_Controller {
             $data = [
                 'kode' 	=> $this->input->post('kode'),
                 'nama' 	=> $this->input->post('nama'),
-				'iduptd'=> 13
+				'idkecamatan'=> $this->input->post('idkecamatan')
             ];
             $insert = $this->Crud->insert_data('mst_kelurahan', $data);
             if ($insert) {
@@ -132,7 +110,8 @@ class Kelurahan extends CI_Controller {
         case 'Edit':
             $kode = $this->input->post('kode');
             $data = [
-                'nama' => $this->input->post('nama')
+                'nama' => $this->input->post('nama'),
+				'idkecamatan'=> $this->input->post('idkecamatan')
             ];
             $update = $this->Crud->update_data('mst_kelurahan', $data, ['kode' => $kode]);
             if ($update) {

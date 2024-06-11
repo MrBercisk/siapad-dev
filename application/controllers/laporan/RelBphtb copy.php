@@ -22,9 +22,9 @@ class RelBphtb extends CI_Controller {
 	 	$data['jsedit']		= NULL;
 	 	$data['jsdelete']	= NULL;
 		$data['forminsert'] = implode($this->MLapBphtb->formInsert());
-		$this->load->view('laporan/relbphtb',$data);
+		$this->load->view('laporan/rladaerah',$data);
 	}
-	public function cetak() {
+	public function printLap() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
         redirect('404');
     }
@@ -38,11 +38,11 @@ class RelBphtb extends CI_Controller {
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
-	$tanggal = $this->input->post('tanggal');
-	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
-
+	$data['tablenya'] = $this->MLapBphtb->get_data('2024-05-1');
+    $tanggal = $this->input->post('tanggal');
+    
     ob_start();
-    $this->load->view('laporan/printbphtb', $data);
+    $this->load->view('laporan/relbphtb', $data);
     echo ob_get_clean();
 }
 

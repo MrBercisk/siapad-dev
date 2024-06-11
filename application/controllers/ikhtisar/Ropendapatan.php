@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class RelBphtb extends CI_Controller {
+class Ropendapatan extends CI_Controller {
 	private $data = [];
 	public function __construct() {
         parent::__construct();
-		$this->load->model('laporan/MLapBphtb');
+		$this->load->model('ikhtisar/Mropendapatan');
     }
 	public function index()
 	{	
@@ -21,8 +21,8 @@ class RelBphtb extends CI_Controller {
 		$data['jstable']	= NULL;
 	 	$data['jsedit']		= NULL;
 	 	$data['jsdelete']	= NULL;
-		$data['forminsert'] = implode($this->MLapBphtb->formInsert());
-		$this->load->view('laporan/relbphtb',$data);
+		$data['forminsert'] = implode($this->Mropendapatan->formInsert());
+		$this->load->view('ikhtisar/ropend',$data);
 	}
 	public function cetak() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
@@ -39,7 +39,7 @@ class RelBphtb extends CI_Controller {
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
 	$tanggal = $this->input->post('tanggal');
-	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
+	$data['tablenya'] = $this->MBkBesar->get_laporan_hari($tanggal);
 
     ob_start();
     $this->load->view('laporan/printbphtb', $data);

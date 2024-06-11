@@ -51,6 +51,7 @@ class Msetup extends CI_Model {
 						background: linear-gradient(27deg, rgba(46, 7, 12, 1) 4%, rgb(152, 34, 34) 29%);
 						color: white;
 						border-radius: 10px;
+						padding: 10px
 					}
 				
 					.navbar-bg{
@@ -216,6 +217,8 @@ class Msetup extends CI_Model {
 		  </footer>
 		</div>
 	  </div>
+	  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+	  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 	  <script src="'.$base['url'].'assets/modules/popper.js"></script>
 	  <script src="'.$base['url'].'assets/modules/tooltip.js"></script>
 	  <script src="'.$base['url'].'assets/modules/bootstrap/js/bootstrap.min.js"></script>
@@ -231,7 +234,7 @@ class Msetup extends CI_Model {
 	public function setup(){
 	$base			= [];
 	$uri			= explode('/',$_SERVER['REQUEST_URI']);
-	$base			= [ 'url' 		=> 'http://'.$_SERVER['HTTP_HOST'].'/siapadgh/',
+	$base			= [ 'url' 		=> 'http://'.$_SERVER['HTTP_HOST'].'/siapad-dev/',
 						'halaman'	=> isset($uri[2]) ? $uri[2] : NULL,
 					   	'fungsi'	=> isset($uri[3]) ? $uri[3] : NULL];
 		return $base;

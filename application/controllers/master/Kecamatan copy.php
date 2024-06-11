@@ -101,7 +101,7 @@ public function myModal() {
             $form [] = '
             <div class="row">
                 <div class="col-md-12">
-                	'.implode($this->Form->hiddenText('kode',$this->input->post('idnya'))).'
+                '.implode($this->Form->hiddenText('idnya', $idnya)).'
                 Apakah kamu yakin ingin menghapus data ini ?
                 </div>
             </div>';
@@ -150,7 +150,7 @@ public function myModal() {
         break;
         case 'Delete':
             $kode = $this->input->post('kode');
-            $delete = $this->Crud->delete_data('mst_kecamatan', ['id' => $kode]);
+            $delete = $this->Crud->delete_data('mst_kecamatan', ['kode' => $kode]);
             if ($delete) {
                 $this->session->set_flashdata('message', 'Data has been deleted successfully');
 				redirect('master/Kecamatan');

@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class MLapBphtb extends CI_Model {
+class MBkBesar extends CI_Model {
     private function get_saldo_awal($tahun, $bulan, $iduptd = null) {
         $this->db->select('SUM(a.total) as saldoawal')
                  ->from('trx_stsdetail a')

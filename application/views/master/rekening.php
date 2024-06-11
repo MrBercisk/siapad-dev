@@ -14,11 +14,17 @@ $(document).ready(function(){
 <table class="table table-striped" style="width:100% !important;" id="ftf">
    <thead>                                 
      <tr>
-         <th>NO</th>
-         <th>KODE</th>
-         <th>KECAMATAN</th>
-		     <th>UPTD</th>
-         <th></th>
+     <th>NO</th>
+     <th>IDHEADER</th>
+     <th>KODE REKENING</th>
+		 <th>KODE REKVIEW</th>
+		 <th>NAMA REKENING</th>
+		 <th>LEVEL</th>
+		 <th>JENIS</th>
+		 <th>TIPE</th>
+		 <th>ISLRAUPD</th>
+		 <th>ISINSIDENTIL</th>
+     <th></th>
      </tr>
    </thead>
    <tbody>                                 

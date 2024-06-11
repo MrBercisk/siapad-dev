@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 $theme['alert'][] = '';
+$theme['main'][]  = '';
 if($this->session->flashdata('message')): 
 $theme['alert'][] ='<div class="alert alert-success">'.
 						$this->session->flashdata('message').'
@@ -15,10 +16,11 @@ $(document).ready(function(){
    <thead>                                 
      <tr>
          <th>NO</th>
-         <th>KODE</th>
-         <th>KECAMATAN</th>
-		     <th>UPTD</th>
-         <th></th>
+         <th>NAMA</th>
+         <th>GOL KAMAR</th>
+         <th>TARIF</th>
+         <th>JML.KAMAR</th>
+		 <th></th>
      </tr>
    </thead>
    <tbody>                                 
@@ -27,7 +29,7 @@ $(document).ready(function(){
 $theme['main'][] = 
     '<div id="page-title" class="page-title" data-title="'.$title.'"></div>
     <div class="main-content">
-        <section class="section">
+        <section class="section m-0">
           <div class="section-header">
             <h1>'.$title.'</h1>
             <div class="section-header-breadcrumb">
@@ -40,7 +42,7 @@ $theme['main'][] =
                 <div class="row">
                   <div class="col-12 col-sm-12 col-lg-12">
                     <div class="card">
-                      <div class="card-body">
+                      <div class="card-body px-4 mx-0">
 					  	'.implode('',$theme['alert']).'
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                           <li class="nav-item">
@@ -65,5 +67,6 @@ $theme['main'][] =
             </div>
 		</section>
       </div>'.implode('',$modalEdit).implode('',$modalDelete);
-echo preg_replace('/\r|\n|\t/', '',implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));
+echo preg_replace('/\r|\n|\t/', '', implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));
+
 ?>

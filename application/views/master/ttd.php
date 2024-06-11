@@ -15,9 +15,11 @@ $(document).ready(function(){
    <thead>                                 
      <tr>
          <th>NO</th>
-         <th>KODE</th>
-         <th>KECAMATAN</th>
-		     <th>UPTD</th>
+         <th>NIP</th>
+         <th>NAMA</th>
+		 <th>JABATAN1</th>
+		 <th>JABATAN2</th>
+		 <th>TIPE</th>
          <th></th>
      </tr>
    </thead>
