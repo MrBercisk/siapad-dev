@@ -60,7 +60,7 @@ $theme['main'][] =
     <div class="main-content">
         <section class="section">
           <div class="section-header">
-            <h1>LRA Pendapatan Daerah Harian</h1>
+            <h1>Wajib Pajak</h1>
             <div class="section-header-breadcrumb">
               <div class="breadcrumb-item active"><a href="'.base_url().'"><i class="bx bxs-home"></i>Home</a></div>
               <div class="breadcrumb-item"><a href="#">'.$title.'</a></div>

@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class Rladaerah extends CI_Controller {
+class Lradaerah extends CI_Controller {
 	private $data = [];
 	public function __construct() {
         parent::__construct();
@@ -21,10 +21,10 @@ class Rladaerah extends CI_Controller {
 		$data['jstable']	= NULL;
 	 	$data['jsedit']		= NULL;
 	 	$data['jsdelete']	= NULL;
-		$data['forminsert'] = implode($this->Mlradaerah->formInsert());
+		$data['forminsert'] = implode($this->Mlradaerah->formInsert1());
 		$this->load->view('laporan/rladaerah',$data);
 	}
-	public function printLap() {
+	public function cetak() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
         redirect('404');
     }
@@ -38,8 +38,8 @@ class Rladaerah extends CI_Controller {
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
-	$data['tablenya'] = $this->Mlradaerah->get_data('2024-05-1');
     $tanggal = $this->input->post('tanggal');
+	$data['tablenya'] = $this->Mlradaerah->get_data_harian($tanggal);
     
     ob_start();
     $this->load->view('laporan/printlap', $data);

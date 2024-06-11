@@ -29,6 +29,26 @@ class Form extends CI_Model {
 		return $form;
 	}
 
+	public function getKec($id_kecamatan = NULL, $label_kecamatan = NULL, $value_kecamatan = NULL, $class = NULL, $attrib_kecamatan = NULL) {
+		$this->load->model('backend/Location');
+		$form = [];
+		$form[] = '<div class="' . $class . '">
+					<div class="form-group">
+					  <label for="' . $id_kecamatan . '">' . $label_kecamatan . '</label>
+					  <select class="form-control" name="' . $id_kecamatan . '" id="' . $id_kecamatan . '" ' . $attrib_kecamatan . '>
+						  <option value="">Pilih Kecamatan</option>';
+		
+		$kecamatan = $this->Location->get_kecamatan();
+		foreach ($kecamatan as $kec) {
+			$selected = ($value_kecamatan == $kec['id']) ? 'selected' : '';
+			$form[] = '<option value="' . $kec['id'] . '" ' . $selected . '>' . $kec['nama'] . '</option>';
+		}
+		$form[] = '</select></div></div>';
+		
+		return implode('', $form);
+	}
+	
+
 	public function selectKec($id_kecamatan = NULL, $id_kelurahan = NULL, $label_kecamatan = NULL, $label_kelurahan = NULL, $value_kecamatan = NULL, $value_kelurahan = NULL, $class = NULL, $attrib_kecamatan = NULL, $attrib_kelurahan = NULL) {
     $this->load->model('backend/Location');
     $form = [];

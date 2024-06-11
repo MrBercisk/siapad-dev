@@ -33,6 +33,10 @@ class Crud extends CI_Model {
     $query = $this->db->get();
     return $query->result();
 	}
+    public function getUptds() {
+        return $this->db->get('mst_updt')->result();
+    }
+    
 
 }
 

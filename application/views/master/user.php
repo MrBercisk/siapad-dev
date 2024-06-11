@@ -15,9 +15,10 @@ $(document).ready(function(){
    <thead>                                 
      <tr>
          <th>NO</th>
-         <th>KODE</th>
-         <th>KECAMATAN</th>
-		     <th>UPTD</th>
+         <th>LOGIN</th>
+         <th>NAMA USER</th>
+         <th>Role</th>
+         <th>UPTD</th>
          <th></th>
      </tr>
    </thead>

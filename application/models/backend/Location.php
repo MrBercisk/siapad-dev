@@ -10,4 +10,9 @@ class Location extends CI_Model {
         $query = $this->db->get('mst_kelurahan');
         return $query->result_array();
     }
+
+    public function getUser(){
+        $query = $this->db->get('sys_user');
+        return $query->result_array();
+    }
 }

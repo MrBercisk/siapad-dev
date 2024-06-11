@@ -17,7 +17,7 @@ $(document).ready(function(){
          <th>NO</th>
          <th>KODE</th>
          <th>KECAMATAN</th>
-		 <th>KELURAHAN</th>
+		     <th>KELURAHAN</th>
          <th></th>
      </tr>
    </thead>
