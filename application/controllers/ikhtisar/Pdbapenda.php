@@ -1,4 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
+use Dompdf\Dompdf;
+require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class Pdbapenda extends CI_Controller {
 	private $data = [];
 	public function __construct() {
@@ -24,7 +26,7 @@ class Pdbapenda extends CI_Controller {
 		$data['forminsert'] = implode($this->MPbapenda->formInsert());
 		$this->load->view('ikhtisar/bapenda',$data);
 	}
-	public function printLap() {
+	public function cetak() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
         redirect('404');
     }
@@ -38,12 +40,25 @@ class Pdbapenda extends CI_Controller {
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = '';
-	$data['tablenya'] = $this->MPbapenda->get_data('2024-05-1');
     $tanggal = $this->input->post('tanggal');
     
-    ob_start();
-    $this->load->view('ikhtisar/printbap', $data);
-    echo ob_get_clean();
+	$tanda_tangan = $this->input->post('tanda_tangan');
+	$ttddetail = $this->db
+	->select('id, nama, nip, jabatan1, jabatan2')
+	->from('mst_tandatangan')
+	->where('id', $tanda_tangan)
+	->get()
+	->row_array();
+	$data['tanda_tangan'] = $ttddetail;
+	
+	$data['tablenya'] = $this->MPbapenda->get_data_bapenda($tanggal);
+	$html = $this->load->view('ikhtisar/printbap', $data, true);
+
+	$dompdf = new Dompdf();
+	$dompdf->loadHtml($html);
+	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->render();
+	$dompdf->stream("laporan_bapenda.pdf", array("Attachment" => 0));
 }
 
 }

@@ -2,13 +2,18 @@
 class MRestoran extends CI_Model {
     
     public function formInsert(){
-        $wpdata = $this->db->get('mst_wajibpajak')->result();
-        $opsiwp = '';
+        $wpdata = $this->db
+        ->select('mst_wajibpajak.id, mst_wajibpajak.nama')
+        ->from('mst_wajibpajak')
+        ->join('mst_wprestoran', 'mst_wprestoran.idwp = mst_wajibpajak.id')
+        ->get()
+        ->result();
+        $opsiwp = '<option></option>';
         foreach ($wpdata as $wp) {
             $opsiwp .= '<option value="'.$wp->id.'">'.$wp->nama.'</option>';
         }
 		$form[] = '
-			  <form action="'.site_url('master/Kecamatan/aksi').'" method="post" enctype="multipart/form-data" class="form-row">
+			  <form action="'.site_url('master/Restoran/aksi').'" method="post" enctype="multipart/form-data" class="form-row">
             <div class="row">
                 <div class="col-md-6">
                     '.implode($this->Form->inputText('menu','Menu')).'
@@ -19,14 +24,12 @@ class MRestoran extends CI_Model {
                 <div class="col-md-6">
                     '.implode($this->Form->inputText('jmlkursi','JML Kursi')).'
                 </div>
-               <div class="col-md-6">
-                           <div class="form-group">
-                    <label for="wp">Wajib Pajak</label>
-                    <select class="form-control select2" id="wp" name="wp" style="width: 100%;">
-                        <option value="">Pilih Nama Restoran</option>
-                    </select>
-                </div>
-                </div>
+                <div class="col-md-6">
+                        <label for="idwp">Nama Restoran</label>
+                       <select id="idwp" name="idwp" class="form-control select2" data-placeholder="Pilih Nama Restoran" style="width: 100%;">
+                            '.$opsiwp.'
+                        </select>
+                    </div>  
               
                 <div class="col-md-12 text-center">
                     <div class="btn-group">
@@ -40,31 +43,6 @@ class MRestoran extends CI_Model {
                 </div>
             </div>
         </form>';
-
-        $form[] = '
-    <script>
-        $(document).ready(function() {
-          $(".select2").select2({
-            ajax: {
-                url: "' . site_url('master/Hotel/getWpData') . '",
-                dataType: "json",
-                delay: 250,
-                 data: function (params) {
-                return {
-                    term: params.term
-                };
-            },
-                processResults: function (data) {
-                    return {
-                        results: data.results
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 2
-        });
-        });
-    </script>';
 
     return $form;
 	}

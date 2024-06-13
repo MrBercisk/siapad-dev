@@ -5,14 +5,7 @@ class Mlradaerah extends CI_Model {
         $query = $this->db->query("CALL spRptLRAHarian(?)", array($tanggal));
         return $query->result_array();
     }
-    public function get_data_bulanan($tanggal){
-        $query = $this->db->query("CALL spRptLRABulanan(?)", array($tanggal));
-        return $query->result_array();
-    }
-    public function get_data_triwulan($tanggal){
-        $query = $this->db->query("CALL spRptLRATriwulan(?)", array($tanggal));
-        return $query->result_array();
-    }
+ 
 	public function formInsert1() {
     $form[] = '
     <div class="card">
@@ -34,13 +27,6 @@ class Mlradaerah extends CI_Model {
                     <div class="form-group">
                         <label for="tgl_cetak">Tgl. Cetak:</label>
                         <input type="date" class="form-control" id="tgl_cetak" name="tgl_cetak" required>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="pg_break">Pg. Break:</label>
-                        <input type="text" class="form-control" id="pg_break" name="pg_break">
                     </div>
                 </div>
 				</div>

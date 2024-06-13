@@ -1,4 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
+use Dompdf\Dompdf;
+require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
+
 class RelBphtb extends CI_Controller {
 	private $data = [];
 	public function __construct() {
@@ -39,11 +42,24 @@ class RelBphtb extends CI_Controller {
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
 	$tanggal = $this->input->post('tanggal');
-	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
 
-    ob_start();
-    $this->load->view('laporan/printbphtb', $data);
-    echo ob_get_clean();
+	$tanda_tangan = $this->input->post('tanda_tangan');
+	$ttddetail = $this->db
+	->select('id, nama, nip, jabatan1, jabatan2')
+	->from('mst_tandatangan')
+	->where('id', $tanda_tangan)
+	->get()
+	->row_array();
+	$data['tanda_tangan'] = $ttddetail;
+	
+	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
+	$html = $this->load->view('laporan/printbphtb', $data, true);
+
+	$dompdf = new Dompdf();
+	$dompdf->loadHtml($html);
+	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->render();
+	$dompdf->stream("laporan_bphtb.pdf", array("Attachment" => 0));
 }
 
 }

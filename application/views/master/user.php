@@ -17,7 +17,7 @@ $(document).ready(function(){
          <th>NO</th>
          <th>LOGIN</th>
          <th>NAMA USER</th>
-         <th>Role</th>
+         <th>ROLE</th>
          <th>UPTD</th>
          <th></th>
      </tr>
@@ -56,7 +56,7 @@ $theme['main'][] =
                           '.$datatables.'
                           </div>
                           <div class="tab-pane fade" id="insert" role="tabpanel" aria-labelledby="profile-tab">
-						  '.$forminsert.'
+						                '.$forminsert.'
                           </div>
                         </div>
                       </div>

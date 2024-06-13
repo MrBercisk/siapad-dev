@@ -1,101 +1,109 @@
-<?php 
-$theme['main'][]  = '';
-$theme['main'][]  = implode($sidebar);
-foreach($tablenya as $row) {
-  $nosspd = htmlspecialchars($row['nosspd']);
-  $skpd = htmlspecialchars($row['skpd']);
-  $nmwp = htmlspecialchars($row['nmwp']);
-  $nmuptd = htmlspecialchars($row['nmuptd']);
-  $total = number_format($row['total'], 2);
-  $saldoawal = number_format($row['saldoawal'], 2);
-  $totalsaldo = number_format($row['total'] + $row['saldoawal'], 2);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><?= $title ?></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 100px;
+        }
+        .header h2, .header h3, .header h4 {
+            margin: 0;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .signature {
+            font-weight: bold;
+            text-align: center;
+            margin-top: 60px;
+            position: relative;
+            float: right;
+            clear: both;
+        }
+        .signature .name {
+            text-decoration: underline;
+            font-weight: bold;
+            margin-top: 70px;
+        }
 
-  
-setlocale(LC_TIME, 'id_ID.utf8');
-
-$tanggal_saat_ini = strftime('%d %B %Y'); 
-$tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day')); // Contoh: 6 Juni 2024
-
-$theme['table'][] = '<tr>
-      <td>'.$nosspd.'</td>
-      <td colspan="3">
-          Jumlah Per '.$tanggal_saat_ini.'<br>
-          Jumlah s.d '.$tanggal_sebelumnya.'<br>
-          Jumlah s.d '.$tanggal_saat_ini.'
-      </td>
-      <td>
-          '.$total.'<br>
-          '.$saldoawal.'<br>
-          '.$totalsaldo.'
-      </td>
-  </tr>';
-
-$datatables = '<script type="text/javascript">
-					$(document).ready(function() {
-						'.$jstable.'	
-					});
-				 </script>
-<table class="table table-striped table-responsive" style="width:100% !important;" id="ftf">
-   <thead>                                 
-     <tr>
-         <th rowspan="2">NO. SSPD</th>
-         <th rowspan="2">NOMOR FORMULIR</th>
-         <th rowspan="2" colspan="2">NAMA WAJIB PAJAK & LOKASI OBJEK PAJAK</th>
-         <th rowspan="2">JUMLAH SSPD</th>
-     </tr>
-   </thead>
-   <tbody>
-   		'.implode($theme['table']).'
-   </tbody>
-</table>';
-
-}
-
-$datatables 	  = '<script type="text/javascript">
-						$(document).ready(function() {
-							'.$jstable.'	
-						});
-					 </script>
-<table class="table table-striped table-responsive" style="width:100% !important;" id="ftf">
-   <thead>                                 
-     <tr>
-         <th rowspan="2">NO. SSPD</th>
-         <th rowspan="2">NOMOR FORMULIR</th>
-         <th rowspan="4">NAMA WAJIB PAJAK</th>
-         <th rowspan="2">LOKASI OBJEK PAJAK</th>
-         <th rowspan="2">jUMLAH SSPD</th>
-     </tr>
-	
-   </thead>
-   <tbody>
-   		'.implode($theme['table']).'
-   </tbody>
-</table>';
-
-$theme['main'][] = 
-    '<div id="page-title" class="page-title" data-title="'.$title.'"></div>
-    <div class="main-content">
-        <section class="section">
-          <div class="section-header">
-            <h1>Cetak BPHTB</h1>
-            <div class="section-header-breadcrumb">
-              <div class="breadcrumb-item active"><a href="'.base_url().'"><i class="bx bxs-home"></i>Home</a></div>
-              <div class="breadcrumb-item"><a href="#">'.$title.'</a></div>
-            </div>
-          </div>
-            <div class="container-fluid">
-              <div class="section-body">
-                <div class="row">
-                  <div class="col-12 col-sm-12 col-lg-12">
-                    <div class="card">
-                      <div class="card-body">
-                        '.$datatables.'
-                      </div>
-                    </div>
-                  </div>
-              </div>
-            </div>
-		</section>
-      </div>';
-echo preg_replace('/\r|\n|\t/', '', implode($topbar) . implode($theme['main']) . implode($footer));
-?>
+    </style>
+</head>
+<body>
+<div class="header">
+    <h2>LAPORAN HARIAN REALISASI PAJAK BAPENDA</h2>
+    <h3>BEA PEROLEHAN HAK ATAS TANAH DAN BANGUNAN (BPHTB)</h3>
+    <h3>TANGGAL <?= strftime('%d %B %Y') ?></h3>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>NO. URUT</th>
+            <th>NO. SSPD</th>
+            <th>NOMOR FORMULIR</th>
+            <th>NAMA WAJIB PAJAK</th>
+            <th>LOKASI OBJEK PAJAK</th>
+            <th>JUMLAH SSPD (Rp)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        $tanggal_saat_ini = strftime('%d %B %Y'); 
+        $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
+        if (!empty($tablenya)):
+            foreach($tablenya as $tbl): ?>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td colspan="5">Jumlah Per <?= $tanggal_saat_ini ?> </td>
+                    <td><?= number_format($tbl['total'], 2); ?></td>
+                </tr>
+                <tr>
+                    <td colspan="5">Jumlah s.d. <?= $tanggal_sebelumnya ?> </td>
+                    <td><?= number_format($tbl['total'] + $tbl['saldoawal'], 2);?></td>
+                </tr>
+                <tr>
+                    <td colspan="5">Jumlah s.d. <?= $tanggal_saat_ini ?> </td>
+                    <td><?= number_format($tbl['saldoawal'], 2, ',', '.') ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </tbody>
+</table>
+<?php if (!empty($tanda_tangan)) : ?>
+    <div class="signature">
+        <p><?= $tanda_tangan['jabatan1'] ?>,</p>
+        <p><?= $tanda_tangan['jabatan2'] ?>,</p>
+        <p class="name"><?= $tanda_tangan['nama'] ?></p>
+        <p>NIP. <?= $tanda_tangan['nip'] ?></p>
+    </div>
+<?php endif; ?>
+</body>
+</html>

@@ -35,7 +35,7 @@ class Obreklame extends CI_Controller {
            
         ]);
         $datatables->setOrderColumn([null,"nama_reklame","nomor_reklame","jenis_ukuran"]);
-		$datatables->setSearchColumns(["nama_reklame","nomor_reklame","jenis_ukuran"]);
+		$datatables->setSearchColumns(["nama","nomor","jnsukuran"]);
         $datatables->addJoin("mst_wajibpajak", "mst_wajibpajak.id = mst_wpreklame.idwp", "left");
         $fetch_data = $this->Datatables->make_datatables();
         $data = array();
@@ -63,18 +63,28 @@ class Obreklame extends CI_Controller {
 			case 'Edit':
 				$idnya = $this->input->post('idnya');
 				$idreklame = $this->Crud->ambilSatu('mst_wpreklame', ['id' => $idnya]);
+				$wpdata = $this->db
+				->select('mst_wajibpajak.id, mst_wajibpajak.nama')
+				->from('mst_wajibpajak')
+				->join('mst_wpreklame', 'mst_wpreklame.idwp = mst_wajibpajak.id')
+				->get()
+				->result();
+				$opsiwp = '<option></option>';
+				foreach ($wpdata as $wp) {
+                    $selected = ($wp->id == $idreklame->idwp) ? 'selected' : '';
+                    $opsiwp .= '<option value="'.$wp->id.'" '.$selected.'>'.$wp->nama.'</option>';
+                }
 				$form [] 	= '
 				<div class="row">
 					<div class="col-md-12">'
 					.implode($this->Form->inputText('jnsukuran','Jenis Ukuran',$idreklame->jnsukuran)).
 				   '</div>
-					 <div class="col-md-12">
-                           <div class="form-group">
-                    <label for="wp">Reklame</label>
-                    <select class="form-control select2" id="wp" name="wp" style="width: 100%;">
-                        <option value="">Pilih Nama Hotel</option>
-                    </select>
-                </div>
+					<div class="col-md-12">
+                            <label for="idwp">Nama Reklame</label>
+                            <select id="idwp" name="idwp" class="form-control select2" data-placeholder="Pilih Nama Reklame" style="width: 100%;">
+                                '.$opsiwp.'
+                            </select>
+                    </div>
 					'.implode($this->Form->hiddenText('kode',$idreklame->id)).'
 				</div>';
 				
@@ -99,43 +109,39 @@ class Obreklame extends CI_Controller {
 		$this->load->model('backend/Crud'); 
 		switch($aksi){
 			case 'Save':
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat'),
-							'urut'		=> $this->input->post('urut'),
-							'isdispenda'=> $this->input->post('isdispenda')];
-				$insert = $this->Crud->insert_data('mst_dinas', $data);
+				$data = [	'jnsukuran' 		=> $this->input->post('jnsukuran'),
+							'idwp'=> $this->input->post('idwp')];
+				$insert = $this->Crud->insert_data('mst_wpreklame', $data);
 				if ($insert) {
 					$this->session->set_flashdata('message', 'Data has been saved successfully');
-					redirect('master/Dinas');
+					redirect('master/obreklame');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to save data');
-					redirect('master/Dinas');
+					redirect('master/obreklame');
 				}
 			break;
 			case 'Edit':
 				$kode = $this->input->post('kode');
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat'),
-							'urut'		=> $this->input->post('urut'),
-							'isdispenda'=> $this->input->post('isdispenda')];
-				$update = $this->Crud->update_data('mst_dinas', $data, ['id' => $kode]);
+				$data = [	'jnsukuran' 		=> $this->input->post('jnsukuran'),
+							'idwp'=> $this->input->post('idwp')];
+				$update = $this->Crud->update_data('mst_wpreklame', $data, ['id' => $kode]);
 				if ($update) {
 					$this->session->set_flashdata('message', 'Data has been updated successfully');
-					redirect('master/Dinas');
+					redirect('master/obreklame');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to update data');
-					redirect('master/Dinas');
+					redirect('master/obreklame');
 				}
 			break;
 			case 'Delete':
 				$kode = $this->input->post('kode');
-				$delete = $this->Crud->delete_data('mst_dinas', ['id' => $kode]);
+				$delete = $this->Crud->delete_data('mst_wpreklame', ['id' => $kode]);
 				if ($delete) {
 					$this->session->set_flashdata('message', 'Data has been deleted successfully');
-					redirect('master/Dinas');
+					redirect('master/obreklame');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to delete data');
-					redirect('master/Dinas');
+					redirect('master/obreklame');
 				}
 			break;
 			default:
