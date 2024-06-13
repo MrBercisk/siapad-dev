@@ -185,12 +185,11 @@ class MLapBphtb extends CI_Model {
     
                     </div>
                 </div>
-                
-
+    
                     <div class="col-md-1">
                         <label class="form-check-label" for="ttd">Penandatangan</label>
                         <div class="form-check">
-                           <input type="checkbox" class="form-check-input" id="ttd_checkbox" name="ttd" checked>
+                           <input type="checkbox" class="form-check-input" id="ttd_checkbox" name="ttd_checkbox" checked>
                         <label class="form-check-label" for="ttd">Ttd</label>
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary">Cetak Laporan</button>

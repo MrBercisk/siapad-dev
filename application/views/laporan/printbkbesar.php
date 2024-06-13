@@ -75,8 +75,8 @@
             foreach($tablenya as $tbl): ?>
                 <tr>
                     <td><?= htmlspecialchars($tbl['nomor'])?></td>
-                    <td><?= number_format($tbl['kdrekening'], 2)?></td>
-                    <td><?= htmlspecialchars($tbl['nmrek'])?></td>
+                    <td><?= htmlspecialchars($tbl['kdrekening'])?></td>
+                    <td><?= htmlspecialchars($tbl['uraian'])?></td>
                     <td><?= htmlspecialchars($tbl['nmdinas'])?></td>
                     <td><?= number_format($tbl['jumlah'], 2)?></td>
                     <td><?= htmlspecialchars($tbl['keterangan'])?></td>
