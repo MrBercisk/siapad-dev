@@ -18,3 +18,4 @@ application/logs/*
 /vendor/
 
 /siapda_dump_tedy.sql
+/siapad_dump_2.sql
