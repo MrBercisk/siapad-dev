@@ -136,7 +136,7 @@ class MLapBphtb extends CI_Model {
         return $result ? (float) $result->total : 0.00;
     }
     public function get_laporan_hari($tanggal){
-        $query = $this->db->query("CALL spRptBPHTBHarian(?)", array($tanggal));
+         $query = $this->db->query("CALL spRptBPHTBHarian('$tanggal')");
         return $query->result_array();
     }
     

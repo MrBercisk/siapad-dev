@@ -13,6 +13,9 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -72,6 +75,24 @@
             font-weight: bold;
             margin-top: 70px;
         }
+        th:nth-child(1) {
+            width: 15%;
+        }
+        th:nth-child(2) {
+            width: 25%;
+        }
+        th:nth-child(3){
+            width: 15%;
+        }
+        th:nth-child(4){
+            width: 15%;
+        }
+        th:nth-child(5){
+            width: 15%;
+        }
+        th:nth-child(6){
+            width: 5%;
+        }
     </style>
 </head>
 <body>
@@ -81,12 +102,27 @@ $tanggal_saat_ini = strftime('%d %B %Y');
 $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
 ?>
 <div class="header">
+    <img src="<?= base_url('/assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>LAPORAN REALISASI ANGGARAN PENDAPATAN DAERAH</h3>
     <h3>TANGGAL <?= strftime('%d %B %Y') ?></h3>
 </div>
 <table>
+    <colgroup>
+        <col style="width: 15%;">
+        <col style="width: 25%;">
+        <col style="width: 10%;">
+        <?php if ($apbdp_checkbox): ?>
+            <col style="width: 10%;">
+        <?php endif; ?>
+        <col style="width: 10%;">
+        <col style="width: 5%;">
+        <col style="width: 10%;">
+        <col style="width: 5%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+    </colgroup>
     <thead>
         <tr>
             <th rowspan="2">KODE REKENING</th>
@@ -122,8 +158,28 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
         </tr>
     </thead>
     <tbody>
-    <?php if (!empty($tablenya)): ?>
-        <?php foreach($tablenya as $tbl): ?>
+    <?php
+    $totalApbd = 0;
+    $totalApbdp = 0;
+    $totalTotlalu = 0;
+    $totalTotini = 0;
+    $totalTotlaluTotini = 0;
+    $totalSelisih = 0;
+    
+    if (!empty($tablenya)): 
+        foreach($tablenya as $tbl): 
+
+            $totalApbd += $tbl['apbd'];
+            if ($apbdp_checkbox) {
+                $totalApbdp += $tbl['apbdp'];
+            }
+            $totalTotlalu += $tbl['totlalu'];
+            $totalTotini += $tbl['totini'];
+
+            $totalTotlaluTotini += ($tbl['totlalu'] + $tbl['totini']);
+            $totalSelisih += (($tbl['totlalu'] + $tbl['totini'] - $tbl['apbd'] ));
+
+    ?>
             <tr>
                 <td><?= htmlspecialchars($tbl['kdrekening']) ?></td>
                 <td><strong><?= htmlspecialchars($tbl['nmrek1']) ?></strong></td>
@@ -135,7 +191,7 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
                 <td><?= number_format($tbl['totini'], 2) ?></td>
                 <td><?= number_format($tbl['totlalu'] + $tbl['totini'], 2) ?></td>
                 <td><?= ($tbl['apbd'] > 0) ? number_format((($tbl['totlalu'] + $tbl['totini']) / $tbl['apbd']) * 100, 2) : '0.00' ?></td>
-                <td><?= number_format($tbl['apbd'] - ($tbl['totlalu'] + $tbl['totini']), 2) ?></td>
+                <td><?= number_format($tbl['totlalu'] + $tbl['totini'] - $tbl['apbd'], 2) ?></td>
                 <td><?= ($tbl['apbd'] > 0) ? number_format(($tbl['apbd'] - ($tbl['totlalu'] + $tbl['totini'])) / $tbl['apbd'] * 100, 2) : '0.00' ?></td>
             </tr>
             <?php for ($i = 2; $i <= 6; $i++): ?>
@@ -157,8 +213,27 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
                 <?php endif; ?>
             <?php endfor; ?>
         <?php endforeach; ?>
+        <?php 
+        // Calculate total percentage values for the entire table
+        $totalPersenPend = ($totalApbd > 0) ? number_format(($totalTotlaluTotini / $totalApbd) * 100, 2) : '0.00';
+        $totalPersenSisa = ($totalApbd > 0) ? number_format(($totalSelisih / $totalApbd) * 100, 2) : '0.00';
+        ?>
+        <tr>
+            <td colspan="2"><strong>Total Pendapatan + Pembiayaan</strong></td>
+            <td><?= number_format($totalApbd, 2) ?></td>
+            <?php if ($apbdp_checkbox): ?>
+                <td><?= number_format($totalApbdp, 2) ?></td>
+            <?php endif; ?>
+            <td><?= number_format($totalTotlalu, 2) ?></td>
+            <td><?= number_format($totalTotini, 2) ?></td>
+            <td><?= number_format($totalTotlaluTotini, 2) ?></td>
+            <td><?= $totalPersenPend ?></td>
+            <td><?= number_format($totalSelisih, 2) ?></td>
+            <td><?= $totalPersenSisa ?></td>
+        </tr>
     <?php endif; ?>
 </tbody>
+
 
 </table>
 <?php if(!empty($tgl_cetak)): ?>

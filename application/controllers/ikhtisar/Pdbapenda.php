@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 use Dompdf\Dompdf;
+setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class Pdbapenda extends CI_Controller {
 	private $data = [];
@@ -40,18 +41,26 @@ class Pdbapenda extends CI_Controller {
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = '';
+	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
+
     $tanggal = $this->input->post('tanggal');
+	$data['format_tanggal'] = strftime('%d %B %Y', strtotime($tanggal));
     
 	$tanda_tangan = $this->input->post('tanda_tangan');
-	$ttddetail = $this->db
-	->select('id, nama, nip, jabatan1, jabatan2')
-	->from('mst_tandatangan')
-	->where('id', $tanda_tangan)
-	->get()
-	->row_array();
-	$data['tanda_tangan'] = $ttddetail;
+	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
 	
+	if($ttd_checkbox && $tanda_tangan){
+		$ttddetail = $this->db
+		->select('id, nama, nip, jabatan1, jabatan2')
+		->from('mst_tandatangan')
+		->where('id', $tanda_tangan)
+		->get()
+		->row_array();
+		$data['tanda_tangan'] = $ttddetail;
+	}
+	$data['ttd_checkbox'] = $ttd_checkbox;
 	$data['tablenya'] = $this->MPbapenda->get_data_bapenda($tanggal);
+	
 	$html = $this->load->view('ikhtisar/printbap', $data, true);
 
 	$dompdf = new Dompdf();

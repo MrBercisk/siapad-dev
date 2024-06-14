@@ -22,7 +22,7 @@ class RelBphtb extends CI_Controller {
 	 	$data['jsedit']		= NULL;
 	 	$data['jsdelete']	= NULL;
 		$data['forminsert'] = implode($this->MrincObj->formInsert());
-		$this->load->view('laporan/rladaerah',$data);
+		$this->load->view('laporan/rincobj',$data);
 	}
 	public function printLap() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {

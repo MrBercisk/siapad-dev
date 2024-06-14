@@ -37,12 +37,17 @@ class Ropendapatan extends CI_Controller {
     $data['link'] 	  = $setpage->link;
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
-    $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
 	$tanggal = $this->input->post('tanggal');
-	$data['tablenya'] = $this->MBkBesar->get_laporan_hari($tanggal);
+	
+	$data['blnpajak'] = $this->input->post('blnpajak');
+	$data['tahun'] = $this->input->post('tahun');
+	$tahun = $this->input->post('tahun');
+	$data['rekening'] = $this->input->post('rekening');
+
+	$data['tablenya'] = $this->Mropendapatan->get_laporan_hari($tanggal);
 
     ob_start();
-    $this->load->view('laporan/printbphtb', $data);
+    $this->load->view('ikhtisar/printlopen', $data);
     echo ob_get_clean();
 }
 

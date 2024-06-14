@@ -50,11 +50,18 @@
     </style>
 </head>
 <body>
+<?php
+setlocale(LC_ALL, 'id-ID', 'id_ID');
+ $tanggal_saat_ini = strftime('%d %B %Y'); 
+ $tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($format_tanggal)));
+ $tanggal_sebelumnya_display = strftime('%d %B %Y', strtotime($tanggal_sebelumnya));
+ $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
+?>
 <div class="header">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h4>IKHTISAR PENDAPATAN PAJAK HARIAN</h4>
-    <h4>TANGGAL <?= strftime('%d %B %Y') ?></h4>
+    <h4>TANGGAL <?= $format_tanggal ?></h4>
 </div>
 <table class="table-container">
     <thead>
@@ -72,8 +79,6 @@
     </thead>
     <tbody>
     <?php
-        $tanggal_saat_ini = strftime('%d %B %Y'); 
-        $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
         if (!empty($tablenya)):
             foreach($tablenya as $tbl): ?>
                 <tr>
@@ -91,11 +96,21 @@
                 <tr class="nmrek2-row">
                     <td colspan="9"><?= htmlspecialchars($tbl['nmrek2'])?></td>
                 </tr>
+                <tr>
+                    <td></td>
+                    <td>Penerimaan Hari Ini</td>
+                    <td colspan="4"></td>
+                    <td colspan="3"></td>
+                    <td></td>
+                </tr>
                 <?php endif; ?>
             <?php endforeach; ?>
         <?php endif; ?>
     </tbody>
 </table>
+<div class="tgl_cetak">
+        <p>Bandar Lampung, <?= $tgl_cetak_format; ?></p>
+    </div>
 <?php if (!empty($tanda_tangan)) : ?>
     <div class="signature">
         <p><?= $tanda_tangan['jabatan1'] ?>,</p>
@@ -104,7 +119,5 @@
         <p>NIP. <?= $tanda_tangan['nip'] ?></p>
     </div>
 <?php endif; ?>
-    </tbody>
-</table>
 </body>
 </html>

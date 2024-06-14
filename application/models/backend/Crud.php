@@ -36,7 +36,6 @@ class Crud extends CI_Model {
     public function getUptds() {
         return $this->db->get('mst_updt')->result();
     }
-    
 
 }
 

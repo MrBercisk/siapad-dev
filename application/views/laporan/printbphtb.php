@@ -67,12 +67,14 @@
 <?php
 setlocale(LC_ALL, 'id-ID', 'id_ID');
         $tanggal_saat_ini = strftime('%d %B %Y'); 
-        $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
+        $tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($format_tanggal)));
+        $tanggal_sebelumnya_display = strftime('%d %B %Y', strtotime($tanggal_sebelumnya));
+        $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
 ?>
 <div class="header">
     <h2>LAPORAN HARIAN REALISASI PAJAK BAPENDA</h2>
     <h3>BEA PEROLEHAN HAK ATAS TANAH DAN BANGUNAN (BPHTB)</h3>
-    <h3>TANGGAL <?= strftime('%d %B %Y') ?></h3>
+    <h3>TANGGAL <?= $format_tanggal ?></h3>
 </div>
 <table>
     <thead>
@@ -101,30 +103,28 @@ setlocale(LC_ALL, 'id-ID', 'id_ID');
                 <tr>
                     <td></td>
                     <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td colspan="3">Jumlah Per <?= $tanggal_saat_ini ?> </td>
+                    <td colspan="3">Jumlah Per <?= $format_tanggal; ?> </td>
                     <td><?= number_format($tbl['total'], 2); ?></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td colspan="3">Jumlah s.d. <?= $tanggal_sebelumnya ?> </td>
+                    <td colspan="3">Jumlah s.d. <?= $tanggal_sebelumnya_display ?> </td>
                     <td><?= number_format($tbl['total'] + $tbl['saldoawal'], 2);?></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td colspan="3">Jumlah s.d. <?= $tanggal_saat_ini ?> </td>
+                    <td colspan="3">Jumlah s.d. <?= $format_tanggal; ?> </td>
                     <td><?= number_format($tbl['saldoawal'], 2, ',', '.') ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>
     </tbody>
 </table>
-<?php if(!empty($tgl_cetak)): ?>
     <div class="tgl_cetak">
-        <p>Bandar Lampung, <?= strftime('%d %B %Y')?></p>
+        <p>Bandar Lampung, <?= $tgl_cetak_format; ?></p>
     </div>
-<?php endif; ?>
 
 <?php if (!empty($tanda_tangan)) : ?>
     <div class="signature">
