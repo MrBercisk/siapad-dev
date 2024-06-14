@@ -84,51 +84,10 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>IKHTISAR PENDAPATAN RINCIAN OBJEK PENDAPATAN</h3>
-    <h3>PAJAK RESTORAN</h3>
+    <h3><?= $rekening ?></h3>
     <h3>BULAN <?= $bulan; ?>-<?= $tahun ?></h3>
 </div>
-<table>
-    
-    <thead>
-        <tr>
-            <th rowspan="2">KODE REKENING</th>
-            <th rowspan="2">URAIAN AKUN</th>
-            <th rowspan="2">APBD</th>
-            <?php if ($apbdp_checkbox): ?>
-                <th rowspan="2">APBDP</th>
-            <?php endif; ?>
-            <th colspan="4">REALISASI PENDAPATAN</th>
-            <th colspan="2">SISA LEBIH / KURANG</th>
-        </tr>
-        <tr>
-            <th>S.D HARI LALU</th>
-            <th>HARI INI</th>
-            <th>S.D HARI INI</th>
-            <th>%</th>
-            <th>JUMLAH</th>
-            <th>%</th>
-        </tr>
-        <tr>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <?php if ($apbdp_checkbox): ?>
-                <th>4</th>
-            <?php endif; ?>
-            <th>5</th>
-            <th>6</th>
-            <th>7</th>
-            <th>8</th>
-            <th>9</th>
-            <th>10</th>
-        </tr>
-    </thead>
-    <tbody>
-    
-</tbody>
 
-
-</table>
 <?php if(!empty($tgl_cetak)): ?>
     <div class="tgl_cetak">
         <p>Bandar Lampung, <?= strftime('%d %B %Y') ?></p>

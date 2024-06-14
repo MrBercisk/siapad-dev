@@ -47,7 +47,6 @@ class RelBphtb extends CI_Controller {
 	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
 	
 	$tanggal = $this->input->post('tanggal');
-
 	$data['format_tanggal'] = strftime('%d %B %Y', strtotime($tanggal));
 	
 	$tanda_tangan = $this->input->post('tanda_tangan');
@@ -65,7 +64,9 @@ class RelBphtb extends CI_Controller {
 	$data['ttd_checkbox'] = $ttd_checkbox;
 	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
 	
+	ob_start();
 	$html = $this->load->view('laporan/printbphtb', $data, true);
+	ob_get_clean();
 
 	$dompdf = new Dompdf();
 	$dompdf->loadHtml($html);

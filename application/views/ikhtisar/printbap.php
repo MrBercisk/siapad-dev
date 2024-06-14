@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Ikhtisar Pendapatan Pajak Harian</title>
     <style>
+        
         body {
             font-family: Arial, sans-serif;
         }
@@ -19,28 +20,41 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        .table-container {
+        table {
             width: 100%;
-            margin-top: 20px;
             border-collapse: collapse;
+            margin-top: 20px;
         }
-        .table-container, .table-container th, .table-container td {
+        table, th, td {
             border: 1px solid black;
         }
-        .table-container th, .table-container td {
+        th, td {
             padding: 8px;
             text-align: center;
         }
-        .table-container th {
+        th {
             background-color: #f2f2f2;
+        }
+        .tgl_cetak p{
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 110px;
+            margin-right: 20px;
+            position: relative;
+            float: right;
+            clear: both;
         }
         .signature {
             font-weight: bold;
             text-align: center;
             margin-top: 60px;
+            margin-right: 20px;
             position: relative;
             float: right;
             clear: both;
+        }
+        .signature .jabatan1{
+            margin-top: 30px;
         }
         .signature .name {
             text-decoration: underline;
@@ -66,6 +80,7 @@ setlocale(LC_ALL, 'id-ID', 'id_ID');
 <table class="table-container">
     <thead>
         <tr>
+            <th>NO</th>
             <th>JENIS PENERIMAAN</th>
             <th>UPT</th>
             <th>MASA PAJAK</th>
@@ -76,12 +91,27 @@ setlocale(LC_ALL, 'id-ID', 'id_ID');
             <th>JUMLAH YG DIBAYAR</th>
             <th>KETERANGAN</th>
         </tr>
+        <tr>
+            <th></th>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+          </tr>
     </thead>
     <tbody>
     <?php
         if (!empty($tablenya)):
+            $no = 1;
             foreach($tablenya as $tbl): ?>
+                
                 <tr>
+                    <td><?= $no++ ?></td>
                     <td><?= htmlspecialchars($tbl['nmrek1'])?></td>
                     <td><?= htmlspecialchars($tbl['upt'])?></td>
                     <td><?= htmlspecialchars($tbl['nomor'])?></td>
@@ -95,13 +125,6 @@ setlocale(LC_ALL, 'id-ID', 'id_ID');
                 <?php if (!empty($tbl['nmrek2'])): ?>
                 <tr class="nmrek2-row">
                     <td colspan="9"><?= htmlspecialchars($tbl['nmrek2'])?></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Penerimaan Hari Ini</td>
-                    <td colspan="4"></td>
-                    <td colspan="3"></td>
-                    <td></td>
                 </tr>
                 <?php endif; ?>
             <?php endforeach; ?>

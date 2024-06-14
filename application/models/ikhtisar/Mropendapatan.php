@@ -51,7 +51,7 @@ class Mropendapatan extends CI_Model {
                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="bulan">Bulan:</label>
-                            <select class="form-control" id="blnpajak" name="blnpajak" required>
+                            <select class="form-control" id="bulan" name="bulan" required>
                                 <option value="" disabled selected>Pilih Bulan</option>
                                 <option value="01">Januari</option>
                                 <option value="02">Februari</option>

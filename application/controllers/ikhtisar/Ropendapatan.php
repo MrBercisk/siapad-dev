@@ -39,12 +39,23 @@ class Ropendapatan extends CI_Controller {
     $data['sidebar']  = $template['sidebar'];
 	$tanggal = $this->input->post('tanggal');
 	
-	$data['blnpajak'] = $this->input->post('blnpajak');
+	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
+	$data['bulan'] = $this->input->post('bulan');
 	$data['tahun'] = $this->input->post('tahun');
-	$tahun = $this->input->post('tahun');
 	$data['rekening'] = $this->input->post('rekening');
+	$tanda_tangan = $this->input->post('tanda_tangan');
+	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
 
-	$data['tablenya'] = $this->Mropendapatan->get_laporan_hari($tanggal);
+	if($ttd_checkbox && $tanda_tangan){
+		$ttddetail = $this->db
+		->select('id, nama, nip, jabatan1, jabatan2')
+		->from('mst_tandatangan')
+		->where('id', $tanda_tangan)
+		->get()
+		->row_array();
+		$data['tanda_tangan'] = $ttddetail;
+	}
+	$data['ttd_checkbox'] = $ttd_checkbox;
 
     ob_start();
     $this->load->view('ikhtisar/printlopen', $data);

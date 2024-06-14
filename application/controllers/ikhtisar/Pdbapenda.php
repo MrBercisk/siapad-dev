@@ -41,6 +41,7 @@ class Pdbapenda extends CI_Controller {
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = '';
+	
 	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
 
     $tanggal = $this->input->post('tanggal');

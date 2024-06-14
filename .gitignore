@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 */config/development
 */logs/log-*.php
 !*/logs/index.html
@@ -19,3 +20,6 @@ application/logs/*
 
 /siapda_dump_tedy.sql
 /siapad_dump_2.sql
+=======
+*.sql
+>>>>>>> 6d6bb67730920dd3f622eb2939468271db0646c4
