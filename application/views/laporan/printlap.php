@@ -122,101 +122,44 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
         </tr>
     </thead>
     <tbody>
-        <?php if (!empty($tablenya)):
-            $row_count = 0;
-            foreach($tablenya as $tbl):
-                $row_count++;
-        ?>
-                <tr>
-                    <td><?= htmlspecialchars($tbl['kdrekening']) ?></td>
-                    <td>
-                        <strong><?= htmlspecialchars($tbl['nmrek1']) ?></strong><br>
-                    </td>
-                    <td><?= number_format($tbl['apbd'], 2) ?></td>
-                    <?php if ($apbdp_checkbox): ?>
-                        <td><?= number_format($tbl['apbdp'], 2) ?></td>
-                    <?php endif; ?>
-                    <td><?= number_format($tbl['totlalu'], 2) ?></td>
-                    <td><?= number_format($tbl['totini'], 2) ?></td>
-                    <td><?= number_format($tbl['totlalu'] + $tbl['totini'], 2) ?></td>
-                    <td><?= ($tbl['apbd'] > 0) ? number_format((($tbl['totlalu'] + $tbl['totini']) / $tbl['apbd']) * 100, 2) : '0.00' ?></td>
-                    <td><?= number_format($tbl['apbd'] - ($tbl['totlalu'] + $tbl['totini']), 2) ?></td>
-                    <td><?= ($tbl['apbd'] > 0) ? number_format(($tbl['apbd'] - ($tbl['totlalu'] + $tbl['totini'])) / $tbl['apbd'] * 100, 2) : '0.00' ?></td>
-                </tr>
-                <tr>
-                    <td><?= htmlspecialchars($tbl['kdrek2']) ?></td>
-                    <td><?= htmlspecialchars($tbl['nmrek2']) ?></td>
-                    <td></td>
-                    <?php if ($apbdp_checkbox): ?>
+    <?php if (!empty($tablenya)): ?>
+        <?php foreach($tablenya as $tbl): ?>
+            <tr>
+                <td><?= htmlspecialchars($tbl['kdrekening']) ?></td>
+                <td><strong><?= htmlspecialchars($tbl['nmrek1']) ?></strong></td>
+                <td><?= number_format($tbl['apbd'], 2) ?></td>
+                <?php if ($apbdp_checkbox): ?>
+                    <td><?= number_format($tbl['apbdp'], 2) ?></td>
+                <?php endif; ?>
+                <td><?= number_format($tbl['totlalu'], 2) ?></td>
+                <td><?= number_format($tbl['totini'], 2) ?></td>
+                <td><?= number_format($tbl['totlalu'] + $tbl['totini'], 2) ?></td>
+                <td><?= ($tbl['apbd'] > 0) ? number_format((($tbl['totlalu'] + $tbl['totini']) / $tbl['apbd']) * 100, 2) : '0.00' ?></td>
+                <td><?= number_format($tbl['apbd'] - ($tbl['totlalu'] + $tbl['totini']), 2) ?></td>
+                <td><?= ($tbl['apbd'] > 0) ? number_format(($tbl['apbd'] - ($tbl['totlalu'] + $tbl['totini'])) / $tbl['apbd'] * 100, 2) : '0.00' ?></td>
+            </tr>
+            <?php for ($i = 2; $i <= 6; $i++): ?>
+                <?php if (!empty($tbl["kdrek$i"])): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($tbl["kdrek$i"]) ?></td>
+                        <td><?= htmlspecialchars($tbl["nmrek$i"]) ?></td>
                         <td></td>
-                    <?php endif; ?>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                               
-                </tr>
-                <tr>
-                    <td><?= htmlspecialchars($tbl['kdrek3']) ?></td>
-                    <td><?= htmlspecialchars($tbl['nmrek3']) ?></td>
-                    <td></td>
-                    <?php if ($apbdp_checkbox): ?>
+                        <?php if ($apbdp_checkbox): ?>
+                            <td></td>
+                        <?php endif; ?>
                         <td></td>
-                    <?php endif; ?>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>       
-                </tr>
-                <tr>
-                    <td><?= htmlspecialchars($tbl['kdrek4']) ?></td>
-                    <td><?= htmlspecialchars($tbl['nmrek4']) ?></td>
-                    <td></td>
-                    <?php if ($apbdp_checkbox): ?>
                         <td></td>
-                    <?php endif; ?>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>       
-                </tr>
-                <tr>
-                    <td><?= htmlspecialchars($tbl['kdrek5']) ?></td>
-                    <td><?= htmlspecialchars($tbl['nmrek5']) ?></td>
-                    <td></td>
-                    <?php if ($apbdp_checkbox): ?>
                         <td></td>
-                    <?php endif; ?>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>       
-                </tr>
-                <tr>
-                    <td><?= htmlspecialchars($tbl['kdrek6']) ?></td>
-                    <td><?= htmlspecialchars($tbl['nmrek6']) ?></td>
-                    <td></td>
-                    <?php if ($apbdp_checkbox): ?>
                         <td></td>
-                    <?php endif; ?>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>       
-                </tr>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </tbody>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                <?php endif; ?>
+            <?php endfor; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</tbody>
+
 </table>
 <?php if(!empty($tgl_cetak)): ?>
     <div class="tgl_cetak">

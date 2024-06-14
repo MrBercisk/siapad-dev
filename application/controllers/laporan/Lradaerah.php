@@ -64,6 +64,7 @@ class Lradaerah extends CI_Controller {
 	$data['apbdp_checkbox'] = $this->input->post('apbdp_checkbox') ? true : false;
 
 	$data['tablenya'] = $this->Mlradaerah->get_data_harian($tanggal);
+	
 	ob_start();
 	$html = $this->load->view('laporan/printlap', $data, true);
 	ob_clean();
