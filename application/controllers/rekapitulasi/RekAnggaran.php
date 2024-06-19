@@ -2,11 +2,13 @@
 use Dompdf\Dompdf;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
-class Ropendapatan extends CI_Controller {
-	private $data = [];
+
+date_default_timezone_set("Asia/Jakarta");
+
+class RekAnggaran extends CI_Controller {
 	public function __construct() {
         parent::__construct();
-		$this->load->model('ikhtisar/Mropendapatan');
+		$this->load->model('rekapitulasi/MRekAnggaran');
     }
 	public function index()
 	{	
@@ -21,11 +23,8 @@ class Ropendapatan extends CI_Controller {
 		$data['modalEdit'] 	= [];
 		$data['modalDelete']= [];
 		$data['sidebar'] 	= $template['sidebar'];
-		$data['jstable']	= NULL;
-	 	$data['jsedit']		= NULL;
-	 	$data['jsdelete']	= NULL;
-		$data['forminsert'] = implode($this->Mropendapatan->formInsert());
-		$this->load->view('ikhtisar/ropend',$data);
+		$data['forminsert'] = implode($this->MRekAnggaran->formInsert());
+		$this->load->view('rekapitulasi/anggaran',$data);
 	}
 	public function cetak() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
@@ -40,21 +39,21 @@ class Ropendapatan extends CI_Controller {
     $data['link'] 	  = $setpage->link;
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
-	$tanggal = $this->input->post('tanggal');
-	
+   
 	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
-
-	$bulan =  $this->input->post('bulan');
-    $data['format_bulan'] = strftime('%B', strtotime($bulan));
-
-	$data['tahun'] = $this->input->post('tahun');
 	
-	$rekening = $this->input->post('rekening');
+	$tanggal = $this->input->post('tanggal');
+	$data['format_tanggal'] = strftime('%d %B %Y', strtotime($tanggal));
 	
 	$tanda_tangan = $this->input->post('tanda_tangan');
+
+    $bulan =  $this->input->post('bulan');
+    $data['format_bulan'] = strftime('%B', strtotime($bulan));
+    
+	$data['tahun'] = $this->input->post('tahun');
+    $rekening = $this->input->post('rekening');
 	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
 
-	
     if($rekening){
         $rekdetail = $this->db
         ->select('id,kdrekening, nmrekening')
@@ -74,10 +73,17 @@ class Ropendapatan extends CI_Controller {
 		$data['tanda_tangan'] = $ttddetail;
 	}
 	$data['ttd_checkbox'] = $ttd_checkbox;
+	/* $data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal); */
+	
+	ob_start();
+	$html = $this->load->view('rekapitulasi/printanggaran', $data, true);
+	ob_get_clean();
 
-    ob_start();
-    $this->load->view('ikhtisar/printlopen', $data);
-    echo ob_get_clean();
+	$dompdf = new Dompdf();
+	$dompdf->loadHtml($html);
+	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->render();
+	$dompdf->stream("rekap_angggaran.pdf", array("Attachment" => 0));
 }
 
 }

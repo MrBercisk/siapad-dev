@@ -60,8 +60,13 @@ class Pdbapenda extends CI_Controller {
 		$data['tanda_tangan'] = $ttddetail;
 	}
 	$data['ttd_checkbox'] = $ttd_checkbox;
-	$data['tablenya'] = $this->MPbapenda->get_data_bapenda($tanggal);
-	
+	$data['tablenya'] = $this->MPbapenda->get_data($tanggal);
+	/* $tablenya = $data['tablenya'];
+	echo "<pre>";
+	var_dump($tablenya);
+	echo "</pre>";
+	die(); */
+
 	$html = $this->load->view('ikhtisar/printbap', $data, true);
 
 	$dompdf = new Dompdf();

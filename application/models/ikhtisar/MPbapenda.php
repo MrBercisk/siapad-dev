@@ -11,6 +11,23 @@ class MPbapenda extends CI_Model {
             $nomor = $nomor % $value;
         }
     }
+    public function get_data($tanggal){
+        $date_format = explode('-', $tanggal);
+        $tahun = $date_format[0];
+        $bulan = $date_format[1];
+        $hari = $date_format[2];
+
+        $this->db->select('idstsmaster, nourut, nobukti, idrapbd, idwp, jumlah, tglpajak, blnpajak, thnpajak, apbd, keterangan,jumlah, prs_denda, nil_denda, total, mst_rekening.nmrekening, mst_uptd.singkat');
+        $this->db->from('trx_stsdetail');
+        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
+        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
+        $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
+        $this->db->where('tglpajak', $hari); 
+        $this->db->where('blnpajak', $bulan); 
+        /* $this->db->where('thnpajak', $tahun);  */
+        $query = $this->db->get();
+        return $query->result_array();
+    }
     public function get_data_bapenda($tanggal) {
         $query = $this->db->query("CALL spRptIkhtisarBPPRD(?)", array($tanggal));
         return $query->result_array();

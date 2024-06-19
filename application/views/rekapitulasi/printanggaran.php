@@ -83,12 +83,46 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
 <div class="header">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
-    <h3>IKHTISAR PENDAPATAN RINCIAN OBJEK PENDAPATAN</h3>
+    <h3>REKAPITULASI REALISASI ANGGARAN PENDAPATAN DAERAH</h3>
     <?php if (!empty($rekening)) : ?>
         <h3><?= $rekening['nmrekening'] ?></h3>
     <?php endif; ?>
-    <h3>BULAN <?= $format_bulan; ?> <?= $tahun ?></h3>
+    
+    <h3>PER : <?= $format_bulan; ?> <?= $tahun ?></h3>
 </div>
+<table>
+    <thead>
+        <tr>
+            <th>NO</th>
+            <th>TANGGAL TRANSAKSI</th>
+            <th>No. SPPD/STS</th>
+            <th>NAMA WAJIB PAJAK</th>
+            <th>MASA PAJAK</th>
+            <th>JUMLAH</th>
+            <th>KETERANGAN</th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+          </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>tes</td>
+            <td>tes</td>
+            <td>tes</td>
+            <td>tes</td>
+            <td>tes</td>
+            <td>tes</td>
+        </tr>
+    </tbody>
+</table>
 
 <?php if(!empty($tgl_cetak)): ?>
     <div class="tgl_cetak">

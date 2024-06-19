@@ -95,7 +95,7 @@ $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
 <table class="table-container">
     <thead>
         <tr>
-            <th>NO BUKTI</th>
+            <th>NO. BUKTI<br>(STS/NOTA DEBET/KREDIT)</th>
             <th>KODE REKENING</th>
             <th>URAIAN</th>
             <th>DINAS</th>
@@ -122,6 +122,23 @@ $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
         <?php endif; ?>
     </tbody>
 </table>
+<h4>Keterangan</h4>
+<table cellpadding="4">
+            
+            <tr>
+                <td style="width:20%;">Penerimaan Kasda</td>
+                <td style="width:40%;">Rp. 999.690.684.927,78</td>
+            </tr>
+            <tr>
+                <td style="width:20%;">PEMBIAYAAN</td>
+                <td style="width:40%;">Rp. 999.690.684.927,78</td>
+            </tr>
+            <tr>
+                <td style="width:30%;">Jumlah Pendapatan + Pembiayaan</td>
+                <td style="width:30%;">Rp. 1.007.550.565.412,16</td>
+            </tr>
+        </table>
+        <br><br>
 <div class="tgl_cetak">
         <p>Bandar Lampung, <?= $tgl_cetak_format; ?></p>
     </div>
