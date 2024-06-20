@@ -3,7 +3,6 @@ use Dompdf\Dompdf;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class Pdbapenda extends CI_Controller {
-	private $data = [];
 	public function __construct() {
         parent::__construct();
 		$this->load->model('ikhtisar/MPbapenda');

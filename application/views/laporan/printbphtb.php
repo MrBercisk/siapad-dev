@@ -64,13 +64,6 @@
     </style>
 </head>
 <body>
-<?php
-setlocale(LC_ALL, 'id-ID', 'id_ID');
-        $tanggal_saat_ini = strftime('%d %B %Y'); 
-        $tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($format_tanggal)));
-        $tanggal_sebelumnya_display = strftime('%d %B %Y', strtotime($tanggal_sebelumnya));
-        $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
-?>
 <div class="header">
     <h2>LAPORAN HARIAN REALISASI PAJAK BAPENDA</h2>
     <h3>BEA PEROLEHAN HAK ATAS TANAH DAN BANGUNAN (BPHTB)</h3>
@@ -86,52 +79,57 @@ setlocale(LC_ALL, 'id-ID', 'id_ID');
             <th>LOKASI OBJEK PAJAK</th>
             <th>JUMLAH SSPD (Rp)</th>
         </tr>
+        <tr>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                </tr>
     </thead>
     <tbody>
         <?php
         
         if (!empty($tablenya)):
             foreach($tablenya as $tbl): ?>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                </tr>
+                
                 <tr>
                     <td></td>
-                    <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td colspan="3">Jumlah Per <?= $format_tanggal; ?> </td>
-                    <td><?= number_format($tbl['total'], 2); ?></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td colspan="3">Jumlah s.d. <?= $tanggal_sebelumnya_display ?> </td>
-                    <td><?= number_format($tbl['total'] + $tbl['saldoawal'], 2);?></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td colspan="3">Jumlah s.d. <?= $format_tanggal; ?> </td>
-                    <td><?= number_format($tbl['saldoawal'], 2, ',', '.') ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['nosspd']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['formulir']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['namawp']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['nmuptd']) ?></td>
+                    <td><?= number_format($tbl['jumlsspd'], 2) ?></td>
                 </tr>
             <?php endforeach; ?>
+            <tr>
+                    <td></td>
+                    <td colspan="4">Jumlah Per <?= $format_tanggal; ?> </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="4">Jumlah s.d.  </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="4">Jumlah s.d. <?= $format_tanggal; ?> </td>
+                    <td></td>
+                </tr>
         <?php endif; ?>
     </tbody>
 </table>
-    <div class="tgl_cetak">
-        <p>Bandar Lampung, <?= $tgl_cetak_format; ?></p>
-    </div>
-
+<div class="tgl_cetak">
+    <p>Bandar Lampung, <?= $tgl_cetak_format ?></p>
+</div>
 <?php if (!empty($tanda_tangan)) : ?>
     <div class="signature">
-        <p class="jabatan1"><?= $tanda_tangan['jabatan1'] ?></p>
-        <p><?= $tanda_tangan['jabatan2'] ?>,</p>
-        <p class="name"><?= $tanda_tangan['nama'] ?></p>
-        <p>NIP. <?= $tanda_tangan['nip'] ?></p>
+        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?>,</p>
+        <p><?= htmlspecialchars($tanda_tangan['jabatan2']) ?>,</p>
+        <p class="name"><?= htmlspecialchars($tanda_tangan['nama']) ?></p>
+        <p>NIP. <?= htmlspecialchars($tanda_tangan['nip']) ?></p>
     </div>
 <?php endif; ?>
 </body>
