@@ -1,4 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
+use Dompdf\Dompdf;
+setlocale(LC_ALL, 'id-ID', 'id_ID');
+require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
+
+date_default_timezone_set("Asia/Jakarta");
 class RelBphtb extends CI_Controller {
 	private $data = [];
 	public function __construct() {
@@ -38,12 +43,36 @@ class RelBphtb extends CI_Controller {
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
     $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
+	
+	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
+	
 	$tanggal = $this->input->post('tanggal');
-	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
+	$data['format_tanggal'] = strftime('%d %B %Y', strtotime($tanggal));
+	
+	$tanda_tangan = $this->input->post('tanda_tangan');
+	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
 
-    ob_start();
-    $this->load->view('laporan/printbphtb', $data);
-    echo ob_get_clean();
+	if($ttd_checkbox && $tanda_tangan){
+		$ttddetail = $this->db
+		->select('id, nama, nip, jabatan1, jabatan2')
+		->from('mst_tandatangan')
+		->where('id', $tanda_tangan)
+		->get()
+		->row_array();
+		$data['tanda_tangan'] = $ttddetail;
+	}
+	$data['ttd_checkbox'] = $ttd_checkbox;
+	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
+	
+	ob_start();
+	$html = $this->load->view('laporan/printbphtb', $data, true);
+	ob_get_clean();
+
+	$dompdf = new Dompdf();
+	$dompdf->loadHtml($html);
+	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->render();
+	$dompdf->stream("laporan_bphtb.pdf", array("Attachment" => 0));
 }
 
 }

@@ -9,6 +9,42 @@ class Form extends CI_Model {
         </div>';
 		return $form;
 	}
+	public function inputCheckbox($id=NULL, $label=NULL, $value=NULL, $attrib=NULL) {
+		$checked = ($value == 1 || $value == 'true') ? 'checked' : ''; 
+		$form[] = '
+			<div class="form-group">
+				<div class="form-check">
+					<input type="hidden" name="'.$id.'" value="0">
+					<input type="checkbox" id="'.$id.'" name="'.$id.'" class="form-check-input" value="1" '.$checked.' '.$attrib.'>
+					<label class="form-check-label" for="'.$id.'">'.$label.'</label>
+				</div>
+			</div>';
+		return $form;
+	}
+	
+	public function inputPassword($id=NULL,$label=NULL,$value=NULL,$attrib=NULL) {
+		$form[]= '
+		<div class="form-group">
+           <label for="'.$id.'">'.$label.'</label>
+           <input type="password"  class="form-control" value="'.$value.'" id="'.$id.'" name="'.$id.'" '.$attrib.'>
+        </div>';
+		return $form;
+    }
+	public function inputEnumOptions($name, $label, $enum_values, $selected_value = '', $attributes = '') {
+        $options = '<div class="form-group">';
+        $options .= '<label for="'.$name.'">'.$label.'</label>';
+        $options .= '<select id="'.$name.'" name="'.$name.'" class="form-control" '.$attributes.'>';
+        
+        foreach ($enum_values as $value) {
+            $selected = ($value == $selected_value) ? 'selected' : '';
+            $options .= '<option value="'.$value.'" '.$selected.'>'.$value.'</option>';
+        }
+
+        $options .= '</select>';
+        $options .= '</div>';
+        
+        return $options;
+    }
 	public function selectText($id=NULL, $label=NULL, $table, $kolom, $value=NULL, $attrib=NULL, $where=NULL) {
 		$this->db->select($kolom); 
 		if ($where != NULL) {

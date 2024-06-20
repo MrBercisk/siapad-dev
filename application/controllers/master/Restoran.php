@@ -66,6 +66,17 @@ class Restoran extends CI_Controller {
 			case 'Edit':
 				$idnya = $this->input->post('idnya');
 				$idresto = $this->Crud->ambilSatu('mst_wprestoran', ['id' => $idnya]);
+				$wpdata = $this->db
+				->select('mst_wajibpajak.id, mst_wajibpajak.nama')
+				->from('mst_wajibpajak')
+				->join('mst_wprestoran', 'mst_wprestoran.idwp = mst_wajibpajak.id')
+				->get()
+				->result();
+				$opsiwp = '<option></option>';
+				foreach ($wpdata as $wp) {
+                    $selected = ($wp->id == $idresto->idwp) ? 'selected' : '';
+                    $opsiwp .= '<option value="'.$wp->id.'" '.$selected.'>'.$wp->nama.'</option>';
+                }
 				$form [] 	= '
 				<div class="row">
 					<div class="col-md-12">'
@@ -77,13 +88,12 @@ class Restoran extends CI_Controller {
 					<div class="col-md-12">'
 					.implode($this->Form->inputText('jmlkursi','JML Kursi',$idresto->jmlkursi)).
 				   '</div>
-				  <div class="col-md-12">
-                           <div class="form-group">
-                    <label for="wp">Resto</label>
-                    <select class="form-control select2" id="wp" name="wp" style="width: 100%;">
-                        <option value="">Pilih Nama Hotel</option>
-                    </select>
-               	 </div>  
+					 <div class="col-md-12">
+                            <label for="idwp">Nama Restoran</label>
+                            <select id="idwp" name="idwp" class="form-control select2" data-placeholder="Pilih Nama Restoran" style="width: 100%;">
+                                '.$opsiwp.'
+                            </select>
+                    </div>
 				   '
 				   .implode($this->Form->hiddenText('kode',$idresto->id)).'
 				</div>';
@@ -109,43 +119,43 @@ class Restoran extends CI_Controller {
 		$this->load->model('backend/Crud'); 
 		switch($aksi){
 			case 'Save':
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat'),
-							'urut'		=> $this->input->post('urut'),
-							'isdispenda'=> $this->input->post('isdispenda')];
-				$insert = $this->Crud->insert_data('mst_dinas', $data);
+				$data = [	'menu' 		=> $this->input->post('menu'),
+							'jmlmeja' 	=> $this->input->post('jmlmeja'),
+							'jmlkursi'		=> $this->input->post('jmlkursi'),
+							'idwp'=> $this->input->post('idwp')];
+				$insert = $this->Crud->insert_data('mst_wprestoran', $data);
 				if ($insert) {
 					$this->session->set_flashdata('message', 'Data has been saved successfully');
-					redirect('master/Dinas');
+					redirect('master/Restoran');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to save data');
-					redirect('master/Dinas');
+					redirect('master/Restoran');
 				}
 			break;
 			case 'Edit':
 				$kode = $this->input->post('kode');
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat'),
-							'urut'		=> $this->input->post('urut'),
-							'isdispenda'=> $this->input->post('isdispenda')];
-				$update = $this->Crud->update_data('mst_dinas', $data, ['id' => $kode]);
+				$data = [	'menu' 		=> $this->input->post('menu'),
+							'jmlmeja' 	=> $this->input->post('jmlmeja'),
+							'jmlkursi'		=> $this->input->post('jmlkursi'),
+							'idwp'=> $this->input->post('idwp')];
+				$update = $this->Crud->update_data('mst_wprestoran', $data, ['id' => $kode]);
 				if ($update) {
 					$this->session->set_flashdata('message', 'Data has been updated successfully');
-					redirect('master/Dinas');
+					redirect('master/Restoran');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to update data');
-					redirect('master/Dinas');
+					redirect('master/Restoran');
 				}
 			break;
 			case 'Delete':
 				$kode = $this->input->post('kode');
-				$delete = $this->Crud->delete_data('mst_dinas', ['id' => $kode]);
+				$delete = $this->Crud->delete_data('mst_wprestoran', ['id' => $kode]);
 				if ($delete) {
 					$this->session->set_flashdata('message', 'Data has been deleted successfully');
-					redirect('master/Dinas');
+					redirect('master/Restoran');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to delete data');
-					redirect('master/Dinas');
+					redirect('master/Restoran');
 				}
 			break;
 			default:

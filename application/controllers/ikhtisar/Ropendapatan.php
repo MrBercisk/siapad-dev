@@ -1,4 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
+use Dompdf\Dompdf;
+setlocale(LC_ALL, 'id-ID', 'id_ID');
+require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class Ropendapatan extends CI_Controller {
 	private $data = [];
 	public function __construct() {
@@ -37,12 +40,43 @@ class Ropendapatan extends CI_Controller {
     $data['link'] 	  = $setpage->link;
     $data['topbar']   = $template['topbar'];
     $data['sidebar']  = $template['sidebar'];
-    $data['jstable']  = ''; // $Jssetup->jsDatatable2('#ftf','Api/ApiLradaerah/fetch_data');
 	$tanggal = $this->input->post('tanggal');
-	$data['tablenya'] = $this->MBkBesar->get_laporan_hari($tanggal);
+	
+	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
+
+	$bulan =  $this->input->post('bulan');
+    $data['format_bulan'] = strftime('%B', strtotime($bulan));
+
+	$data['tahun'] = $this->input->post('tahun');
+	
+	$rekening = $this->input->post('rekening');
+	
+	$tanda_tangan = $this->input->post('tanda_tangan');
+	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
+
+	
+    if($rekening){
+        $rekdetail = $this->db
+        ->select('id,kdrekening, nmrekening')
+		->from('mst_rekening')
+		->where('id', $rekening)
+		->get()
+		->row_array();
+		$data['rekening'] = $rekdetail;
+    }
+	if($ttd_checkbox && $tanda_tangan){
+		$ttddetail = $this->db
+		->select('id, nama, nip, jabatan1, jabatan2')
+		->from('mst_tandatangan')
+		->where('id', $tanda_tangan)
+		->get()
+		->row_array();
+		$data['tanda_tangan'] = $ttddetail;
+	}
+	$data['ttd_checkbox'] = $ttd_checkbox;
 
     ob_start();
-    $this->load->view('laporan/printbphtb', $data);
+    $this->load->view('ikhtisar/printlopen', $data);
     echo ob_get_clean();
 }
 

@@ -2,8 +2,13 @@
 class MHotel extends CI_Model {
     
     public function formInsert(){
-        $wpdata = $this->db->get('mst_wajibpajak')->result();
-        $opsiwp = '';
+        $wpdata = $this->db
+        ->select('mst_wajibpajak.id, mst_wajibpajak.nama')
+        ->from('mst_wajibpajak')
+        ->join('mst_wphotel', 'mst_wphotel.idwp = mst_wajibpajak.id')
+        ->get()
+        ->result();
+        $opsiwp = '<option></option>';
         foreach ($wpdata as $wp) {
             $opsiwp .= '<option value="'.$wp->id.'">'.$wp->nama.'</option>';
         }
@@ -20,11 +25,11 @@ class MHotel extends CI_Model {
                     '.implode($this->Form->inputText('jmlkamar','Jml Kamar')).'
                 </div>
                 <div class="col-md-6">
-                <label for="idwp">Wajib Pajak</label>
-                <select id="idwp" name="idwp" class="form-control" style="width: 100%;">
-                    '.$opsiwp.'
-                </select>
-            </div>
+                        <label for="idwp">Nama Hotel</label>
+                       <select id="idwp" name="idwp" class="form-control select2" data-placeholder="Pilih Nama Hotel" style="width: 100%;">
+                            '.$opsiwp.'
+                        </select>
+                    </div>
               
                 <div class="col-md-12 text-center">
                     <div class="btn-group">

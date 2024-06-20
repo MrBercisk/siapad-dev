@@ -23,6 +23,7 @@ class WP extends CI_Controller {
 	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','master/WP/myModal','#modalkuD');
 	 	$data['jslurah']	= $Jssetup->jsKelurahan('master/WP/get_kelurahan','kecamatan','kelurahan');
 		$data['forminsert'] = $this->Mwp->formInsert();
+		
 		$this->load->view('master/WP',$data);
 	}
 	public function get_kelurahan() {

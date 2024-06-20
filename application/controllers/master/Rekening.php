@@ -62,26 +62,51 @@ class Rekening extends CI_Controller {
 		$wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:'.site_url('404'));
 		switch($wadi){
 			case 'Edit':
-				$joinTables  		= [];
-				$selectFields 		= 'id, nama, singkat, urut, isdispenda';
-				$kode 				= $this->Crud->gandengan('mst_dinas', $joinTables, $selectFields,'id="'.$this->input->post('idnya').'"')[0];
-				if($kode->isdispenda==0 || empty($kode->isdispenda)){
-					$kode->isdispenda = 0;
+				$idnya = $this->input->post('idnya');
+				$idrek = $this->Crud->ambilSatu('mst_rekening', ['id' => $idnya]);
+				$enumtipe = ['H', 'D'];
+				$enumjenis = ['HRH','REK','BPHTB','PPJ','AKUN','LAIN'];
+				$headerData = $this->db->get('mst_rekening')->result();
+				$opsiheader = '';
+				foreach ($headerData as $header) {
+					$opsiheader .= '<option value="'.$header->idheader.'">'.$header->nmrekening.' ('.$header->idheader.')</option>';
 				}
+
 				$form [] 	= '
 				<div class="row">
+				 <div class="col-md-12 ">
+                    <div class="form-group">
+                        <label for="idheader">Id Header</label>
+                        <select name="idheader" id="idheader" class="form-control select2" data-placeholder="Pilih Nama Rekening" style="width: 100%;">
+                            '.$opsiheader.'
+                        </select>
+                    </div>
+                </div>
 					<div class="col-md-12">'
-					.implode($this->Form->inputText('nama','Nama Dinas',$kode->nama)).
+					.implode($this->Form->inputText('kdrekening','Kode Rekening', $idrek->kdrekening)).
 				   '</div>
 					<div class="col-md-12">'
-					.implode($this->Form->inputText('singkat','Singkatan',$kode->singkat)).
+					.implode($this->Form->inputText('nmrekening','Nama Rekening',$idrek->nmrekening)).
 				   '</div>
 					<div class="col-md-12">'
-					.implode($this->Form->inputText('urut','No. Urut',$kode->urut)).
+					.implode($this->Form->inputText('kdrekview','Kode Rekview',$idrek->kdrekview)).
 				   '</div>
 					<div class="col-md-12">'
-					.implode($this->Form->inputText('isdispenda','Instdispenda',intval($kode->isdispenda))).
-				   '</div>'.implode($this->Form->hiddenText('kode',$kode->id)).'
+					.implode($this->Form->inputText('level','Level',$idrek->level)).
+				   '</div>
+					<div class="col-md-6">'
+					.$this->Form->inputEnumOptions('tipe', 'Tipe', $enumtipe).
+				   '</div>
+					<div class="col-md-6">'
+					.$this->Form->inputEnumOptions('jenis', 'Jenis', $enumjenis).
+				   '</div>
+					<div class="col-md-6">'
+					.implode($this->Form->inputCheckbox('islrauptd', 'islrauptd')).
+				   '</div>
+					<div class="col-md-6">'
+					.implode($this->Form->inputCheckbox('isinsidentil', 'isinsidentil')).
+				   '</div>
+					'.implode($this->Form->hiddenText('kode',$idrek->id)).'
 				</div>';
 				
 			break;
@@ -105,43 +130,55 @@ class Rekening extends CI_Controller {
 		$this->load->model('backend/Crud'); 
 		switch($aksi){
 			case 'Save':
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat'),
-							'urut'		=> $this->input->post('urut'),
-							'isdispenda'=> $this->input->post('isdispenda')];
-				$insert = $this->Crud->insert_data('mst_dinas', $data);
+				$data = [	'idheader' 		=> $this->input->post('idheader'),
+							'kdrekening' 		=> $this->input->post('kdrekening'),
+							'nmrekening' 		=> $this->input->post('nmrekening'),
+							'kdrekview' 		=> $this->input->post('kdrekview'),
+							'level' 	=> $this->input->post('level'),
+							'tipe'		=> $this->input->post('tipe'),
+							'jenis'=> $this->input->post('jenis'),
+							'islrauptd'=> $this->input->post('islrauptd'),
+							'isinsidentil'=> $this->input->post('isinsidentil'),
+						];
+				$insert = $this->Crud->insert_data('mst_rekening', $data);
 				if ($insert) {
 					$this->session->set_flashdata('message', 'Data has been saved successfully');
-					redirect('master/Dinas');
+					redirect('master/Rekening');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to save data');
-					redirect('master/Dinas');
+					redirect('master/Rekening ');
 				}
 			break;
 			case 'Edit':
 				$kode = $this->input->post('kode');
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat'),
-							'urut'		=> $this->input->post('urut'),
-							'isdispenda'=> $this->input->post('isdispenda')];
-				$update = $this->Crud->update_data('mst_dinas', $data, ['id' => $kode]);
+				$data = [	'idheader' 		=> $this->input->post('idheader'),
+							'kdrekening' 		=> $this->input->post('kdrekening'),
+							'nmrekening' 		=> $this->input->post('nmrekening'),
+							'kdrekview' 		=> $this->input->post('kdrekview'),
+							'level' 	=> $this->input->post('level'),
+							'tipe'		=> $this->input->post('tipe'),
+							'jenis'=> $this->input->post('jenis'),
+							'islrauptd'=> $this->input->post('islrauptd'),
+							'isinsidentil'=> $this->input->post('isinsidentil'),
+						];
+				$update = $this->Crud->update_data('mst_rekening', $data, ['id' => $kode]);
 				if ($update) {
 					$this->session->set_flashdata('message', 'Data has been updated successfully');
-					redirect('master/Dinas');
+					redirect('master/Rekening');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to update data');
-					redirect('master/Dinas');
+					redirect('master/Rekening');
 				}
 			break;
 			case 'Delete':
 				$kode = $this->input->post('kode');
-				$delete = $this->Crud->delete_data('mst_dinas', ['id' => $kode]);
+				$delete = $this->Crud->delete_data('mst_rekening', ['id' => $kode]);
 				if ($delete) {
 					$this->session->set_flashdata('message', 'Data has been deleted successfully');
-					redirect('master/Dinas');
+					redirect('master/Rekening');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to delete data');
-					redirect('master/Dinas');
+					redirect('master/Rekening');
 				}
 			break;
 			default:

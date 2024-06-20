@@ -8,7 +8,7 @@ endif;
 $theme['main'][] = implode($sidebar);
 $datatables = '<script type="text/javascript">
 $(document).ready(function(){
-	'.$jstable.$jsedit.$jsdelete.$jskecamatan.'  
+	'.$jstable.$jsedit.$jsdelete.'  
 });
 </script>
 <table class="table table-striped" style="width:100% !important;" id="ftf">
@@ -16,8 +16,8 @@ $(document).ready(function(){
      <tr>
          <th>NO</th>
          <th>KODE</th>
-         <th>KECAMATAN</th>
-		     <th>KELURAHAN</th>
+         <th>NAMA KELURAHAN</th>
+		     <th>KECAMATAN</th>
          <th></th>
      </tr>
    </thead>

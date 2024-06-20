@@ -136,11 +136,22 @@ class MLapBphtb extends CI_Model {
         return $result ? (float) $result->total : 0.00;
     }
     public function get_laporan_hari($tanggal){
-        $query = $this->db->query("CALL spRptBPHTBHarian(?)", array($tanggal));
+         $query = $this->db->query("CALL spRptBPHTBHarian('$tanggal')");
         return $query->result_array();
     }
+    
     public function formInsert() {
+        $ttddata = $this->db
+        ->select('mst_tandatangan.id, mst_tandatangan.nip, mst_tandatangan.nama, mst_tandatangan.jabatan1, mst_tandatangan.jabatan2')
+        ->from('mst_tandatangan')
+        ->get()
+        ->result();
+        $opsittd = '<option></option>';
+        foreach ($ttddata as $ttd) {
+            $opsittd .= '<option value="'.$ttd->id.'">'.$ttd->nama.'</option>';
+        }
         $form[] = '
+        
         <div class="card">
             <div class="card-body">
                 <form action="' . site_url('laporan/RelBphtb/cetak') . '" class="form-row" method="post">
@@ -162,51 +173,23 @@ class MLapBphtb extends CI_Model {
                             <input type="date" class="form-control" id="tgl_cetak" name="tgl_cetak" required>
                         </div>
                     </div>
-    
+
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="pg_break">Pg. Break:</label>
-                            <input type="text" class="form-control" id="pg_break" name="pg_break">
+                            <label for="ttd">Tanda Tangan:</label>
+                              <select id="tanda_tangan" name="tanda_tangan" class="form-control select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;">
+                                      '.$opsittd.'
+                              </select>
                         </div>
                     </div>
+    
                     </div>
                 </div>
-                
-                    <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
-                        <h5>Validator</h5>
-                    </div>
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="nama">Nama:</label>
-                                    <input type="text" class="form-control" id="nama" name="nama" value="Drs. YANWARDI, MM." required>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="nip">NIP:</label>
-                                    <input type="text" class="form-control" id="nip" name="nip" value="196401151986101001" required>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="jabatan">Jabatan:</label>
-                                    <input type="text" class="form-control" id="jabatan" name="jabatan" value="KEPALA BADAN PENGELOLA PAJAK DAN RETRIBUSI DAERAH" required>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="kota">Kota:</label>
-                                    <input type="text" class="form-control" id="kota" name="kota" value="KOTA BANDAR LAMPUNG" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    
                     <div class="col-md-1">
                         <label class="form-check-label" for="ttd">Penandatangan</label>
                         <div class="form-check">
-                           <input type="checkbox" class="form-check-input" id="ttd" name="ttd" checked>
+                           <input type="checkbox" class="form-check-input" id="ttd_checkbox" name="ttd_checkbox" checked>
                         <label class="form-check-label" for="ttd">Ttd</label>
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary">Cetak Laporan</button>

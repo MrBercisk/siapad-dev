@@ -2,7 +2,6 @@
 class UserManagement extends CI_Controller {
 	public function __construct() {
         parent::__construct();
-		$this->load->model('backend/Location');
 		$this->load->model('master/Muser');
     }
 	public function index()
@@ -21,7 +20,7 @@ class UserManagement extends CI_Controller {
 		$data['jstable']	= $Jssetup->jsDatatable('#ftf','master/UserManagement/getuser');
 		$data['jsedit']		= $Jssetup->jsModal('#edit','Edit','master/UserManagement/myModal','#modalkuE');
 	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','master/UserManagement/myModal','#modalkuD');
-		$data['forminsert'] = $this->Muser->formInsert();
+		$data['forminsert'] = implode($this->Muser->formInsert());
 		$this->load->view('master/user',$data);
 	}
 
@@ -29,8 +28,16 @@ class UserManagement extends CI_Controller {
     {
         $datatables = new Datatables();
 		$datatables->setTable("sys_user");
-        $datatables->setSelectColumn(["id","login","username", "role", "iduptd"]);
-        $datatables->setOrderColumn(["login", "username", "role"]);
+        $datatables->setSelectColumn([
+            "sys_user.id",
+            "sys_user.login",
+            "sys_user.username",
+            "sys_user.role",
+            "mst_uptd.nama as nama_uptd"
+        ]);
+        $datatables->setOrderColumn([null,"login", "username", "role", "nama"]);
+		$datatables->setSearchColumns(['login', 'username','role','nama']); 
+		$datatables->addJoin("mst_uptd", "sys_user.iduptd = mst_uptd.id", "left");
 		$fetch_data = $datatables->make_datatables();
         $data 		= array();
 		$no   		= 1;
@@ -40,7 +47,7 @@ class UserManagement extends CI_Controller {
 			$sub_array[] = $row->login;
             $sub_array[] = $row->username;
             $sub_array[] = $row->role;
-            $sub_array[] = $row->iduptd;
+            $sub_array[] = $row->nama_uptd;
 			$sub_array[] = implode('',$datatables->tombol($row->id));
             $data[] = $sub_array;
         }
@@ -54,16 +61,40 @@ class UserManagement extends CI_Controller {
     }
 	public function myModal(){
 		$wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:'.site_url('404'));
+		$idnya = $this->input->post('idnya');
+		$iduser = $this->Crud->ambilSatu('sys_user', ['id' => $idnya]);
 		switch($wadi){
 			case 'Edit':
+				$uptdData = $this->db->get('mst_uptd')->result();
+				$opsiuptd = '';
+				foreach ($uptdData as $uptd) {
+					$opsiuptd .= '<option value="'.$uptd->id.'">'.$uptd->nama.'</option>';
+				}
+				$enum = ['adm', 'man', 'opr','pjb','kadis','uptd','mhs','pjk','bpk'];
 				$form [] 	= '
 				<div class="row">
 					<div class="col-md-12">'
-					.implode($this->Form->inputText('login','Login', $kode->login)).
+					.implode($this->Form->inputText('login','Login', $iduser->login)).
 				   '</div>
 					<div class="col-md-12">'
-					.implode($this->Form->inputText('username','Username',$kode->username)).
-				   '</div>'.implode($this->Form->hiddenText('kode',$kode->id)).'
+					.implode($this->Form->inputText('username','Username',$iduser->username)).
+				   '</div>
+					<div class="col-md-12">'
+					.implode($this->Form->inputPassword('passwd','Password',$iduser->passwd)).
+				   '</div>
+					<div class="col-md-12">'
+					.$this->Form->inputEnumOptions('role', 'Role', $enum).
+				   '</div>
+				   <div class="col-md-6 offset-3">
+                    <div class="form-group">
+                        <label for="iduptd">Nama Kecamatan/UPTD</label>
+                        <select name="iduptd" id="iduptd" class="form-control">
+                            '.$opsiuptd.'
+                        </select>
+                    </div>
+                </div>
+				   '
+				   .implode($this->Form->hiddenText('kode',$iduser->id)).'
 				</div>';
 				
 			break;
@@ -87,39 +118,49 @@ class UserManagement extends CI_Controller {
 		$this->load->model('backend/Crud'); 
 		switch($aksi){
 			case 'Save':
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat')];
-				$insert = $this->Crud->insert_data('mst_uptd', $data);
+				$hash = md5($this->input->post('passwd'));
+				$data = [	'login' 	=> $this->input->post('login'),
+							'username' 	=> $this->input->post('username'),
+							'passwd' 	=> $hash,
+							'role ' 	=> $this->input->post('role'),
+							'iduptd' 	=> $this->input->post('iduptd'),
+						];
+				$insert = $this->Crud->insert_data('sys_user', $data);
 				if ($insert) {
 					$this->session->set_flashdata('message', 'Data has been saved successfully');
-					redirect('master/Uptd');
+					redirect('master/usermanagement');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to save data');
-					redirect('master/Uptd');
+					redirect('master/usermanagement');
 				}
 			break;
 			case 'Edit':
+				$hash = md5($this->input->post('passwd'));
 				$kode = $this->input->post('kode');
-				$data = [	'nama' 		=> $this->input->post('nama'),
-							'singkat' 	=> $this->input->post('singkat')];
-				$update = $this->Crud->update_data('mst_uptd', $data, ['id' => $kode]);
+				$data = [	'login' 	=> $this->input->post('login'),
+							'username' 	=> $this->input->post('username'),
+							'passwd' 	=> $hash,
+							'role ' 	=> $this->input->post('role'),
+							'iduptd' 	=> $this->input->post('iduptd'),
+						];
+				$update = $this->Crud->update_data('sys_user', $data, ['id' => $kode]);
 				if ($update) {
 					$this->session->set_flashdata('message', 'Data has been updated successfully');
-					redirect('master/Uptd');
+					redirect('master/usermanagement');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to update data');
-					redirect('master/Uptd');
+					redirect('master/usermanagement');
 				}
 			break;
 			case 'Delete':
 				$kode = $this->input->post('kode');
-				$delete = $this->Crud->delete_data('mst_uptd', ['id' => $kode]);
+				$delete = $this->Crud->delete_data('sys_user', ['id' => $kode]);
 				if ($delete) {
 					$this->session->set_flashdata('message', 'Data has been deleted successfully');
-					redirect('master/Uptd');
+					redirect('master/usermanagement');
 				} else {
 					$this->session->set_flashdata('message', 'Failed to delete data');
-					redirect('master/Uptd');
+					redirect('master/usermanagement');
 				}
 			break;
 			default:

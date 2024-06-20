@@ -21,54 +21,72 @@ class Kelurahan extends CI_Controller {
 		$data['jstable']	= $Jssetup->jsDatatable('#ftf','master/Kelurahan/getKel');
 	 	$data['jsedit']		= $Jssetup->jsModal('#edit','Edit','master/Kelurahan/myModal','#modalkuE');
 	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','master/Kelurahan/myModal','#modalkuD');
-	 	$data['jskecamatan']= $Jssetup->jsKecamatan('master/Kecamatan/json_Kecamatan');
 		$data['forminsert'] = implode($this->Mkelurahan->formInsert());
 		$this->load->view('master/kelurahan',$data);
 	}
 	public function getKel(){
-        $this->Datatables->setTable('mst_kelurahan');
-        $this->Datatables->setSelectColumn(['mst_kelurahan.id AS idkel', 'mst_kelurahan.kode AS kodekkel','mst_kelurahan.nama AS nama_kelurahan','mst_kecamatan.nama AS nama_kecamatan']);
-        $this->Datatables->setOrderColumn([null, 'mst_kelurahan.kode','mst_kelurahan.nama']);
-        $this->Datatables->setSearchColumns(['mst_kelurahan.nama', 'mst_kelurahan.nomor']);
-        $this->Datatables->addJoin('mst_kecamatan', 'mst_kecamatan.id= mst_kelurahan.idkecamatan');
-		$data = array();
-		$no   = 1;
-        $fetch_data				= $this->Datatables->make_datatables();
-        $filtered_data_count 	= $this->Datatables->get_filtered_data();
-        $total_data_count 		= $this->Datatables->get_all_data();
-		foreach ($fetch_data as $row) {
+		$datatables = new Datatables();
+		$datatables->setTable("mst_kelurahan");
+        $datatables->setSelectColumn([
+            "mst_kelurahan.id",
+            "mst_kelurahan.kode",
+            "mst_kelurahan.nama",
+            "mst_kecamatan.nama as nama_kecamatan"
+        ]);
+        $datatables->setOrderColumn([null, "mst_kelurahan.kode", "mst_kelurahan.nama", "mst_kelurahan.nama_kecamatan"]);
+		$datatables->setSearchColumns(['mst_kelurahan.kode', 'mst_kelurahan.nama', 'mst_kecamatan.nama']); 
+		$datatables->addJoin("mst_kecamatan", "mst_kelurahan.idkecamatan = mst_kecamatan.id", "left");
+		$fetch_data = $datatables->make_datatables();
+        $data 		= array();
+		$no   		= 1;
+        foreach ($fetch_data as $row) {
             $sub_array = array();
             $sub_array[] = $no++;
-			$sub_array[] = $row->kodekkel;
-			$sub_array[] = $row->nama_kecamatan;
-            $sub_array[] = $row->nama_kelurahan;
-			$sub_array[] = $this->Datatables->tombol($row->idkel);
+			$sub_array[] = $row->kode;
+            $sub_array[] = $row->nama;
+            $sub_array[] = $row->nama_kecamatan;
+			$sub_array[] = implode('',$datatables->tombol($row->id));
             $data[] = $sub_array;
         }
-        $response = array(
-            "draw" 				=> intval($this->input->post("draw")),
-            "recordsTotal" 		=> $total_data_count,
-            "recordsFiltered" 	=> $filtered_data_count,
-            "data" => $data
+        $output = array(
+            "draw" 			  => intval($_POST["draw"]),
+            "recordsTotal" 	  => $datatables->get_all_data(),
+            "recordsFiltered" => $datatables->get_filtered_data(),
+            "data" 			  => $data
         );
-
-        echo json_encode($response);
+        echo json_encode($output);
+       
     }
 	public function myModal(){
 		$wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:'.site_url('404'));
-		$kode = $this->Crud->ambilSatu('mst_kelurahan', ['id' => $this->input->post('idnya')]);
-		
+		$idnya = $this->input->post('idnya');
+		$idkel = $this->Crud->ambilSatu('mst_kelurahan', ['id' => $idnya]);
 		
 		switch($wadi){
 			case 'Edit':
+				$kecData = $this->db->get('mst_kecamatan')->result();
+				$opsikec = '';
+				foreach ($kecData as $kec) {
+					$opsikec .= '<option value="'.$kec->id.'">'.$kec->nama.'</option>';
+				}
 				$form [] = '
 				<div class="row">
 					<div class="col-md-12">
-					'.implode($this->Form->inputText('kode','Kode',$kode->kode)).'
+					'.implode($this->Form->inputText('kode','Kode',$idkel->kode)).'
 					</div>
 					<div class="col-md-12">
-					'.implode($this->Form->inputText('nama','Kecamatan',$kode->nama)).'
-					</div>'.implode($this->Form->hiddenText('kode',$kode->kode)).'
+					'.implode($this->Form->inputText('nama','Kelurahan',$idkel->nama)).'
+					</div>
+					 <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="iduptd">Nama Kecamatan</label>
+                        <select name="idkecamatan" id="idkecamatan" class="form-control">
+                            '.$opsikec.'
+                        </select>
+                    </div>
+                </div>
+					'
+					.implode($this->Form->hiddenText('kode',$idkel->kode)).'
 				</div>';
 				echo implode($form);
 			break;
@@ -111,6 +129,7 @@ class Kelurahan extends CI_Controller {
             $kode = $this->input->post('kode');
             $data = [
                 'nama' => $this->input->post('nama'),
+				'nama' 	=> $this->input->post('nama'),
 				'idkecamatan'=> $this->input->post('idkecamatan')
             ];
             $update = $this->Crud->update_data('mst_kelurahan', $data, ['kode' => $kode]);

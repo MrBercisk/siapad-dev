@@ -1,4 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
+
+date_default_timezone_set("Asia/Jakarta");
 class Msetup extends CI_Model {
 	public function loadTemplate($title = NULL,$link= NULL) {
 	$base 	  			= $this->setup();
