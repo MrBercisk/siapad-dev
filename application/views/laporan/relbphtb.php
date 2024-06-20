@@ -8,9 +8,6 @@ $theme['alert'][] ='<div class="alert alert-success">'.
 endif; 
 $theme['main'][] = implode($sidebar);
 $datatables = '<script type="text/javascript">
-$(document).ready(function(){
-	'.$jstable.$jsedit.$jsdelete.'  
-});
 </script>';
 $theme['main'][] = 
     '<div id="page-title" class="page-title" data-title="'.$title.'"></div>
@@ -32,7 +29,7 @@ $theme['main'][] =
               </div>
             </div>
 		</section>
-      </div>'.implode('',$modalEdit).implode('',$modalDelete);
+      </div>';
 echo preg_replace('/\r|\n|\t/', '', implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));
 
 ?>

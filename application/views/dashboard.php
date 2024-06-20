@@ -92,20 +92,7 @@ $theme['main'][] = '
 <div class="container">
 
 <div class="row">
-<div class="col-lg-4">
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title text-center">Card title</h5>
-  </div>
-</div>
-</div>
-<div class="col-lg-8">
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title text-center">Card title</h5>
-  </div>
-</div>
-</div>
+
 </div>
 </div>
 </section>

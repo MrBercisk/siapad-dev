@@ -26,24 +26,27 @@
         }
         table, th, td {
             border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
+            font-size: 12px;
         }
         th {
-            background-color: #f2f2f2;
+            padding: 5px;
+            text-align: center;
+        }
+        td{
+            text-align: right;
         }
         .tgl_cetak p{
+            font-size: 12px;
             text-align: center;
-            margin-top: 50px;
-            margin-bottom: 110px;
-            margin-right: 40px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            margin-right: 50px;
             position: relative;
             float: right;
             clear: both;
         }
         .signature {
+            font-size: 12px;
             font-weight: bold;
             text-align: center;
             margin-top: 60px;
@@ -64,20 +67,18 @@
 </head>
 <body>
 <?php
-setlocale(LC_ALL, 'id-ID', 'id_ID');
-$tanggal_saat_ini = strftime('%d %B %Y'); 
-$tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($format_tanggal)));
-$tanggal_sebelumnya_display = strftime('%d %B %Y', strtotime($tanggal_sebelumnya));
-$tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
-
 $total_hari_ini = 0;
 $total_sampai_hari_ini = 0;
+$total_hari_sebelumnya = 0;
+
 if (!empty($tablenya)):
     foreach($tablenya as $tbl) {
-        $total_hari_ini += $tbl['total'];
-        $total_sampai_hari_ini += $tbl['total']; // Modify this according to your data source for total until today
+        $total_hari_ini += $tbl['jumlahdibayar'];
+        $total_sampai_hari_ini += $tbl['jumlahdibayar']; 
     }
 endif;
+
+$total_sampai_hari_ini = $saldo + $total_hari_ini;
 ?>
 <div class="header">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
@@ -87,17 +88,23 @@ endif;
 </div>
 <table class="table-container">
     <thead>
+    <tr>
+            <th rowspan="3" class="center nowrap">NO</th>
+            <th rowspan="3" class="center nowrap">JENIS PENERIMAAN</th>
+            <th rowspan="3" class="center nowrap">UPT</th>
+            <th rowspan="3" class="center nowrap">MASA PAJAK</th>
+            <th colspan="4" class="center nowrap">SSPD / STS</th> 
+            <th rowspan="3" class="center nowrap">JUMLAH YG DIBAYAR</th>
+            <th rowspan="3" class="center nowrap">KETERANGAN</th>
+        </tr>
         <tr>
-            <th>NO</th>
-            <th>JENIS PENERIMAAN</th>
-            <th>UPT</th>
-            <th>MASA PAJAK</th>
-            <th>NOMOR</th>
-            <th>POKOK PAJAK</th>
-            <th>DENDA %</th>
-            <th>DENDA JUMLAH</th>
-            <th>JUMLAH YG DIBAYAR</th>
-            <th>KETERANGAN</th>
+            <th class="center nowrap" rowspan="2">NOMOR</th>
+            <th class="center nowrap" rowspan="2">POKOK PAJAK</th>
+            <th class="center nowrap" colspan="2">DENDA</th>
+        </tr>
+        <tr>
+            <th class="center nowrap">%</th>
+            <th class="center nowrap">JUMLAH</th>
         </tr>
         <tr>
             <th></th>
@@ -113,44 +120,68 @@ endif;
         </tr>
     </thead>
     <tbody>
-    <?php if (!empty($tablenya)): 
-        $no = 1;
-        foreach($tablenya as $tbl): ?>
-            <tr>
-                <td><?= $no++ ?></td>
-                <td><?= htmlspecialchars($tbl['nmrekening']) ?></td>
-                <td><?= htmlspecialchars($tbl['singkat']) ?></td>
-                <td></td>
-                <td><?= htmlspecialchars($tbl['nobukti']) ?></td>
-                <td><?= number_format($tbl['jumlah'], 2) ?></td>
-                <td><?= number_format($tbl['prs_denda'], 2) ?>%</td>
-                <td><?= number_format($tbl['nil_denda'], 2) ?></td>
-                <td><?= number_format($tbl['total'], 2) ?></td>
-                <td><?= htmlspecialchars($tbl['keterangan']) ?></td>
-            </tr>
+    <?php
+    $groupedData = [];
+    foreach($tablenya as $tbl) {
+        $idrekening = $tbl['idrekening'];
+        if (!isset($groupedData[$idrekening])) {
+            $groupedData[$idrekening] = [
+                'namarekening' => $tbl['namarekening'],
+                'wajibpajak' => []
+            ];
+        }
+        $groupedData[$idrekening]['wajibpajak'][] = $tbl;
+    }
+
+    $no = 1;
+    foreach($groupedData as $idrekening => $group):
+    ?>
+        <tr>
+            <td style="text-align: center;"><?= $this->MPbapenda->roman($no++) ?></td>
+            <td colspan="3" style="text-align: left; font-weight: bold;"><?= htmlspecialchars($group['namarekening']) ?></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <?php foreach($group['wajibpajak'] as $wp): ?>
+        <tr>
+            <td></td>
+            <td style="text-align: left;"><?= htmlspecialchars($wp['namawp']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($wp['singkatanupt']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($wp['blnpajak'] . ' - ' . $wp['thnpajak']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($wp['nomor']) ?></td>
+            <td><?= number_format($wp['pokokpajak'], 2) ?></td>
+            <td><?= number_format($wp['persendenda'], 2) ?>%</td>
+            <td><?= number_format($wp['jumlahdenda'], 2) ?></td>
+            <td><?= number_format($wp['jumlahdibayar'], 2) ?></td>
+            <td><?= htmlspecialchars($wp['keterangan']) ?></td>
+        </tr>
         <?php endforeach; ?>
-        <tr>
-            <td></td>
-            <td>Penerimaan Hari ini  :</td>
-            <td colspan="4"></td>
-            <td colspan="3"><b>Rp. </b></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Penerimaan Hari lalu :</td>
-            <td colspan="4"></td>
-            <td colspan="3"><b>Rp. </b></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Penerimaan s/d Hari ini :</td>
-            <td colspan="4"></td>
-            <td colspan="3"><b>Rp. <?= number_format($total_sampai_hari_ini, 2) ?></b></td>
-            <td></td>
-        </tr>
-    <?php endif; ?>
+    <?php endforeach; ?>
+    <tr>
+        <td></td>
+        <td style="text-align: left;"><b>Penerimaan Hari ini  :</b></td>
+        <td colspan="4"></td>
+        <td colspan="3"><b>Rp. <?= number_format($total_hari_ini, 2) ?></b></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td style="text-align: left;"><b>Penerimaan Hari lalu :</b></td>
+        <td colspan="4"></td>
+        <td colspan="3"><b>Rp. <?= number_format($saldo, 2) ?></b></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td style="text-align: left;" ><b>Penerimaan s/d Hari ini :</b></td>
+        <td colspan="4"></td>
+        <td colspan="3"><b>Rp. <?= number_format($total_sampai_hari_ini, 2) ?></b></td>
+        <td></td>
+    </tr>
     </tbody>
 </table>
 <div class="tgl_cetak">

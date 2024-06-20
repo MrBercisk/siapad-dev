@@ -50,15 +50,28 @@ class Msetup extends CI_Model {
 					}
 					
 					.main-sidebar .sidebar-menu li a.active {
-						background: linear-gradient(27deg, rgba(46, 7, 12, 1) 4%, rgb(152, 34, 34) 29%);
+						background: linear-gradient(27deg, 
+							rgba(46, 7, 12, 1) 4%, 
+							rgb(152, 34, 34) 29%, 
+							rgb(200, 50, 50) 50%, 
+							rgb(230, 100, 100) 75%, 
+							rgb(255, 150, 150) 100%
+						);
 						color: white;
 						border-radius: 10px;
 						padding: 10px
 					}
 				
-					.navbar-bg{
-					background: linear-gradient(27deg, rgba(46, 7, 12, 1) 4%, rgb(152, 34, 34) 29%);
+					.navbar-bg {
+						background: linear-gradient(27deg, 
+							rgba(46, 7, 12, 1) 4%, 
+							rgb(152, 34, 34) 29%, 
+							rgb(200, 50, 50) 50%, 
+							rgb(230, 100, 100) 75%, 
+							rgb(255, 150, 150) 100%
+						);
 					}
+
 				</style>
 				<!-- Start GA -->
 				<script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
@@ -297,6 +310,19 @@ class Msetup extends CI_Model {
         } else {
             return "Title Not Found";
         }
+    }
+	public function get_tanda_tangan($ttd_checkbox, $tanda_tangan) {
+        if ($ttd_checkbox && $tanda_tangan) {
+            $ttddetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $tanda_tangan)
+                ->get()
+                ->row_array();
+            
+            return $ttddetail;
+        }
+        return null;
     }
 }
 ?>

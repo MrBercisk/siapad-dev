@@ -111,7 +111,7 @@ class MLapBphtb extends CI_Model {
         ->join('mst_wajibpajak c', 'c.id = a.idwp')
         ->join('trx_rapbd d', 'd.id = a.idrapbd')
         ->join('mst_rekening e', 'e.id = d.idrekening')
-        ->left_join('mst_uptd f', 'f.id = a.iduptd')
+        ->join('mst_uptd f', 'f.id = a.iduptd')
         ->where('e.jenis', 'BPHTB')
         ->where('b.tanggal', $tanggal)
         ->where('b.tahun', $tahun);
@@ -135,7 +135,37 @@ class MLapBphtb extends CI_Model {
 
         return $result ? (float) $result->total : 0.00;
     }
-    public function get_laporan_hari($tanggal){
+    public function get_laporan_hari($tanggal)
+    {
+        $tahun = date('Y', strtotime($tanggal));
+
+        $this->db->select(
+            '
+             nobukti as nosspd, 
+             formulir, 
+             trx_stsdetail.nama as namapejabat,
+             trx_stsmaster.tanggal, 
+             blnpajak, 
+             thnpajak, 
+             jumlah as pokokpajak, 
+             total as jumlsspd,
+             IFNULL(mst_uptd.nama, \'-\') AS nmuptd,
+             mst_wajibpajak.nama as namawp,
+             mst_wajibpajak.id
+             ');
+             $this->db->from('trx_stsdetail');
+             $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
+             $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
+             $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
+             $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
+             $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
+             $this->db->where('trx_stsmaster.tanggal', $tanggal); 
+
+             $query = $this->db->get();
+             $results = $query->result_array();
+             return $results;
+    }
+    public function get_laporan_harii($tanggal){
          $query = $this->db->query("CALL spRptBPHTBHarian('$tanggal')");
         return $query->result_array();
     }
