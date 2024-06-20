@@ -1,33 +1,106 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class MPbapenda extends CI_Model {
-    public function romawi($no) {
-        $nomor = intval($no);
+    public function roman($num)
+    {
+        $n = intval($num);
         $result = '';
-        $lookup = ['M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90, 'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1];
-        foreach ($lookup as $angka => $value) {
-            $konversi = intval($nomor / $value);
-            $result .= str_repeat($angka, $konversi);
-            $nomor = $nomor % $value;
+        $numerals = array(
+            'M'  => 1000,
+            'CM' => 900,
+            'D'  => 500,
+            'CD' => 400,
+            'C'  => 100,
+            'XC' => 90,
+            'L'  => 50,
+            'XL' => 40,
+            'X'  => 10,
+            'IX' => 9,
+            'V'  => 5,
+            'IV' => 4,
+            'I'  => 1
+        );
+    
+        foreach ($numerals as $key => $value) {
+            $matches = intval($n / $value);
+            $result .= str_repeat($key, $matches);
+            $n = $n % $value;
         }
+    
+        return $result;
     }
-    public function get_data($tanggal){
+    public function get_data($tanggal) {
         $date_format = explode('-', $tanggal);
         $tahun = $date_format[0];
         $bulan = $date_format[1];
         $hari = $date_format[2];
 
-        $this->db->select('idstsmaster, nourut, nobukti, idrapbd, idwp, jumlah, tglpajak, blnpajak, thnpajak, apbd, keterangan,jumlah, prs_denda, nil_denda, total, mst_rekening.nmrekening, mst_uptd.singkat');
+        $this->db->select(
+           'idstsmaster, 
+            nobukti as nomor, 
+            idrapbd, 
+            tglpajak, 
+            blnpajak, 
+            thnpajak, 
+            keterangan, 
+            jumlah as pokokpajak, 
+            prs_denda as persendenda, 
+            nil_denda as jumlahdenda, 
+            total as jumlahdibayar, 
+            mst_rekening.nmrekening as namarekening, 
+            mst_uptd.singkat as singkatanupt, 
+            mst_wajibpajak.nama as namawp,
+            mst_wajibpajak.idrekening 
+            ');
         $this->db->from('trx_stsdetail');
         $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
         $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
         $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
+        $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
         $this->db->where('tglpajak', $hari); 
         $this->db->where('blnpajak', $bulan); 
-        /* $this->db->where('thnpajak', $tahun);  */
+        $this->db->where('thnpajak', $tahun);
+        $this->db->order_by('mst_rekening.id');
         $query = $this->db->get();
-        return $query->result_array();
+        $results = $query->result_array();
+        
+        $bulan_map = [
+            '01' => 'Januari',
+            '02' => 'Februari',
+            '03' => 'Maret',
+            '04' => 'April',
+            '05' => 'Mei',
+            '06' => 'Juni',
+            '07' => 'Juli',
+            '08' => 'Agustus',
+            '09' => 'September',
+            '10' => 'Oktober',
+            '11' => 'November',
+            '12' => 'Desember',
+        ];
+
+        foreach ($results as &$row) {
+            if (isset($bulan_map[$row['blnpajak']])) {
+                $row['blnpajak'] = $bulan_map[$row['blnpajak']];
+            }
+        }
+
+        return $results;
     }
+    public function get_saldo($tanggal) {
+        $date_format = explode('-', $tanggal);
+        $tahun = $date_format[0];
+        $hari = $date_format[2];
+        
+        $this->db->select_sum('total', 'saldo');
+        $this->db->where('thnpajak', $tahun);
+        $this->db->where('tglpajak <=', $hari);
+        $query = $this->db->get('trx_stsdetail');
+        
+        $result = $query->row();
+        return $result->saldo;
+    }
+    
     public function get_data_bapenda($tanggal) {
         $query = $this->db->query("CALL spRptIkhtisarBPPRD(?)", array($tanggal));
         return $query->result_array();
