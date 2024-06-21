@@ -27,18 +27,16 @@
         }
         table, th, td {
             border: 1px solid black;
+            font-size: 12px;
         }
         th {
-            padding: 10px;
+            padding: 5px;
             text-align: center;
-            font-size: 10px;
         }
-        td {
-            font-size: 10px;
+        td{
+            text-align: left;
         }
-        th {
-            background-color: #f2f2f2;
-        }
+     
         tbody td {
             text-align: right;
         }
@@ -49,7 +47,7 @@
         .tgl_cetak p {
             text-align: center;
             margin-top: 50px;
-            margin-bottom: 110px;
+            margin-bottom: 30px;
             margin-right: 70px;
             position: relative;
             float: right;
@@ -87,8 +85,54 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     <?php if (!empty($rekening)) : ?>
         <h3><?= $rekening['nmrekening'] ?></h3>
     <?php endif; ?>
-    <h3>BULAN <?= $format_bulan; ?> <?= $tahun ?></h3>
+    <h3>BULAN <?= $format_bulan; ?>-<?= $tahun ?></h3>
 </div>
+<table>
+    <thead>
+        <tr>
+            <th>NO</th>
+            <th>TANGGAL TRANSAKSI</th>
+            <th>WAJIB PAJAK</th>
+            <th>UPT</th>
+            <th>Tanggal Terbit SPTPD/SKP</th>
+            <th>NOMOR SPTPD/SKPD</th>
+            <th>MASA PAJAK</th>
+            <th>NOMOR</th>
+            <th>POKOK</th>
+            <th>DENDA</th>
+            <th>JUMLAH</th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+            <th>10</th>
+            <th>11</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+         if (!empty($tablenya)):
+            $no = 1;
+            foreach($tablenya as $tbl): ?>       
+                <tr>
+                    <td style="text-align: center;"><?= $no++ ?></td>
+                    <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
+                    <td><?= htmlspecialchars($tbl['formulir']) ?></td>
+                    <td><?= htmlspecialchars($tbl['namawp']) ?></td>
+                    <td><?= htmlspecialchars($tbl['nmuptd']) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['jumlsspd'], 2) ?></td>
+                </tr>
+            <?php endforeach; ?>        
+        <?php endif; ?>
+    </tbody>
+</table>
 
 <?php if(!empty($tgl_cetak)): ?>
     <div class="tgl_cetak">
