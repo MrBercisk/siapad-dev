@@ -126,7 +126,7 @@
 </div>
 <?php if (!empty($tanda_tangan)) : ?>
     <div class="signature">
-        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?>,</p>
+        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?></p>
         <p><?= htmlspecialchars($tanda_tangan['jabatan2']) ?>,</p>
         <p class="name"><?= htmlspecialchars($tanda_tangan['nama']) ?></p>
         <p>NIP. <?= htmlspecialchars($tanda_tangan['nip']) ?></p>

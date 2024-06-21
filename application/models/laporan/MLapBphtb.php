@@ -137,8 +137,7 @@ class MLapBphtb extends CI_Model {
     }
     public function get_laporan_hari($tanggal)
     {
-        $tahun = date('Y', strtotime($tanggal));
-
+   
         $this->db->select(
             '
              nobukti as nosspd, 
@@ -165,11 +164,8 @@ class MLapBphtb extends CI_Model {
              $results = $query->result_array();
              return $results;
     }
-    public function get_laporan_harii($tanggal){
-         $query = $this->db->query("CALL spRptBPHTBHarian('$tanggal')");
-        return $query->result_array();
-    }
-    
+/* 
+ */    
     public function formInsert() {
         $ttddata = $this->db
         ->select('mst_tandatangan.id, mst_tandatangan.nip, mst_tandatangan.nama, mst_tandatangan.jabatan1, mst_tandatangan.jabatan2')

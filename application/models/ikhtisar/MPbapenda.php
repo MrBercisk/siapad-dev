@@ -29,7 +29,32 @@ class MPbapenda extends CI_Model {
     
         return $result;
     }
-    public function get_data($tanggal) {
+    public function get_saldo_awal($tahun, $bulan, $iduptd = null) {
+        $this->db->select('SUM(a.total) as saldoawal')
+                 ->from('trx_stsdetail a')
+                 ->join('trx_stsmaster b', '
+				 b.id = a.idstsmaster')
+                 ->join('trx_rapbd c', 'c.id = a.idrapbd')
+                 ->join('mst_rekening d', 'd.id = c.idrekening')
+                 ->where('d.jenis', 'BPHTB')
+                 ->where('MONTH(b.tanggal) <', $bulan)
+                 ->where('b.tahun', $tahun);
+
+        if ($iduptd !== null) {
+            $this->db->where('a.iduptd', $iduptd);
+        }
+
+        $query = $this->db->get();
+        $result = $query->row();
+        return $result ? (float) $result->saldoawal : 0.00;
+    }
+    public function get_laporan_harian($tanggal)
+    {
+        $tahun = date('Y', strtotime($tanggal));
+        $saldoawal = $this->get_saldo_awal($tahun, $bulan, $iduptd);
+    }
+    
+    public function get_data_hari_ini($tanggal) {
         $date_format = explode('-', $tanggal);
         $tahun = $date_format[0];
         $bulan = $date_format[1];
@@ -42,7 +67,7 @@ class MPbapenda extends CI_Model {
             tglpajak, 
             blnpajak, 
             thnpajak, 
-            keterangan, 
+            trx_stsdetail.keterangan, 
             jumlah as pokokpajak, 
             prs_denda as persendenda, 
             nil_denda as jumlahdenda, 
@@ -50,17 +75,19 @@ class MPbapenda extends CI_Model {
             mst_rekening.nmrekening as namarekening, 
             mst_uptd.singkat as singkatanupt, 
             mst_wajibpajak.nama as namawp,
-            mst_wajibpajak.idrekening 
+            mst_wajibpajak.idrekening ,
+            trx_stsmaster.tahun,
             ');
         $this->db->from('trx_stsdetail');
+        $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
         $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
         $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
         $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
         $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
         $this->db->where('tglpajak', $hari); 
         $this->db->where('blnpajak', $bulan); 
-        $this->db->where('thnpajak', $tahun);
-        $this->db->order_by('mst_rekening.id');
+        $this->db->where('trx_stsmaster.tahun', $tahun);
+        /* $this->db->order_by('mst_rekening.id'); */
         $query = $this->db->get();
         $results = $query->result_array();
         
