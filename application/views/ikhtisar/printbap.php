@@ -121,67 +121,73 @@ $total_sampai_hari_ini = $saldo + $total_hari_ini;
     </thead>
     <tbody>
     <?php
-    $groupedData = [];
-    foreach($tablenya as $tbl) {
-        $idrekening = $tbl['idrekening'];
-        if (!isset($groupedData[$idrekening])) {
-            $groupedData[$idrekening] = [
-                'namarekening' => $tbl['namarekening'],
-                'wajibpajak' => []
-            ];
+        $groupedData = [];
+        foreach ($tablenya as $tbl) {
+            $idrekening = $tbl['idrekening'];
+            if (!isset($groupedData[$idrekening])) {
+                $groupedData[$idrekening] = [
+                    'namarekening' => $tbl['namarekening'],
+                    'wajibpajak' => []
+                ];
+            }
+            $groupedData[$idrekening]['wajibpajak'][] = $tbl;
         }
-        $groupedData[$idrekening]['wajibpajak'][] = $tbl;
-    }
 
-    $no = 1;
-    foreach($groupedData as $idrekening => $group):
-    ?>
+        $roman_no = 1;
+
+        foreach ($groupedData as $idrekening => $group):
+            ?>
+            <tr>
+                <td style="font-weight: bold; text-align:center">
+                    <?= $this->MPbapenda->roman($roman_no++) ?>
+                </td>
+                <td colspan="3" style="font-weight: bold; text-align: left;"><?= htmlspecialchars($group['namarekening']) ?></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <?php
+            foreach ($group['wajibpajak'] as $row): ?>
+                <tr>
+                    <td></td>
+                    <td style="text-align: left;"><?= htmlspecialchars($row['namawp']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($row['singkatanupt']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($row['blnpajak'] . ' - ' . $row['thnpajak']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($row['nomor']) ?></td>
+                    <td><?= number_format($row['pokokpajak'], 2) ?></td>
+                    <td><?= number_format($row['persendenda'], 2) ?>%</td>
+                    <td><?= number_format($row['jumlahdenda'], 2) ?></td>
+                    <td><?= number_format($row['jumlahdibayar'], 2) ?></td>
+                    <td><?= htmlspecialchars($row['keterangan']) ?></td>
+                </tr>
+            <?php endforeach;
+        endforeach;
+        ?>
+
         <tr>
-            <td style="text-align: center;"><?= $this->MPbapenda->roman($no++) ?></td>
-            <td colspan="3" style="text-align: left; font-weight: bold;"><?= htmlspecialchars($group['namarekening']) ?></td>
             <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td style="text-align: left;"><b>Penerimaan Hari ini  :</b></td>
+            <td colspan="4"></td>
+            <td colspan="3"><b>Rp. <?= number_format($total_hari_ini, 2) ?></b></td>
             <td></td>
         </tr>
-        <?php foreach($group['wajibpajak'] as $wp): ?>
         <tr>
             <td></td>
-            <td style="text-align: left;"><?= htmlspecialchars($wp['namawp']) ?></td>
-            <td style="text-align: center;"><?= htmlspecialchars($wp['singkatanupt']) ?></td>
-            <td style="text-align: center;"><?= htmlspecialchars($wp['blnpajak'] . ' - ' . $wp['thnpajak']) ?></td>
-            <td style="text-align: center;"><?= htmlspecialchars($wp['nomor']) ?></td>
-            <td><?= number_format($wp['pokokpajak'], 2) ?></td>
-            <td><?= number_format($wp['persendenda'], 2) ?>%</td>
-            <td><?= number_format($wp['jumlahdenda'], 2) ?></td>
-            <td><?= number_format($wp['jumlahdibayar'], 2) ?></td>
-            <td><?= htmlspecialchars($wp['keterangan']) ?></td>
+            <td style="text-align: left;"><b>Penerimaan Hari lalu :</b></td>
+            <td colspan="4"></td>
+            <td colspan="3"><b>Rp. <?= number_format($saldo, 2) ?></b></td>
+            <td></td>
         </tr>
-        <?php endforeach; ?>
-    <?php endforeach; ?>
-    <tr>
-        <td></td>
-        <td style="text-align: left;"><b>Penerimaan Hari ini  :</b></td>
-        <td colspan="4"></td>
-        <td colspan="3"><b>Rp. <?= number_format($total_hari_ini, 2) ?></b></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td style="text-align: left;"><b>Penerimaan Hari lalu :</b></td>
-        <td colspan="4"></td>
-        <td colspan="3"><b>Rp. <?= number_format($saldo, 2) ?></b></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td></td>
-        <td style="text-align: left;" ><b>Penerimaan s/d Hari ini :</b></td>
-        <td colspan="4"></td>
-        <td colspan="3"><b>Rp. <?= number_format($total_sampai_hari_ini, 2) ?></b></td>
-        <td></td>
-    </tr>
+        <tr>
+            <td></td>
+            <td style="text-align: left;" ><b>Penerimaan s/d Hari ini :</b></td>
+            <td colspan="4"></td>
+            <td colspan="3"><b>Rp. <?= number_format($total_sampai_hari_ini, 2) ?></b></td>
+            <td></td>
+        </tr>
     </tbody>
 </table>
 <div class="tgl_cetak">
@@ -189,7 +195,7 @@ $total_sampai_hari_ini = $saldo + $total_hari_ini;
 </div>
 <?php if (!empty($tanda_tangan)) : ?>
     <div class="signature">
-        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?></p>
+        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?>,</p>
         <p><?= htmlspecialchars($tanda_tangan['jabatan2']) ?>,</p>
         <p class="name"><?= htmlspecialchars($tanda_tangan['nama']) ?></p>
         <p>NIP. <?= htmlspecialchars($tanda_tangan['nip']) ?></p>

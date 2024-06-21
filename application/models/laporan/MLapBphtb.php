@@ -150,7 +150,9 @@ class MLapBphtb extends CI_Model {
              total as jumlsspd,
              IFNULL(mst_uptd.nama, \'-\') AS nmuptd,
              mst_wajibpajak.nama as namawp,
-             mst_wajibpajak.id
+             mst_wajibpajak.id,
+             trx_stsmaster.tahun,
+             trx_stsmaster.tanggal,
              ');
              $this->db->from('trx_stsdetail');
              $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
@@ -158,14 +160,15 @@ class MLapBphtb extends CI_Model {
              $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
              $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
              $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
-             $this->db->where('trx_stsmaster.tanggal', $tanggal); 
+             $this->db->where('mst_rekening.jenis', 'BPHTB'); 
+             $this->db->where('trx_stsmaster.tanggal', $tanggal);
+             $this->db->order_by('mst_rekening.id');
 
              $query = $this->db->get();
              $results = $query->result_array();
              return $results;
     }
-/* 
- */    
+ 
     public function formInsert() {
         $ttddata = $this->db
         ->select('mst_tandatangan.id, mst_tandatangan.nip, mst_tandatangan.nama, mst_tandatangan.jabatan1, mst_tandatangan.jabatan2')
