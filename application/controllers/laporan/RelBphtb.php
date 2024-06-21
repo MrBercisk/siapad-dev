@@ -5,7 +5,6 @@ require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 
 date_default_timezone_set("Asia/Jakarta");
 class RelBphtb extends CI_Controller {
-	private $data = [];
 	public function __construct() {
         parent::__construct();
 		$this->load->model('laporan/MLapBphtb');

@@ -26,13 +26,15 @@
         }
         table, th, td {
             border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
+            font-size: 12px;
         }
         th {
-            background-color: #f2f2f2;
+            padding: 5px;
+            text-align: center;
+        }
+       
+        td{
+            text-align: left;
         }
         .tgl_cetak p{
             text-align: center;
@@ -92,33 +94,34 @@
         <?php
         
         if (!empty($tablenya)):
+            $no = 1;
             foreach($tablenya as $tbl): ?>
                 
                 <tr>
-                    <td></td>
-                    <td style="text-align: center;"><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td style="text-align: center;"><?= htmlspecialchars($tbl['formulir']) ?></td>
-                    <td style="text-align: center;"><?= htmlspecialchars($tbl['namawp']) ?></td>
-                    <td style="text-align: center;"><?= htmlspecialchars($tbl['nmuptd']) ?></td>
-                    <td><?= number_format($tbl['jumlsspd'], 2) ?></td>
+                    <td style="text-align: center;"><?= $no++ ?></td>
+                    <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
+                    <td><?= htmlspecialchars($tbl['formulir']) ?></td>
+                    <td><?= htmlspecialchars($tbl['namawp']) ?></td>
+                    <td><?= htmlspecialchars($tbl['nmuptd']) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['jumlsspd'], 2) ?></td>
                 </tr>
-            <?php endforeach; ?>
-            <tr>
-                    <td></td>
-                    <td colspan="4">Jumlah Per <?= $format_tanggal; ?> </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td colspan="4">Jumlah s.d.  </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td colspan="4">Jumlah s.d. <?= $format_tanggal; ?> </td>
-                    <td></td>
-                </tr>
+            <?php endforeach; ?>        
         <?php endif; ?>
+                 <tr>
+                    <td></td>
+                    <td colspan="4"><b>Jumlah Per <?= $format_tanggal; ?></b> </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="4"><b>Jumlah s.d.  </b></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="4"><b>Jumlah s.d. <?= $format_tanggal; ?></b> </td>
+                    <td></td>
+                </tr>
     </tbody>
 </table>
 <div class="tgl_cetak">
@@ -126,7 +129,7 @@
 </div>
 <?php if (!empty($tanda_tangan)) : ?>
     <div class="signature">
-        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?>,</p>
+        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?></p>
         <p><?= htmlspecialchars($tanda_tangan['jabatan2']) ?>,</p>
         <p class="name"><?= htmlspecialchars($tanda_tangan['nama']) ?></p>
         <p>NIP. <?= htmlspecialchars($tanda_tangan['nip']) ?></p>

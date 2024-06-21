@@ -3,44 +3,46 @@ use Dompdf\Dompdf;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class Ropendapatan extends CI_Controller {
-	private $data = [];
 	public function __construct() {
         parent::__construct();
 		$this->load->model('ikhtisar/Mropendapatan');
     }
 	public function index()
 	{	
-		$Jssetup	= $this->Jssetup;
 		$base 		= $this->Msetup->setup();
 		$setpage	= $this->Msetup->get_title($base['halaman'].'/'.$base['fungsi']);
 		$template 	= $this->Msetup->loadTemplate($setpage->title);
-		$data['footer']		= $template['footer'];
-		$data['title'] 		= $setpage->title;
-		$data['link'] 		= $setpage->link;
-		$data['topbar'] 	= $template['topbar'];
-		$data['modalEdit'] 	= [];
-		$data['modalDelete']= [];
-		$data['sidebar'] 	= $template['sidebar'];
-		$data['jstable']	= NULL;
-	 	$data['jsedit']		= NULL;
-	 	$data['jsdelete']	= NULL;
-		$data['forminsert'] = implode($this->Mropendapatan->formInsert());
+		$data = [
+			'footer' => $template['footer'],
+			'topbar' => $template['topbar'],
+			'sidebar' => $template['sidebar'],
+			'title' => $setpage->title,
+			'link' => $setpage->link,
+			'forminsert' =>  implode($this->Mropendapatan->formInsert())
+		];
 		$this->load->view('ikhtisar/ropend',$data);
 	}
 	public function cetak() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
         redirect('404');
     }
-    $Jssetup 		  = $this->Jssetup;
     $base 			  = $this->Msetup->setup();
     $setpage 		  = $this->Msetup->get_title($base['halaman'] . '/' . $base['fungsi']);
     $template 		  = $this->Msetup->loadTemplate($setpage->title);
-    $data['footer']   = $template['footer'];
-    $data['title'] 	  = $setpage->title;
-    $data['link'] 	  = $setpage->link;
-    $data['topbar']   = $template['topbar'];
-    $data['sidebar']  = $template['sidebar'];
-	$tanggal = $this->input->post('tanggal');
+	
+	$tgl_cetak = $this->input->post('tgl_cetak');
+	$tanda_tangan = $this->input->post('tanda_tangan');
+	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
+	
+	$data = [
+		'footer' => $template['footer'],
+		'title' => $setpage->title,
+		'link' => $setpage->link,
+		'topbar' => $template['topbar'],
+		'sidebar' => $template['sidebar'],
+		'ttd_checkbox' => $ttd_checkbox,
+		'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
+	];
 	
 	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
 

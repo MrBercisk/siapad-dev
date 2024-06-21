@@ -1,6 +1,5 @@
-
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class Apbd extends CI_Controller {
+class PendDaerah extends CI_Controller {
 	public function __construct() {
         parent::__construct();
 		$this->load->model('backend/Location');
@@ -16,34 +15,31 @@ class Apbd extends CI_Controller {
 		$data['title'] 		= $setpage->title;
 		$data['link'] 		= $setpage->link;
 		$data['topbar'] 	= $template['topbar'];
-		$data['modalEdit'] 	= $this->Form->modalKu('E','Edit','transaksi/apbd/aksi',$actions = ['edit']);;
-		$data['modalDelete']= $this->Form->modalKu('D','Delete','transaksi/apbd/aksi',$actions = ['delete']);
+		$data['modalEdit'] 	= $this->Form->modalKu('E','Edit','transaksi/PendDaerah/aksi',$actions = ['edit']);;
+		$data['modalDelete']= $this->Form->modalKu('D','Delete','transaksi/PendDaerah/aksi',$actions = ['delete']);
 		$data['sidebar'] 	= $template['sidebar'];
-		$data['jstable']	= $Jssetup->jsDatatable('#ftf','transaksi/apbd/getDataApbd');
-	 	$data['jsedit']		= $Jssetup->jsModal('#edit','Edit','transaksi/apbd/myModal','#modalkuE');
-	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','transaksi/apbd/myModal','#modalkuD');
+		$data['jstable']	= $Jssetup->jsDatatable('#ftf','transaksi/PendDaerah/getDataPendDaerah');
+	 	$data['jsedit']		= $Jssetup->jsModal('#edit','Edit','transaksi/PendDaerah/myModal','#modalkuE');
+	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','transaksi/PendDaerah/myModal','#modalkuD');
 		$data['forminsert'] = $this->Mapbd->formInsert();
 		
-		$this->load->view('transaksi/apbd',$data);
+		$this->load->view('transaksi/pnddaerah',$data);
 	}
 	
-	public function getDataApbd() {
+	public function getDataPendDaerah() {
 		$datatables = $this->Datatables;
-		$datatables->setTable("trx_rapbd");
-
-        $dinas = $this->input->post('dinas');
-        $tahun = $this->input->post('tahun');
+		$datatables->setTable("trx_stsdetail");
 
         $datatables->setSelectColumn([
-            "trx_rapbd.id", 
-            "trx_rapbd.iddinas", 
+            "trx_stsdetail.idstsmaster", 
+            "trx_stsdetail.iddinas", 
             "mst_dinas.nama as namadinas", 
-            "trx_rapbd.tahun", 
-            "trx_rapbd.idrekening", 
+            "trx_stsdetail.tahun", 
+            "trx_stsdetail.idrekening", 
             "mst_rekening.nmrekening as namarekening", 
             "mst_rekening.kdrekening as koderekening", 
-            "trx_rapbd.apbd",
-            "trx_rapbd.apbdp"]);
+            "trx_stsdetail.apbd",
+            "trx_stsdetail.apbdp"]);
         $datatables->setOrderColumn([null, "namadinas", "tahun","namarekening","apbd","apbdp"]);
         $datatables->setSearchColumns(['mst_dinas.nama', 'mst_rekening.nmrekening', 'trx_rapbd.tahun','trx_rapbd.apbd']); 
         $datatables->addJoin("mst_dinas", "trx_rapbd.iddinas = mst_dinas.id", "left");
@@ -80,59 +76,43 @@ class Apbd extends CI_Controller {
     }
 	public function myModal(){
 		$wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:'.site_url('404'));
-		$idnya = $this->input->post('idnya');
-		$idapbd = $this->Crud->ambilSatu('trx_rapbd', ['id' => $idnya]);
 		switch($wadi){
 			case 'Edit':
-                $dinasData = $this->db->get('mst_dinas')->result();
-                $opsidin = '';
-                foreach ($dinasData as $din) {
-                    $opsidin .= '<option value="'.$din->id.'">'.$din->nama.'</option>';
-                }
-                $rekData = $this->db->get('mst_rekening')->result();
-                $opsirek = '';
-                foreach ($rekData as $rek) {
-                    $opsirek .= '<option value="'.$rek->id.'">'.$rek->nmrekening.'</option>';
-                }
-				$form [] 	= '
+		$joinTables  	= [	'mst_kelurahan b' => [
+							'condition' => 'a.idkelurahan = b.id',
+							'type' => 'LEFT'
+							],
+							'mst_kecamatan c' => [
+							'condition' => 'b.idkecamatan = c.id',
+							'type' => 'LEFT'
+							]];
+		$selectFields 	= 	'a.id as id_wp,nomor,a.nama as nama_wp,alamat,notype,idkecamatan,idkelurahan';
+		$kode 			= 	$this->Crud->gandengan('mst_wajibpajak a', $joinTables, $selectFields,'a.id="'.$this->input->post('idnya').'"')[0];
+				$Jssetup	= $this->Jssetup;
+				$form [] = '
 				<div class="row">
-					<div class="col-md-12">
-					<div class="form-group">
-                            <label for="iddinas">Nama Dinas</label>
-                            <select name="iddinas" id="iddinas" class="form-control select2" data-placeholder="Pilih Nama Dinas" style="width: 100%;">
-                                '.$opsidin.'
-                            </select>
-                        </div>
-				    </div>
-					<div class="col-md-12">
-                        <div class="form-group">
-                            <label for="tahun">Tahun:</label>
-                            <input type="number" class="form-control" id="tahun" name="tahun" min="1900" max="9999" value="2024" required>
-                        </div></div>
-					<div class="col-md-12">
-					    <div class="form-group">
-                            <label for="idrekening">Nama Rekening</label>
-                            <select name="idrekening" id="idrekening" class="form-control select2" data-placeholder="Pilih Nama Rekening" style="width: 100%;">
-                                '.$opsirek.'
-                            </select>
-                        </div>
-				    </div>
-					<div class="col-md-12"> 
-                        <div class="form-group">
-                            <label for="apbd">APBD</label>
-                            <input type="number" class="form-control" id="apbd" name="apbd" step="0.01" required>
-                        </div>	
-                    </div>
-					<div class="col-md-12"> 
-                        <div class="form-group">
-                            <label for="apbdp">APBDP</label>
-                            <input type="number" class="form-control" id="apbdp" name="apbdp" step="0.01" required>
-                        </div>
-                    </div>
-				   '
-				   .implode($this->Form->hiddenText('kode',$idapbd->id)).'
-				</div>';
-				
+					<div class="col-md-12">'
+					.implode($this->Form->inputText('nomor','NOP/SKP/NPWPD',$kode->nomor)).
+				   '</div>
+					<div class="col-md-12">'
+					.implode($this->Form->inputText('nama','NAMA',$kode->nama_wp)).
+				   '</div>
+					<div class="col-md-12">'
+					.implode($this->Form->inputText('alamat','ALAMAT',$kode->alamat)).
+				   '</div>
+					<div class="col-md-12">'
+					.implode($this->Form->inputText('no_type','Type Nomor',$kode->notype)).
+				   '</div>
+				    <div class="col-md-12">'
+					.
+				   '</div>'
+					.$this->Form->selectKec('kecamatanx','kelurahanx','Kecamatan','Kelurahan' ,$kode->idkecamatan, $kode->idkelurahan, 'col-md-12').implode($this->Form->hiddenText('kode',$kode->id_wp)).'
+				</div>
+				<script type="text/javascript">
+		'.$Jssetup->jsKelurahan('master/WP/get_kelurahan','kecamatanx','kelurahanx').'
+				</script>
+				';
+				echo implode($form);
 			break;
 			case 'Delete':
 				$form [] = '
@@ -142,13 +122,13 @@ class Apbd extends CI_Controller {
 					Apakah kamu yakin ingin menghapus data ini ?
 					</div>
 				</div>';
+				echo implode($form);
 			break;
 			default:
-				$form [] = 'NOTHING !!!';
+				echo 'NOTHING !!!';
 			break;
 		}
-        echo implode('',$form);
-    }
+	}
 	public function aksi(){
     $aksi = isset($_POST['AKSI']) ? $_POST['AKSI'] : header('location:'.site_url('404'));
     $this->load->model('backend/Crud'); 
@@ -204,4 +184,4 @@ class Apbd extends CI_Controller {
 }
 }
 ?>
-
+		

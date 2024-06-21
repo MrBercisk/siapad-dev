@@ -1,9 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Mropendapatan extends CI_Model {
-    public function get_laporan_hari($tanggal){
-       $query = $this->db->query("CALL spRptIkhtisarRinci(?)", array($tanggal));
-       return $query->result_array();
+    public function get_laporan_bulanan($tanggal){
+       
    }
    
     public function formInsert() {
@@ -36,12 +35,6 @@ class Mropendapatan extends CI_Model {
                 </div>
                 <div class="col-md-10">
                     <div class="row">
-                     <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="tanggal">Tanggal:</label>
-                        <input type="date" class="form-control" id="tanggal" name="tanggal" required>
-                    </div>
-                </div>
                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="tahun">Tahun:</label>
