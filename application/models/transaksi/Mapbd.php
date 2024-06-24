@@ -1,54 +1,24 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
-class Mapbd extends CI_Model {
-    public function formInsert(){
-        $dinasData = $this->db->get('mst_dinas')->result();
-        $opsidin = '';
-        foreach ($dinasData as $din) {
-            $opsidin .= '<option value="'.$din->id.'">'.$din->nama.'</option>';
-        }
-        $rekData = $this->db->get('mst_rekening')->result();
-        $opsirek = '';
-        foreach ($rekData as $rek) {
-            $opsirek .= '<option value="'.$rek->id.'">'.$rek->nmrekening.'</option>';
-        }
+<?php defined('BASEPATH') or exit('No direct script access allowed');
+class MApbd extends CI_Model
+{
+	public function formInsert()
+	{
 		$form[] = '
-			<form id="forminput" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/apbd/aksi').'" class="form-row">
+			<form id="forminput" class="form-row" method="post" enctype="multipart/form-data" action="' . site_url('master/Dinas/aksi') . '">
 				<div class="row">
-					<div class="col-md-6">
-                        <div class="form-group">
-                            <label for="iddinas">Nama Dinas</label>
-                            <select name="iddinas" id="iddinas" class="form-control select2" data-placeholder="Pilih Nama Dinas" style="width: 100%;">
-                                '.$opsidin.'
-                            </select>
-                        </div>
-                    </div>
-					<div class="col-md-6">
-                        <div class="form-group">
-                            <label for="tahun">Tahun:</label>
-                            <input type="number" class="form-control" id="tahun" name="tahun" min="1900" max="9999" value="2024" required>
-                        </div>
-                    </div>
-					<div class="col-md-6">
-                        <div class="form-group">
-                            <label for="idrekening">Nama Rekening</label>
-                            <select name="idrekening" id="idrekening" class="form-control select2" data-placeholder="Pilih Nama Rekening" style="width: 100%;">
-                                '.$opsirek.'
-                            </select>
-                        </div>
-                    </div>
-					<div class="col-md-6">
-                        <div class="form-group">
-                            <label for="apbd">APBD</label>
-                            <input type="number" class="form-control" id="apbd" name="apbd" step="0.01" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="apbdp">APBDP</label>
-                            <input type="number" class="form-control" id="apbdp" name="apbdp" step="0.01" required>
-                        </div>
-                    </div>
-				   <div class="col-md-12 text-center">
+					<div class="col-md-5 offset-1">'
+			. implode($this->Form->inputText('nama', 'Nama Dinas')) .
+			'</div>
+					<div class="col-md-5">'
+			. implode($this->Form->inputText('singkat', 'Singkatan')) .
+			'</div><div class="col-md-1"></div>
+					<div class="col-md-5 offset-1">'
+			. implode($this->Form->inputText('urut', 'No. Urut')) .
+			'</div>
+					<div class="col-md-5">'
+			. implode($this->Form->inputText('isdispenda', 'Type Nomor')) .
+			'</div><div class="col-md-1"></div>' .
+			'<div class="col-md-12 text-center">
 						<div class="btn-group">
 							<button class="btn btn-outline-danger mr-1" type="reset">
 								<i class="fa fa-undo"></i> Reset
@@ -58,9 +28,59 @@ class Mapbd extends CI_Model {
 							</button>
 						</div>
 					</div>
-					</di>
-               </form>
+				</di>
+             </form>
         </div>';
-		return implode('',$form);
+		return $form;
+	}
+
+	public function formCari()
+	{
+		$datadinas = $this->db
+			->select('nama, singkat, urut, id')
+			->from('mst_dinas')
+			->get()
+			->result();
+		$opsidinas = '<option></option>';
+		foreach ($datadinas as $dinas) {
+			$opsidinas .= '<option value="' . $dinas->id . '">' . $dinas->nama . '</option>';
+		}
+
+
+		$currentYear = (int)date('Y');
+		$lastFiveYears = '';
+		for ($i = 0; $i < 5; $i++) {
+			$lastFiveYears .= '<option value="' . ($currentYear - $i) . '">' . ($currentYear - $i) . '</option>';
+		}
+
+		$formCari[] = '
+			<div class="row ml-4 mr-3">	
+				<div class="col-8 colek">
+					<div class="form-group row mt-4">
+						<div class="col-sm-3">
+                                 <label for="dinas">Dinas</label>
+						</div>
+						<div class="col-sm-9">
+							<select id="dinas" name="dinas" class="form-control select2 " data-placeholder="Pilih Dinas">
+									' . $opsidinas . '
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-4 colek"> 
+					<div class="form-group row mt-4">
+						<div class="col-sm-3">
+									<label for="tahun">Tahun</label>
+						</div>
+						<div class="col-sm-9">
+							<select id="tahun" name="tahun" class="form-control" data-placeholder="Pilih Dinas">
+									' . $lastFiveYears . '
+							</select>
+						</div>
+					</div>
+				</div>
+		</div>
+		';
+		return $formCari;
 	}
 }
