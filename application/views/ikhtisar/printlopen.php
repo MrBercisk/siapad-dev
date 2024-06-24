@@ -123,9 +123,9 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
             foreach($tablenya as $tbl): ?>       
                 <tr>
                     <td style="text-align: center;"><?= $no++ ?></td>
-                    <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td><?= htmlspecialchars($tbl['formulir']) ?></td>
+                    <td><?= htmlspecialchars($tbl['tanggal']) ?></td>
                     <td><?= htmlspecialchars($tbl['namawp']) ?></td>
+                    <td><?= htmlspecialchars($tbl['singkatanupt']) ?></td>
                     <td><?= htmlspecialchars($tbl['nmuptd']) ?></td>
                     <td style="text-align: right;"><?= number_format($tbl['jumlsspd'], 2) ?></td>
                 </tr>

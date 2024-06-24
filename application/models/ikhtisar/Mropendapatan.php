@@ -1,8 +1,37 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Mropendapatan extends CI_Model {
-    public function get_laporan_bulanan($tanggal){
-       
+    public function get_laporan_bulanan($bulan){
+        $this->db->select(
+            '
+             nobukti as nosspd, 
+             formulir, 
+             trx_stsdetail.nama as namapejabat,
+             trx_stsmaster.tanggal, 
+             blnpajak, 
+             thnpajak, 
+             jumlah as pokokpajak, 
+             total as jumlsspd,
+             IFNULL(mst_uptd.nama, \'-\') AS nmuptd,
+             mst_wajibpajak.nama as namawp,
+             mst_wajibpajak.id,
+             mst_uptd.singkat as singkatanupt, 
+             trx_stsmaster.tahun,
+             trx_stsmaster.tanggal,
+             ');
+             $this->db->from('trx_stsdetail');
+             $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
+             $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
+             $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
+             $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
+             $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
+             $this->db->where('mst_rekening.jenis', 'BPHTB');
+             $this->db->where('MONTH(trx_stsmaster.tanggal)', $bulan);
+             $this->db->group_by('trx_stsdetail.iduptd');
+
+             $query = $this->db->get();
+             $results = $query->result_array();
+             return $results;
    }
    
     public function formInsert() {

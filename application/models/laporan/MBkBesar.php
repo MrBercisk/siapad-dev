@@ -135,9 +135,39 @@ class MBkBesar extends CI_Model {
 
         return $result ? (float) $result->total : 0.00;
     }
-    public function get_bk_besar($tanggal){
-        $query = $this->db->query("CALL spRptKasPendapatanDaerah(?)", array($tanggal));
-        return $query->result_array();
+    public function get_data_hari_ini($tanggal) {
+        $tahun = date('Y', strtotime($tanggal));
+        $this->db->select(
+           'idstsmaster, 
+            nobukti as nomor, 
+            idrapbd, 
+            trx_stsdetail.keterangan, 
+            jumlah as pokokpajak, 
+            total as jumlahdibayar, 
+            mst_rekening.kdrekening as koderekening, 
+            mst_rekening.nmrekening as namarekening, 
+            mst_uptd.singkat as singkatanupt, 
+            mst_wajibpajak.nama as namawp,
+            mst_wajibpajak.idrekening ,
+            mst_dinas.singkat as singkatdinas ,
+            trx_stsmaster.tahun,
+            trx_stsmaster.tanggal,
+            '
+            );
+        $this->db->from('trx_stsmaster');
+        $this->db->join('trx_stsdetail', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'inner');
+        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
+        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'inner');
+        $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
+        $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
+        $this->db->join('mst_dinas', 'trx_stsmaster.iddinas = mst_dinas.id', 'left');
+        $this->db->where('trx_stsmaster.tahun', $tahun);
+        $this->db->where('trx_stsmaster.tanggal', $tanggal);
+
+        $query = $this->db->get();
+        $results = $query->result_array();
+
+        return $results;
     }
     public function formInsert() {
         $ttddata = $this->db

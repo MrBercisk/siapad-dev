@@ -68,13 +68,10 @@
 <body>
 <?php
 $total_hari_ini = 0;
-$total_sampai_hari_ini = 0;
-$total_hari_sebelumnya = 0;
 
 if (!empty($tablenya)):
     foreach($tablenya as $tbl) {
         $total_hari_ini += $tbl['jumlahdibayar'];
-        $total_sampai_hari_ini += $tbl['jumlahdibayar']; 
     }
 endif;
 
@@ -93,76 +90,83 @@ $total_sampai_hari_ini = $saldo + $total_hari_ini;
             <th rowspan="3" class="center nowrap">JENIS PENERIMAAN</th>
             <th rowspan="3" class="center nowrap">UPT</th>
             <th rowspan="3" class="center nowrap">MASA PAJAK</th>
-            <th colspan="4" class="center nowrap">SSPD / STS</th> 
-            <th rowspan="3" class="center nowrap">JUMLAH YG DIBAYAR</th>
+            <th colspan="5" class="center nowrap">SSPD / STS</th> 
             <th rowspan="3" class="center nowrap">KETERANGAN</th>
         </tr>
         <tr>
             <th class="center nowrap" rowspan="2">NOMOR</th>
             <th class="center nowrap" rowspan="2">POKOK PAJAK</th>
             <th class="center nowrap" colspan="2">DENDA</th>
+            <th class="center nowrap" rowspan="2">JUMLAH YG DIBAYAR</th>
         </tr>
         <tr>
             <th class="center nowrap">%</th>
             <th class="center nowrap">JUMLAH</th>
         </tr>
         <tr>
-            <th></th>
             <th>1</th>
             <th>2</th>
             <th>3</th>
             <th>4</th>
             <th>5</th>
             <th>6</th>
-            <th>7</th>
+            <th colspan="2">7</th>
             <th>8</th>
             <th>9</th>
         </tr>
     </thead>
     <tbody>
     <?php
-        $groupedData = [];
-        foreach ($tablenya as $tbl) {
-            $idrekening = $tbl['idrekening'];
-            if (!isset($groupedData[$idrekening])) {
-                $groupedData[$idrekening] = [
-                    'namarekening' => $tbl['namarekening'],
-                    'wajibpajak' => []
-                ];
-            }
-            $groupedData[$idrekening]['wajibpajak'][] = $tbl;
-        }
-
-        $roman_no = 1;
-
-        foreach ($groupedData as $idrekening => $group):
-            ?>
-            <tr>
-                <td style="font-weight: bold; text-align:center">
-                    <?= $this->MPbapenda->roman($roman_no++) ?>
-                </td>
-                <td colspan="3" style="font-weight: bold; text-align: left;"><?= htmlspecialchars($group['namarekening']) ?></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <?php
-            foreach ($group['wajibpajak'] as $row): ?>
-                <tr>
-                    <td></td>
-                    <td style="text-align: left;"><?= htmlspecialchars($row['namawp']) ?></td>
-                    <td style="text-align: center;"><?= htmlspecialchars($row['singkatanupt']) ?></td>
-                    <td style="text-align: center;"><?= htmlspecialchars($row['blnpajak'] . ' - ' . $row['thnpajak']) ?></td>
-                    <td style="text-align: center;"><?= htmlspecialchars($row['nomor']) ?></td>
-                    <td><?= number_format($row['pokokpajak'], 2) ?></td>
-                    <td><?= number_format($row['persendenda'], 2) ?>%</td>
-                    <td><?= number_format($row['jumlahdenda'], 2) ?></td>
-                    <td><?= number_format($row['jumlahdibayar'], 2) ?></td>
-                    <td><?= htmlspecialchars($row['keterangan']) ?></td>
-                </tr>
+       $groupedData = [];
+       foreach ($tablenya as $tbl) {
+           $idrekening = $tbl['idrekening'];
+           if (!isset($groupedData[$idrekening])) {
+               $groupedData[$idrekening] = [
+                   'namarekening' => $tbl['namarekening'],
+                   'wajibpajak' => [],
+                   'total' => 0 ,
+                   'jumlah' => 0,
+                   'jmldenda' => 0,
+               ];
+           }
+           $groupedData[$idrekening]['wajibpajak'][] = $tbl;
+           $groupedData[$idrekening]['total'] += $tbl['pokokpajak'];
+           $groupedData[$idrekening]['jumlah'] += $tbl['jumlahdibayar'];
+           $groupedData[$idrekening]['jmldenda'] += $tbl['jumlahdenda'];
+       }
+       
+       $roman_no = 1;
+       
+       foreach ($groupedData as $idrekening => $group):
+           ?>
+           <tr>
+               <td style="font-weight: bold; text-align:center">
+                   <?= $this->MPbapenda->roman($roman_no++) ?>
+               </td>
+               <td colspan="3" style="font-weight: bold; text-align: left;"><?= htmlspecialchars($group['namarekening']) ?></td>
+               <td></td>
+               <td><b><?= number_format($group['total'], 2) ?></b></td>
+               <td></td>
+               <td><b><?= number_format($group['jmldenda'], 2) ?></b></td>
+               <td><b><?= number_format($group['jumlah'], 2) ?></b></td>
+               <td></td>
+           </tr>
+           <?php
+            $no = 1;
+           foreach ($group['wajibpajak'] as $row): ?>
+           
+               <tr>
+                   <td style="text-align: center;"><?= $no++ ?></td>
+                   <td style="text-align: left;"><?= htmlspecialchars($row['namawp']) ?></td>
+                   <td style="text-align: center;"><?= htmlspecialchars($row['singkatanupt']) ?></td>
+                   <td style="text-align: center;"><?= htmlspecialchars($row['blnpajak'] . ' - ' . $row['thnpajak']) ?></td>
+                   <td style="text-align: center;"><?= htmlspecialchars($row['nomor']) ?></td>
+                   <td><?= number_format($row['pokokpajak'], 2) ?></td>
+                   <td><?= number_format($row['persendenda'], 2) ?>%</td>
+                   <td><?= number_format($row['jumlahdenda'], 2) ?></td>
+                   <td><?= number_format($row['jumlahdibayar'], 2) ?></td>
+                   <td><?= htmlspecialchars($row['keterangan']) ?></td>
+               </tr>
             <?php endforeach;
         endforeach;
         ?>

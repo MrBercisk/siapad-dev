@@ -31,17 +31,14 @@
         }
         table, th, td {
             border: 1px solid black;
+            font-size: 12px;
+        }
+        td{
+            text-align: right;
         }
         th {
-            padding: 10px;
+            padding: 5px;
             text-align: center;
-            font-size: 15px;
-        }
-        td {
-            font-size: 15px;
-        }
-        th {
-            background-color: #f2f2f2;
         }
         tbody td {
             text-align: right;
@@ -79,13 +76,7 @@
     </style>
 </head>
 <body>
-<?php
-setlocale(LC_ALL, 'id-ID', 'id_ID');
-$tanggal_saat_ini = strftime('%d %B %Y'); 
-$tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($format_tanggal)));
-$tanggal_sebelumnya_display = strftime('%d %B %Y', strtotime($tanggal_sebelumnya));
-$tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
-?>
+
 <div class="header">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
@@ -95,12 +86,25 @@ $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
 <table class="table-container">
     <thead>
         <tr>
-            <th>NO. BUKTI<br>(STS/NOTA DEBET/KREDIT)</th>
-            <th>KODE REKENING</th>
-            <th>URAIAN</th>
-            <th>DINAS</th>
-            <th>JUMLAH</th>
-            <th>KETERANGAN</th>
+                <th rowspan="2">No. Bukti (STS/Nota Debit/Kredit)</th>
+                <th rowspan="2">Kode Rekening</th>
+                <th rowspan="2">Uraian</th>
+                <th rowspan="2">Dinas</th>
+                <th colspan="2">Jumlah</th>
+                <th rowspan="2">Keterangan</th>
+        </tr>  
+        <tr>
+                <th>Per Kode Rekening</th>
+                <th>Per Setoran</th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
         </tr>
     </thead>
     <tbody>
@@ -111,10 +115,11 @@ $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
             foreach($tablenya as $tbl): ?>
                 <tr>
                     <td><?= htmlspecialchars($tbl['nomor'])?></td>
-                    <td><?= htmlspecialchars($tbl['kdrekening'])?></td>
-                    <td><?= htmlspecialchars($tbl['uraian'])?></td>
-                    <td><?= htmlspecialchars($tbl['nmdinas'])?></td>
-                    <td><?= number_format($tbl['jumlah'], 2)?></td>
+                    <td><?= htmlspecialchars($tbl['koderekening'])?></td>
+                    <td><?= htmlspecialchars($tbl['namarekening'])?></td>
+                    <td><?= htmlspecialchars($tbl['singkatdinas'])?></td>
+                    <td></td>
+                    <td></td>
                     <td><?= htmlspecialchars($tbl['keterangan'])?></td>
 
                 </tr>

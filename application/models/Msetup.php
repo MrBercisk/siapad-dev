@@ -324,5 +324,17 @@ class Msetup extends CI_Model {
         }
         return null;
     }
+	public function get_rekening($rekening) {
+		if($rekening){
+			$rekdetail = $this->db
+			->select('id,kdrekening, nmrekening')
+			->from('mst_rekening')
+			->where('id', $rekening)
+			->get()
+			->row_array();
+			return $rekdetail;
+		}
+        return null;
+    }
 }
 ?>
