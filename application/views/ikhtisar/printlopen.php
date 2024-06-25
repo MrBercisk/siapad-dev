@@ -23,7 +23,6 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed;
         }
         table, th, td {
             border: 1px solid black;
@@ -85,7 +84,7 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     <?php if (!empty($rekening)) : ?>
         <h3><?= $rekening['nmrekening'] ?></h3>
     <?php endif; ?>
-    <h3>BULAN <?= $format_bulan; ?>-<?= $tahun ?></h3>
+    <h3>BULAN <?= $format_bulan; ?>-<?= $format_tahun ?></h3>
 </div>
 <table>
     <thead>
@@ -124,13 +123,60 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
                 <tr>
                     <td style="text-align: center;"><?= $no++ ?></td>
                     <td><?= htmlspecialchars($tbl['tanggal']) ?></td>
-                    <td><?= htmlspecialchars($tbl['namawp']) ?></td>
-                    <td><?= htmlspecialchars($tbl['singkatanupt']) ?></td>
-                    <td><?= htmlspecialchars($tbl['nmuptd']) ?></td>
-                    <td style="text-align: right;"><?= number_format($tbl['jumlsspd'], 2) ?></td>
+                    <td style="text-align: left;"><?= htmlspecialchars($tbl['nmwp']) ?></td>
+                    <td><?= htmlspecialchars($tbl['uptd']) ?></td>
+                    <td><?= htmlspecialchars($tbl['tgl']) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['skpd'], 2) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['masapajak'] ) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars( $tbl['nomor']) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['pokok'], 2) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['denda'], 2) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['pokok_lalu'], 2) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['denda_lalu'], 2) ?></td>
                 </tr>
             <?php endforeach; ?>        
         <?php endif; ?>
+        
+        <tr style=" background-color: #f2f2f2;">
+            <td></td>
+            <td></td>
+            <td colspan="4" style="text-align: left;"><b>JUMLAH</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td colspan="4" style="text-align: left;"><b>JUMLAH BULAN INI</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td colspan="4" style="text-align: left;"><b>JUMLAH S.D BULAN LALU</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td colspan="4" style="text-align: left;"><b>JUMLAH S.D INI</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
     </tbody>
 </table>
 

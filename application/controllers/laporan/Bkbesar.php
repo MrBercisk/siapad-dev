@@ -46,9 +46,13 @@ class Bkbesar extends CI_Controller {
 		'ttd_checkbox' => $ttd_checkbox,
 		'format_tanggal' =>strftime('%d %B %Y', strtotime($tanggal)),
 		'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
-
+		'tanggal_sebelumnya' =>strftime('%d %B %Y', strtotime('-1 day', strtotime($tanggal))),
 		'tablenya' => $this->MBkBesar->get_data_hari_ini($tanggal),
-		
+		'saldo' => $this->MBkBesar->get_saldo_awal($tanggal),
+		'pembiayaan' => $this->MBkBesar->get_pembiayaan($tanggal),
+		'blud' => $this->MBkBesar->get_blud($tanggal),
+		'bos' => $this->MBkBesar->get_bos($tanggal),
+		'rilau' => $this->MBkBesar->get_rilau($tanggal),
 	];
 	$tanda_tangan_data = $this->Msetup->get_tanda_tangan($ttd_checkbox, $tanda_tangan);
 
@@ -67,6 +71,7 @@ class Bkbesar extends CI_Controller {
 	$dompdf->render();
 	$dompdf->stream("laporan_buku_besar.pdf", array("Attachment" => 0));
 }
+
 
 }
 

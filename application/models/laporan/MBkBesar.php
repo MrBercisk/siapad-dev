@@ -1,174 +1,159 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class MBkBesar extends CI_Model {
-    private function get_saldo_awal($tahun, $bulan, $iduptd = null) {
-        $this->db->select('SUM(a.total) as saldoawal')
-                 ->from('trx_stsdetail a')
-                 ->join('trx_stsmaster b', '
-				 b.id = a.idstsmaster')
-                 ->join('trx_rapbd c', 'c.id = a.idrapbd')
-                 ->join('mst_rekening d', 'd.id = c.idrekening')
-                 ->where('d.jenis', 'BPHTB')
-                 ->where('MONTH(b.tanggal) <', $bulan)
-                 ->where('b.tahun', $tahun);
-
-        if ($iduptd !== null) {
-            $this->db->where('a.iduptd', $iduptd);
-        }
-
+   
+    public function get_saldo_awal($tanggal) {
+        $tahun = date('Y', strtotime($tanggal));
+        
+        $this->db->select("COALESCE(SUM(jumlah), 0) as saldoawal")
+                 ->from("(
+                    SELECT SUM(b.total) AS jumlah
+                    FROM trx_stsmaster a
+                    INNER JOIN trx_stsdetail b ON b.idstsmaster = a.id
+                    INNER JOIN trx_rapbd c ON c.id = b.idrapbd
+                    INNER JOIN mst_rekening d ON d.id = c.idrekening
+                    WHERE a.tanggal < '$tanggal' 
+                        AND YEAR(a.tanggal) = $tahun
+                        AND NOT d.kdrekening LIKE '4.1.4.18%'
+                        AND NOT d.kdrekening LIKE '4.3.1.01.01.02%'
+                        AND NOT (d.kdrekening LIKE '4.3.1.01.06%' OR d.kdrekening LIKE '4.1.4.19.01%')
+                        AND a.isnonkas = 0
+                 ) as saldoawal");
+    
         $query = $this->db->get();
         $result = $query->row();
         return $result ? (float) $result->saldoawal : 0.00;
     }
-    public function get_laporan_uptd($tahun, $bulan, $iduptd) {
-        $saldoawal = $this->get_saldo_awal($tahun, $bulan, $iduptd);
-
-        $this->db->select([
-            'NULL AS nosspd',
-            'NULL AS tanggal',
-            'NULL AS nmwp',
-            '0 AS total',
-            "$saldoawal AS saldoawal"
-        ]);
-        $query1 = $this->db->get_compiled_select();
-        $this->db->select([
-            'a.nobukti AS nosspd',
-            'b.tanggal',
-            'c.nama AS nmwp',
-            'a.total',
-            "$saldoawal AS saldoawal"
-        ])
-        ->from('trx_stsdetail a')
-        ->join('trx_stsmaster b', 'b.id = a.idstsmaster')
-        ->join('mst_wajibpajak c', 'c.id = a.idwp')
-        ->join('trx_rapbd d', 'd.id = a.idrapbd')
-        ->join('mst_rekening e', 'e.id = d.idrekening')
-        ->join('mst_uptd f', 'f.id = a.iduptd')
-        ->where('e.jenis', 'BPHTB')
-        ->where('a.iduptd', $iduptd)
-        ->where('MONTH(b.tanggal)', $bulan)
-        ->where('b.tahun', $tahun);
-        $query2 = $this->db->get_compiled_select();
-
-        $query = $this->db->query("$query1 UNION ALL $query2");
-        return $query->result();
-    }
-    public function get_laporan_bulanan($tahun, $bulan) {
-        $saldoawal = $this->get_saldo_awal($tahun, $bulan);
-
-        $this->db->select([
-            'NULL AS nmuptd',
-            'NULL AS lembar',
-            '0 AS total',
-            "$saldoawal AS saldoawal"
-        ]);
-        $query1 = $this->db->get_compiled_select();
-        $this->db->select([
-            'f.nama AS nmuptd',
-            'COUNT(*) AS lembar',
-            'SUM(a.total) AS total',
-            "$saldoawal AS saldoawal"
-        ])
-        ->from('trx_stsdetail a')
-        ->join('trx_stsmaster b', 'b.id = a.idstsmaster')
-        ->join('mst_wajibpajak c', 'c.id = a.idwp')
-        ->join('trx_rapbd d', 'd.id = a.idrapbd')
-        ->join('mst_rekening e', 'e.id = d.idrekening')
-        ->join('mst_uptd f', 'f.id = a.iduptd')
-        ->where('e.jenis', 'BPHTB')
-        ->where('MONTH(b.tanggal)', $bulan)
-        ->where('b.tahun', $tahun)
-        ->group_by('a.iduptd');
-        $query2 = $this->db->get_compiled_select();
-
-        $query = $this->db->query("$query1 UNION ALL $query2");
-        return $query->result();
-    }
-    public function get_laporan_harian($tanggal) {
+    public function get_pembiayaan($tanggal) {
         $tahun = date('Y', strtotime($tanggal));
-        $saldoawal = $this->get_saldo_awal($tahun, date('m', strtotime($tanggal)));
-
-        $this->db->select([
-            'NULL AS nosspd',
-            'NULL AS skpd',
-            'NULL AS nmpejabat',
-            'NULL AS nmwp',
-            'NULL AS nmuptd',
-            '0 AS total',
-            "$saldoawal AS saldoawal"
-        ]);
-        $query1 = $this->db->get_compiled_select();
-        $this->db->select([
-            'a.nobukti AS nosspd',
-            'a.formulir AS skpd',
-            'a.nama AS nmpejabat',
-            'c.nama AS nmwp',
-            'IFNULL(f.nama, \'-\') AS nmuptd',
-            'a.total',
-            "$saldoawal AS saldoawal"
-        ])
-        ->from('trx_stsdetail a')
-        ->join('trx_stsmaster b', 'b.id = a.idstsmaster')
-        ->join('mst_wajibpajak c', 'c.id = a.idwp')
-        ->join('trx_rapbd d', 'd.id = a.idrapbd')
-        ->join('mst_rekening e', 'e.id = d.idrekening')
-        ->left_join('mst_uptd f', 'f.id = a.iduptd')
-        ->where('e.jenis', 'BPHTB')
-        ->where('b.tanggal', $tanggal)
-        ->where('b.tahun', $tahun);
-        $query2 = $this->db->get_compiled_select();
-
-        $query = $this->db->query("$query1 UNION ALL $query2");
-        return $query->result();
-    }
-    public function get_real_hari_ini($idrekening, $iddinas, $tahun, $tanggal) {
-        $this->db->select('SUM(a.total) AS total')
-                 ->from('trx_stsdetail a')
-                 ->join('trx_stsmaster b', 'b.id = a.idstsmaster')
-                 ->join('trx_rapbd c', 'c.id = a.idrapbd')
-                 ->where('c.idrekening', $idrekening)
-                 ->where('b.iddinas', $iddinas)
-                 ->where('b.tahun', $tahun)
-                 ->where('b.tanggal', $tanggal);
-
+        
+        $this->db->select("IFNULL(SUM(IFNULL(b.total, 0)), 0) AS jumlah, d.nmrekening")
+                 ->from("trx_stsmaster a")
+                 ->join("trx_stsdetail b", "b.idstsmaster = a.id")
+                 ->join("trx_rapbd c", "c.id = b.idrapbd")
+                 ->join("mst_rekening d", "d.id = c.idrekening")
+                 ->where("a.tanggal <=", $tanggal)
+                 ->where("YEAR(a.tanggal) =", $tahun)
+                 ->where("a.isnonkas", 1)
+                 ->where("d.kdrekening NOT LIKE '4.1.4.18%'")
+                 ->where("d.kdrekening NOT LIKE '4.3.1.01.01.02%'")
+                 ->where("(d.kdrekening NOT LIKE '4.3.1.01.06%' AND d.kdrekening NOT LIKE '4.1.4.19.01%')");
+    
         $query = $this->db->get();
         $result = $query->row();
-
+        return $result ? (float) $result->jumlah : 0.00;
+    }
+    /* Get data blud keterangan */
+    public function get_blud($tanggal)
+    {
+        $tahun = date('Y', strtotime($tanggal));
+        $this->db->select("IFNULL(SUM(IFNULL(b.total, 0)), 0) AS jumlah")
+        ->from("trx_stsmaster a")
+        ->join("trx_stsdetail b", "b.idstsmaster = a.id")
+        ->join("trx_rapbd c", "c.id = b.idrapbd")
+        ->join("mst_rekening d", "d.id = c.idrekening")
+        ->where("a.tanggal <=", $tanggal)
+        ->where("YEAR(a.tanggal) =", $tahun)
+        ->where("d.kdrekening LIKE '4.1.4.16%'");
+        
+        $query = $this->db->get();  
+        $result = $query->row();
+        return $result ? (float) $result->jumlah : 0.00;
+    }
+    /* Get data bos keterangan */
+    public function get_bos($tanggal)
+    {
+        $tahun = date('Y', strtotime($tanggal));
+        $this->db->select("IFNULL(SUM(IFNULL(b.total, 0)), 0) AS jumlah")
+        ->from("trx_stsmaster a")
+        ->join("trx_stsdetail b", "b.idstsmaster = a.id")
+        ->join("trx_rapbd c", "c.id = b.idrapbd")
+        ->join("mst_rekening d", "d.id = c.idrekening")
+        ->where("a.tanggal <=", $tanggal)
+        ->where("YEAR(a.tanggal) =", $tahun)
+        ->where("d.kdrekening LIKE '4.3.1.01.06%' OR d.kdrekening LIKE '4.1.4.19.01%'");
+        
+        $query = $this->db->get();  
+        $result = $query->row();
+        return $result ? (float) $result->jumlah : 0.00;
+    }
+    /* Get data rilau keterangan */
+    public function get_rilau($tanggal)
+    {
+        $tahun = date('Y', strtotime($tanggal));
+        $this->db->select("IFNULL(SUM(IFNULL(b.total, 0)), 0) AS jumlah")
+        ->from("trx_stsmaster a")
+        ->join("trx_stsdetail b", "b.idstsmaster = a.id")
+        ->join("trx_rapbd c", "c.id = b.idrapbd")
+        ->join("mst_rekening d", "d.id = c.idrekening")
+        ->where("a.tanggal <=", $tanggal)
+        ->where("YEAR(a.tanggal) =", $tahun)
+        ->where("d.kdrekening LIKE '4.3.1.01.01.02%'");
+        
+        $query = $this->db->get();  
+        $result = $query->row();
+        return $result ? (float) $result->jumlah : 0.00;
+    }
+    public function get_total($tanggal)
+    {
+        $tahun = date('Y', strtotime($tanggal));
+        $this->db->select(
+            'a.id, b.total'
+        );
+        $this->db->from('trx_stsmaster a');
+        $this->db->join('trx_stsdetail b', 'b.idstsmaster = a.id', 'inner');
+        $this->db->join('trx_rapbd c', 'c.id = b.idrapbd', 'inner');
+        $this->db->join('mst_rekening d', 'd.id = c.idrekening', 'inner');
+        $this->db->where('a.tanggal', $tanggal);
+        $this->db->where('YEAR(a.tanggal)', $tahun);
+        $this->db->where("d.kdrekening NOT LIKE '4.1.4.18%'", '', false);
+        $this->db->where("d.kdrekening NOT LIKE '4.3.1.01.01.02%'", '', false);
+        $this->db->where("(d.kdrekening NOT LIKE '4.3.1.01.06%' OR d.kdrekening NOT LIKE '4.1.4.19.01%')", '', false);
+        $this->db->where('a.isnonkas', 0);
+        $this->db->group_by('a.id');
+    
+        $query = $this->db->get();  
+        $result = $query->row();
+    
         return $result ? (float) $result->total : 0.00;
     }
+    
     public function get_data_hari_ini($tanggal) {
         $tahun = date('Y', strtotime($tanggal));
         $this->db->select(
-           'idstsmaster, 
-            nobukti as nomor, 
-            idrapbd, 
-            trx_stsdetail.keterangan, 
-            jumlah as pokokpajak, 
-            total as jumlahdibayar, 
-            mst_rekening.kdrekening as koderekening, 
-            mst_rekening.nmrekening as namarekening, 
-            mst_uptd.singkat as singkatanupt, 
-            mst_wajibpajak.nama as namawp,
-            mst_wajibpajak.idrekening ,
-            mst_dinas.singkat as singkatdinas ,
-            trx_stsmaster.tahun,
-            trx_stsmaster.tanggal,
-            '
-            );
-        $this->db->from('trx_stsmaster');
-        $this->db->join('trx_stsdetail', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'inner');
-        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
-        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'inner');
-        $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
-        $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
-        $this->db->join('mst_dinas', 'trx_stsmaster.iddinas = mst_dinas.id', 'left');
-        $this->db->where('trx_stsmaster.tahun', $tahun);
-        $this->db->where('trx_stsmaster.tanggal', $tanggal);
-
+           'a.id AS idstsmaster, 
+            a.nomor AS nomor, 
+            b.idrapbd, 
+            b.keterangan, 
+            b.jumlah AS pokokpajak, 
+            b.total AS jumlahdibayar, 
+            e.kdrekening AS koderekening, 
+            e.nmrekening AS namarekening, 
+            c.singkat AS singkatanupt, 
+            c.singkat AS singkatdinas ,
+            a.tahun,
+            a.tanggal'
+        );
+        $this->db->from('trx_stsmaster a');
+        $this->db->join('trx_stsdetail b', 'b.idstsmaster = a.id', 'inner');
+        $this->db->join('mst_dinas c', 'c.id = a.iddinas', 'inner');
+        $this->db->join('trx_rapbd d', 'd.id = b.idrapbd', 'inner');
+        $this->db->join('mst_rekening e', 'e.id = d.idrekening', 'inner');
+        $this->db->join('mst_rekening f', 'f.id = e.idheader', 'left');
+        $this->db->join('mst_rekening g', 'g.id = f.idheader', 'left');
+        $this->db->where('a.tanggal', $tanggal);
+        $this->db->where('YEAR(a.tanggal)', $tahun);
+        $this->db->where("NOT e.kdrekening LIKE '4.1.4.18%'", '', false);
+        $this->db->where("NOT e.kdrekening LIKE '4.3.1.01.01.02%'", '', false);
+        $this->db->where("(NOT e.kdrekening LIKE '4.3.1.01.06%' OR e.kdrekening NOT LIKE '4.1.4.19.01%')", '', false);
+        $this->db->where('a.isnonkas', 0);
+        $this->db->group_by('a.iddinas, a.id, e.kdrekening');
+    
         $query = $this->db->get();
         $results = $query->result_array();
-
+    
         return $results;
     }
+    
     public function formInsert() {
         $ttddata = $this->db
         ->select('mst_tandatangan.id, mst_tandatangan.nip, mst_tandatangan.nama, mst_tandatangan.jabatan1, mst_tandatangan.jabatan2')

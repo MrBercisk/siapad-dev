@@ -47,11 +47,17 @@ class Ropendapatan extends CI_Controller {
 		'sidebar' => $template['sidebar'],
 		'ttd_checkbox' => $ttd_checkbox,
 		'format_bulan' => strftime('%B', strtotime($bulan)),
+		'format_tahun' => strftime('%Y', strtotime($tahun)),
 		'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
-		'tablenya' => $this->Mropendapatan->get_laporan_bulanan($bulan)
+		'tabelnya' => $this->Mropendapatan->get_laporan_bulanan($bulan, $tahun)
+		
 	];
-	/* var_dump($data);
-	die(); */
+	$cek = $this->Mropendapatan->get_laporan_bulanan($bulan, $tahun);
+	echo '<pre>';
+	var_dump($cek);
+	echo '</pre>';
+	die();
+
 
 	
 	$tanda_tangan_data = $this->Msetup->get_tanda_tangan($ttd_checkbox, $tanda_tangan);

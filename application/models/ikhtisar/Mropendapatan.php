@@ -1,38 +1,41 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Mropendapatan extends CI_Model {
-    public function get_laporan_bulanan($bulan){
-        $this->db->select(
-            '
-             nobukti as nosspd, 
-             formulir, 
-             trx_stsdetail.nama as namapejabat,
-             trx_stsmaster.tanggal, 
-             blnpajak, 
-             thnpajak, 
-             jumlah as pokokpajak, 
-             total as jumlsspd,
-             IFNULL(mst_uptd.nama, \'-\') AS nmuptd,
-             mst_wajibpajak.nama as namawp,
-             mst_wajibpajak.id,
-             mst_uptd.singkat as singkatanupt, 
-             trx_stsmaster.tahun,
-             trx_stsmaster.tanggal,
-             ');
-             $this->db->from('trx_stsdetail');
-             $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
-             $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
-             $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
-             $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
-             $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
-             $this->db->where('mst_rekening.jenis', 'BPHTB');
-             $this->db->where('MONTH(trx_stsmaster.tanggal)', $bulan);
-             $this->db->group_by('trx_stsdetail.iduptd');
-
-             $query = $this->db->get();
-             $results = $query->result_array();
-             return $results;
-   }
+    public function get_laporan_bulanan($bulan, $tahun) {
+        $this->db->select("
+            $tahun AS tahun, 
+            d.kdrekening, 
+            d.nmrekening, 
+            b.tanggal,
+            e.nama AS nmwp, 
+            IFNULL(f.singkat, '-') AS uptd, 
+            CONCAT(a.blnpajak, '-', a.thnpajak) AS masapajak, 
+            a.nobukti AS nomor,
+            a.formulir AS skpd,
+            a.tgl_input AS tgl, 
+            a.jumlah AS pokok, 
+            a.nil_denda AS denda,
+            0 AS pokok_lalu,  
+            0 AS denda_lalu  
+        ");
+    
+        $this->db->from('trx_stsdetail a');
+        $this->db->join('trx_stsmaster b', 'b.id = a.idstsmaster', 'inner');
+        $this->db->join('trx_rapbd c', 'c.id = a.idrapbd', 'inner');
+        $this->db->join('mst_rekening d', 'd.id = c.idrekening', 'inner');
+        $this->db->join('mst_wajibpajak e', 'e.id = a.idwp', 'inner');
+        $this->db->join('mst_uptd f', 'f.id = a.iduptd', 'left');
+        $this->db->join('trx_sptpd g', 'g.id = a.idskpd', 'left');
+    
+        $this->db->where('MONTH(b.tanggal)', $bulan);
+        $this->db->where('YEAR(b.tanggal)', $tahun);
+        $this->db->order_by('b.tanggal', 'ASC');
+    
+        $query = $this->db->get();
+        $results = $query->result_array();
+        return $results;
+    }
+    
    
     public function formInsert() {
         $ttddata = $this->db
@@ -112,7 +115,7 @@ class Mropendapatan extends CI_Model {
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="ttd">Pembuat Dokumen:</label>
+                            <label for="pembuat">Pembuat Dokumen:</label>
                               <select id="pembuat" name="pembuat" class="form-control select2" data-placeholder="Pilih Pembuat Dokumen" style="width: 100%;">
                                       '.$opsittd.'
                               </select>
@@ -122,8 +125,8 @@ class Mropendapatan extends CI_Model {
 
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="ttd">Rekening:</label>
-                              <select id="rekening" name="rekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
+                            <label for="rekening">Rekening:</label>
+                              <select id="rekening" name="rekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" required>
                                       '.$opsirek.'
                               </select>
                         </div>

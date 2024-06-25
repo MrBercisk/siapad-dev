@@ -34,7 +34,6 @@ class RelBphtb extends CI_Controller {
     $template 		  = $this->Msetup->loadTemplate($setpage->title);
 	
 	$tanggal = $this->input->post('tanggal');
-	$tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($tanggal)));
 	
 	$tgl_cetak = $this->input->post('tgl_cetak');
 	$tanda_tangan = $this->input->post('tanda_tangan');
