@@ -130,7 +130,6 @@
                     $groupedData[$singkatdinas][] = $tbl;
                 }
 
-                // Menampilkan data yang telah dikelompokkan
                 foreach($groupedData as $singkatdinas => $rows):
                     $jumlahTotal = 0;
                     $pokokTotal = 0;
@@ -161,19 +160,19 @@
                         <tr>
                             <td colspan="4" style="text-align: center;"><b>Jumlah Per <?= $format_tanggal; ?></b> </td>
                             <td style="text-align: right;"><b> <?= number_format($total_hari_ini, 2) ?></b></td>
-                            <td></td>
+                            <td style="text-align: right;"><b> <?= number_format($total_hari_ini, 2) ?></b></td>
                             <td></td>
                         </tr>
                         <tr>
                             <td colspan="4" style="text-align: center;"><b>Jumlah s.d.  <?= $tanggal_sebelumnya; ?></b></td>
                             <td style="text-align: right;"><b><?= number_format($saldo, 2) ?><</b></td>
-                            <td></td>
+                            <td style="text-align: right;"><b><?= number_format($saldo, 2) ?><</b></td>
                             <td></td>
                         </tr>
                         <tr>
                             <td colspan="4" style="text-align: center;"><b>Jumlah s.d. <?= $format_tanggal; ?></b> </td>
                             <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
-                            <td></td>
+                            <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
                             <td></td>
                         </tr>
             </tbody>

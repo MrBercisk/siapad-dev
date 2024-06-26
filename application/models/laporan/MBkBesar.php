@@ -109,8 +109,7 @@ class MBkBesar extends CI_Model {
         $this->db->where("d.kdrekening NOT LIKE '4.3.1.01.01.02%'", '', false);
         $this->db->where("(d.kdrekening NOT LIKE '4.3.1.01.06%' OR d.kdrekening NOT LIKE '4.1.4.19.01%')", '', false);
         $this->db->where('a.isnonkas', 0);
-        $this->db->group_by('a.id');
-    
+       
         $query = $this->db->get();  
         $result = $query->row();
     

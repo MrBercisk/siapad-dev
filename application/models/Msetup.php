@@ -324,12 +324,26 @@ class Msetup extends CI_Model {
         }
         return null;
     }
-	public function get_rekening($rekening) {
-		if($rekening){
+	public function get_pembuat($pembuat_checkbox, $pembuat) {
+        if ($pembuat_checkbox && $pembuat) {
+            $pembuatdetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $pembuat)
+                ->get()
+                ->row_array();
+            
+            return $pembuatdetail;
+        }
+        return null;
+    }
+	
+	public function get_rekening($kdrekening) {
+		if($kdrekening){
 			$rekdetail = $this->db
 			->select('id,kdrekening, nmrekening')
 			->from('mst_rekening')
-			->where('id', $rekening)
+			->where('kdrekening', $kdrekening)
 			->get()
 			->row_array();
 			return $rekdetail;

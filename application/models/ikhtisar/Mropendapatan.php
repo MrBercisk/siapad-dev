@@ -1,7 +1,24 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Mropendapatan extends CI_Model {
-    public function get_laporan_bulanan($bulan, $tahun) {
+    public function get_saldo_awal($bulan, $tahun, $kdrekening) {
+
+        $this->db->select('SUM(a.jumlah) as saldoawal')
+            ->from('trx_stsdetail a')
+            ->join('trx_stsmaster b', 'b.id = a.idstsmaster')
+            ->join('trx_rapbd c', 'c.id = a.idrapbd')
+            ->join('mst_rekening d', 'd.id = c.idrekening')
+            ->where('MONTH(b.tanggal) <', $bulan)
+            ->where('YEAR(b.tanggal)', $tahun)
+            ->like('d.kdrekening', $kdrekening, 'after');
+                
+        $query = $this->db->get();
+        $result = $query->row();
+        return $result ? (float) $result->saldoawal : 0.00;
+    }    
+    
+
+    public function get_laporan_bulanan($bulan, $tahun, $kdrekening) {
         $this->db->select("
             $tahun AS tahun, 
             d.kdrekening, 
@@ -16,7 +33,7 @@ class Mropendapatan extends CI_Model {
             a.jumlah AS pokok, 
             a.nil_denda AS denda,
             0 AS pokok_lalu,  
-            0 AS denda_lalu  
+            0 AS denda_lalu
         ");
     
         $this->db->from('trx_stsdetail a');
@@ -29,12 +46,18 @@ class Mropendapatan extends CI_Model {
     
         $this->db->where('MONTH(b.tanggal)', $bulan);
         $this->db->where('YEAR(b.tanggal)', $tahun);
-        $this->db->order_by('b.tanggal', 'ASC');
+        $this->db->where('d.kdrekening LIKE', "$kdrekening%");
+        $this->db->order_by('e.nama', 'ASC');
     
         $query = $this->db->get();
         $results = $query->result_array();
         return $results;
     }
+    public function get_data_rinci($bulan, $tahun, $kdrekening) {
+        $query = $this->db->query("CALL spRptIkhtisarRinciAsli(?, ?, ?)", array($bulan, $tahun, $kdrekening));
+        return $query->result_array();
+    }
+    
     
    
     public function formInsert() {
@@ -55,7 +78,7 @@ class Mropendapatan extends CI_Model {
         ->result();
         $opsirek = '<option></option>';
         foreach ($rekdata as $ttd) {
-            $opsirek .= '<option value="'.$ttd->id.'">'.$ttd->nmrekening.'</option>';
+            $opsirek .= '<option value="'.$ttd->kdrekening.'">'.$ttd->nmrekening.'</option>';
         }
         $form[] = '
         
@@ -126,7 +149,7 @@ class Mropendapatan extends CI_Model {
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="rekening">Rekening:</label>
-                              <select id="rekening" name="rekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" required>
+                              <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" required>
                                       '.$opsirek.'
                               </select>
                         </div>
@@ -134,12 +157,22 @@ class Mropendapatan extends CI_Model {
     
                     </div>
                 </div>
-    
-                    <div class="col-md-1">
+
+                    <div class="col-md-2">
                         <label class="form-check-label" for="ttd">Penandatangan</label>
-                        <div class="form-check">
-                           <input type="checkbox" class="form-check-input" id="ttd_checkbox" name="ttd_checkbox" checked>
-                        <label class="form-check-label" for="ttd">Ttd</label>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="ttd_checkbox" name="ttd_checkbox">
+                                    <label class="form-check-label" for="ttd">Ttd</label>
+                                </div>
+                                 <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="pembuat_checkbox" name="pembuat_checkbox">
+                                    <label class="form-check-label" for="pembuat">Pembuat</label>
+                                </div>        
+                            </div>
+                    </div>
+               
+                    <div class="col-md-1">
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary">Cetak Laporan</button>
                         </div>
