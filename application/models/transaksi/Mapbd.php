@@ -294,46 +294,4 @@ class MApbd extends CI_Model
       $i++;
     }
   }
-
-  private function getApbdrek($idrekening, $iddinas, $tahun)
-  {
-    // Ambil kdrekening dari mst_rekening berdasarkan idrekening
-    $this->db->select('kdrekening');
-    $this->db->from('mst_rekening');
-    $this->db->where('id', $idrekening);
-    $query = $this->db->get();
-
-    if ($query->num_rows() > 0) {
-      $row = $query->row();
-      $kdrekening = $row->kdrekening;
-    }
-
-    // Cek apakah $iddinas adalah NULL
-    if (is_null($iddinas)) {
-      // Query untuk mendapatkan total apbd jika $iddinas adalah NULL
-      $this->db->select_sum('apbd', 'total');
-      $this->db->from('trx_rapbd a');
-      $this->db->join('mst_rekening b', 'b.id = a.idrekening');
-      $this->db->where('LEFT(b.kdrekening, LENGTH(' . $this->db->escape($kdrekening) . ')) = ', $kdrekening, FALSE);
-      $this->db->where('a.iddinas IS NULL');
-      $this->db->where('a.tahun', $tahun);
-    } else {
-      // Query untuk mendapatkan total apbd jika $iddinas tidak NULL
-      $this->db->select_sum('apbd', 'total');
-      $this->db->from('trx_rapbd a');
-      $this->db->join('mst_rekening b', 'b.id = a.idrekening');
-      $this->db->where('LEFT(b.kdrekening, LENGTH(' . $this->db->escape($kdrekening) . ')) = ', $kdrekening, FALSE);
-      $this->db->where('a.iddinas', $iddinas);
-      $this->db->where('a.tahun', $tahun);
-    }
-
-    $query = $this->db->get();
-    if ($query->num_rows() > 0) {
-      $row = $query->row();
-      $ret = $row->total;
-    }
-
-    // Kembalikan hasil, atau 0 jika NULL
-    return $ret === null ? 0.00 : $ret;
-  }
 }
