@@ -173,6 +173,7 @@ class Form extends CI_Model
 		  </div>
 		  <div class="modal-footer pull-right">';
 		$modal[] = '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>';
+
 		if (in_array('edit', $actions)) {
 			$modal[] = '<button type="submit" name="AKSI" value="Edit" class="btn btn-info">Save changes</button>';
 		}

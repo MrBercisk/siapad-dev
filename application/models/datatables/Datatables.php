@@ -8,6 +8,10 @@ class Datatables extends CI_Model {
     public function setTable($table) {
         $this->table = $table;
     }
+    public function addWhere($column, $value) {
+        $this->db->where($column, $value);
+    }
+    
     public function setSelectColumn($select_column) {
         $this->select_column = $select_column;
     }
@@ -70,5 +74,22 @@ class Datatables extends CI_Model {
         $tombol []= '</div>';
         return $tombol;
     }
+    public function tombolPend($idstsmaster, $nourut, $actions = ['edit', 'delete']) {
+        $tombol[] = '<div class="btn-group pull-right">';
+        
+        if (in_array('edit', $actions)) {
+            $tombol[] = '<a class="btn btn-xs btn-outline-primary modin fa fa-edit" id="edit" href="' . site_url('transaksi/PendDaerah/myModal/'.$idstsmaster.'/'.$nourut) . '" data-placement="bottom" title="Edit data">Edit</a>';
+        }
+        
+        if (in_array('delete', $actions)) {
+            // Tombol untuk hapus data bisa Anda tambahkan sesuai kebutuhan
+            $tombol[] = '<a class="btn btn-xs btn-outline-danger modin fa fa-trash" id="delete" href="#" data-id="' . $idstsmaster . '" data-toggle="modal" data-target="#myModalD" data-placement="bottom" title="Hapus data">Hapus</a>';
+        }
+        
+        $tombol[] = '</div>';
+        
+        return implode(' ', $tombol);
+    }
+    
 }
 ?>

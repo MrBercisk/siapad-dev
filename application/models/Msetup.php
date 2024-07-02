@@ -73,6 +73,8 @@ class Msetup extends CI_Model {
 					}
 
 				</style>
+
+
 				<!-- Start GA -->
 				<script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
 				<script>
@@ -83,6 +85,7 @@ class Msetup extends CI_Model {
 				</script>
 			</head>
 			<body>
+			
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
       <div class="navbar-bg"></div>
@@ -232,6 +235,8 @@ class Msetup extends CI_Model {
 		  </footer>
 		</div>
 	  </div>
+	 
+	  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 	  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 	  <script src="'.$base['url'].'assets/modules/popper.js"></script>
@@ -242,10 +247,15 @@ class Msetup extends CI_Model {
 	  <script src="'.$base['url'].'assets/js/stisla.js"></script>
 	  <script src="'.$base['url'].'assets/js/scripts.js"></script>
 	  <script src="'.$base['url'].'assets/js/custom.js"></script>
+	  <script src="'.$base['url'].'assets/js/select2.js"></script>
+	  
 	</body>
-	</html>';
+	</html>'
+	
+	;
 	return $theme;
 	}
+	
 	public function setup(){
 	$base			= [];
 	$uri			= explode('/',$_SERVER['REQUEST_URI']);
@@ -347,6 +357,17 @@ class Msetup extends CI_Model {
 			->get()
 			->row_array();
 			return $rekdetail;
+		}
+        return null;
+    }
+	public function get_dinas($dinas) {
+		if($dinas){
+			$dinDetail = $this->db
+			->select('id,nama')
+			->from('mst_dinas')
+			->get()
+			->row_array();
+			return $dinDetail;
 		}
         return null;
     }

@@ -68,3 +68,17 @@ $theme['main'][] =
       </div>'.implode('',$modalEdit).implode('',$modalDelete);
 echo preg_replace('/\r|\n|\t/', '',implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));
 ?>
+
+$sub_array = array();
+                $sub_array[] = $row->nourut;
+                $sub_array[] = $row->nobukti;
+                $sub_array[] = $row->tglpajak;
+                $sub_array[] = $row->blnpajak;
+                $sub_array[] = $row->thnpajak;
+                $sub_array[] = $row->jumlah;
+                $sub_array[] = $row->prs_denda;
+                $sub_array[] = $row->nil_denda;
+                $sub_array[] = $row->total;
+                $sub_array[] = $row->keterangan;
+                $sub_array[] = implode('',$datatables->tombol($row->idstsmaster));
+                $data[] = $sub_array;
