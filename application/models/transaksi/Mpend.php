@@ -49,31 +49,66 @@ class Mpend extends CI_Model {
           return null; // No data found
         }
       }
+
     public function delete($idstsmaster, $nourut)
     {
         $idstsmaster = $this->input->post('idstsmaster');
         $nourut = $this->input->post('nourut');
     
         $delete = $this->Crud->delete_data('trx_stsdetail', ['idstsmaster' => $idstsmaster, 'nourut' => $nourut]);
-
-        if ($delete) {
-            echo json_encode(['success' => true, 'message' => 'All Data has been deleted successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to delete data']);
-        }
+        echo json_encode(['success' => true, 'message' => 'All Data has been deleted successfully']);
+       
     }
-    public function deleteAll()
+
+
+    public function delete_record($idstsmaster, $nourut) {
+        $this->db->where('idstsmaster', $idstsmaster);
+        $this->db->where('nourut', $nourut);
+        return $this->db->delete('trx_stsdetail'); 
+      }
+      
+    public function deleteAll($idstsmaster)
     {
-        $idstsmaster = $this->input->post('idstsmaster');
+        $this->db->where('idstsmaster', $idstsmaster);
+        return $this->db->delete('trx_stsdetail'); 
+    }
+    public function insertdata($data)
+    {
+        return $this->db->insert('trx_stsdetail', $data); 
+    }
     
-        $delete = $this->Crud->delete_data('trx_stsdetail', ['idstsmaster' => $idstsmaster]);
+  /*   public function getDataByIdNourut($idstsmaster, $nourut) {
+        return $this->db->get_where('trx_stsdetail', ['idstsmaster' => $idstsmaster, 'nourut' => $nourut])->row_array();
+    } */
+    public function getDataById($idstsmaster, $nourut) {
+        $this->db->select('trx_stsdetail.*'); 
+        $this->db->from('trx_stsdetail');
+        $this->db->where('idstsmaster', $idstsmaster);
+        $this->db->where('nourut', $nourut);
+        $query = $this->db->get();
 
-        if ($delete) {
-            echo json_encode(['success' => true, 'message' => 'All Data has been deleted successfully']);
+        if ($query->num_rows() > 0) {
+            return $query->row_array();
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to delete data']);
+            return false;
         }
     }
+   
+
+
+    public function databyid($id)
+    {
+        $this->db->select('*');
+        $this->db->from('trx_stsdetail');
+        $this->db->where('idstsmaster',$id);
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+    
+    public function updatedata($idstsmaster, $nourut, $data) {
+        return $this->db->update('trx_stsdetail', $data, ['idstsmaster' => $idstsmaster, 'nourut' => $nourut]);
+    }
+
     public function formInsert(){
         $dinasData = $this->db->get('mst_dinas')->result();
         $opsidin = '';

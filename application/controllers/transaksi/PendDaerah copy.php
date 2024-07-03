@@ -18,12 +18,10 @@ class PendDaerah extends CI_Controller {
 		$data['topbar'] 	= $template['topbar'];
 		$data['modalEdit'] 	= $this->Form->modalKu('E','Edit','transaksi/PendDaerah/aksi',$actions = ['edit']);;
 		$data['modalDelete']= $this->Form->modalKu('D','Delete','transaksi/PendDaerah/aksi',$actions = ['delete']);
-		$data['modalAdd']   = $this->Form->modalKu('A','Add','transaksi/PendDaerah/aksi',$actions = ['add']);
 		$data['sidebar'] 	= $template['sidebar'];
 		$data['jstable']	= $Jssetup->jsDatatable('#pendapatan','transaksi/PendDaerah/get_datatable_data');
 	 	$data['jsedit']		= $Jssetup->jsModal('#edit','Edit','transaksi/PendDaerah/myModal','#modalkuE');
 	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','transaksi/PendDaerah/myModal','#modalkuD');
-	 	$data['jsadd']	    = $Jssetup->jsModal('#add','Add','transaksi/PendDaerah/myModal','#modalkuA');
 		$data['forminsert'] = $this->Mpend->formInsert();
 		
 		$this->load->view('transaksi/pnddaerah',$data);
@@ -89,18 +87,16 @@ class PendDaerah extends CI_Controller {
             $sub_array[] = $row->kodebayar;
             $sub_array[] = $row->tgl_input;
             $sub_array[] = $row->nopelaporan;
-           /*  $sub_array[] = implode('',$this->Datatables->tombol($row->idstsmaster)); */
-            
-            $add_button = '<button type="button" class="btn btn-sm btn-outline-success modin fa fa-plus add-data" id="add-data"  data-toggle="modal" data-target="#addModal" data-idstsmaster="'.$row->idstsmaster.'"> Tambah</button>';
+            $add_button = '<button type="button" class="btn btn-xs btn-outline-primary modin fa fa-plus add-data"  data-toggle="modal" data-target="#addModal" data-idstsmaster="'.$row->idstsmaster.'"> Tambah</button>';
             $sub_array[] = $add_button;
             
-            $edit_button = '<button type="button" class="btn btn-sm btn-outline-primary modin fa fa-edit edit-data" id="edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'" data-nobukti="'.$row->nobukti.'"> Edit</button>';
+            $edit_button = '<button type="button" class="btn btn-xs btn-outline-primary modin fa fa-edit edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"  data-nobukti="'.$row->nobukti.'"> Edit</button>';
             $sub_array[] = $edit_button;
 
-            $delete_button = '<button type="button" class="btn btn-sm btn-outline-danger modin fa fa-times delete-data"  data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>';
+            $delete_button = '<button type="button" class="btn btn-xs btn-outline-danger modin fa fa-times delete-data"  data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>';
             $sub_array[] = $delete_button;
 
-            $delete_all_button = '<button type="button" class="btn btn-sm btn-outline-danger modin fa fa-times delete-all-data" id="hapus_data"  data-placement="bottom" title="Hapus Semua data" data-idstsmaster="'.$row->idstsmaster.'"> Hapus Semua</button>';
+            $delete_all_button = '<button type="button" class="btn btn-xs btn-outline-danger modin fa fa-times delete-all-data" id="hapus_data"  data-placement="bottom" title="Hapus Semua data" data-idstsmaster="'.$row->idstsmaster.'"> Hapus Semua</button>';
             $sub_array[] = $delete_all_button;
 
             $data[] = $sub_array;
@@ -141,36 +137,19 @@ class PendDaerah extends CI_Controller {
                 echo json_encode(['success' => false]);
             }
         }   
-       
+        
+     
+        
         public function myModal(){
             $wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:'.site_url('404'));
             $idnya = $this->input->post('idnya');
             $nourut = $this->input->post('nourut');
-            $idPend = $this->Mpend->get_data_by_id($idnya, $nourut);
-
+            $idPend = $this->Crud->ambilSatu('trx_stsdetail', ['idstsmaster' => $idnya , 'nourut' => $nourut]);
             switch($wadi){
-                case 'Add':
-                    $form [] = '
-                    <div class="row">
-                    <div class="col-md-6">
-                          '.implode($this->Form->inputText('kode',$this->input->post('idnya'))).'
-                    </div>
-                             
-                   <div class="col-md-6">'
-                        .implode($this->Form->inputText('nobukti','NOP/SKP/NPWPD',$idPend->nobukti)).
-                       '</div>
-                    </div>
-                  ';
-                    echo implode($form);
-                break;
                 case 'Edit':
                     $form [] = '
                     <div class="row">
-                    <div class="col-md-6">
-                          '.implode($this->Form->inputText('kode',$this->input->post('idnya'))).'
-                    </div>
-                             
-                   <div class="col-md-6">'
+                        <div class="col-md-6">'
                         .implode($this->Form->inputText('nobukti','NOP/SKP/NPWPD',$idPend->nobukti)).
                        '</div>
                     </div>
@@ -263,7 +242,6 @@ class PendDaerah extends CI_Controller {
             }
         }
         
-        /* Record fynction */
         public function add_record_data() {
             $isnonkas = $this->input->post('isnonkas') ? $this->input->post('isnonkas') : 0;
             $iddinas = $this->input->post('iddinas');
@@ -351,12 +329,6 @@ class PendDaerah extends CI_Controller {
                 redirect('transaksi/PendDaerah');
             }
         }
-
-        /* End record function */
-
-        
-
-        /* Action datatable Record fynction */
         public function add_data() {
             $data = [
                 'idstsmaster' => $this->input->post('idstsmaster'),
@@ -374,9 +346,6 @@ class PendDaerah extends CI_Controller {
                 /* 'total' => $this->input->post('total'), */
                 'keterangan' => $this->input->post('keterangan'),
                 'formulir' => $this->input->post('formulir'),
-                'kodebayar' => $this->input->post('kodebayar'),
-                'tgl_input' => $this->input->post('tgl_input'),
-                'nopelaporan' => $this->input->post('nopelaporan'),
             ];
    
             $insert = $this->Mpend->insertdata($data);
@@ -389,34 +358,36 @@ class PendDaerah extends CI_Controller {
             
               echo json_encode($response);
         }
-
-      
-        public function get_edit_data() {
+        public function edit_data()
+        {
             $this->load->model('Mpend'); 
-
+     
             $idstsmaster = $this->input->post('idstsmaster');
             $nourut = $this->input->post('nourut');
-    
-            $data = $this->Mpend->getDataById($idstsmaster, $nourut);
+
+            $data = $this->Mpend->getDataByIdNourut($idstsmaster, $nourut);
+
             if ($data) {
-                echo json_encode(['success' => true, 'data' => $data]);
+                $response = ['success' => true, 'data' => $data];
             } else {
-                echo json_encode(['success' => false, 'message' => 'Data not found']);
+                $response = ['success' => false, 'message' => 'Data tidak ditemukan'];
             }
+
+            echo json_encode($response);
         }
-        
+
    
         public function update_data() 
         {
             $this->load->model('Mpend'); 
             $idstsmaster = $this->input->post('idstsmaster');
             $nourut = $this->input->post('nourut');
-        
     
             $data = [
-               /*  'idwp' => $this->input->post('idwp'), */
+                'idstsmaster' =>  $idstsmaster,
+                'idwp' => $this->input->post('idwp'),
                 'iduptd' => $this->input->post('iduptd'),
-               /*  'tglpajak' => $this->input->post('tglpajak'), */
+                'tglpajak' => $this->input->post('tglpajak'),
                 /* 'idskpd' => $this->input->post('idskpd'), */
                 'nobukti' => $this->input->post('nobukti'),
                 'nourut' => $this->input->post('nourut'),
@@ -428,19 +399,15 @@ class PendDaerah extends CI_Controller {
                 /* 'total' => $this->input->post('total'), */
                 'keterangan' => $this->input->post('keterangan'),
                 'formulir' => $this->input->post('formulir'),
-                'kodebayar' => $this->input->post('kodebayar'),
-                'tgl_input' => $this->input->post('tgl_input'),
-                'nopelaporan' => $this->input->post('nopelaporan'),
             ];
-            $update = $this->Mpend->updatedata($idstsmaster, $nourut, $data);
-           
+            $update = $this->Mpend->updatedata('trx_stsdetail', $data , ['idstsmater' => $idstsmaster, 'nourut'=> $nourut]);
             if ($update) {
-                $response = ['success' => true, 'message' => 'Berhasil update Data.'];
-              } else {
-                $response = ['success' => false, 'message' => 'Gagal update Data'];
-              }
-            
-              echo json_encode($response);
+                $this->session->set_flashdata('message', 'Data has been updated successfully');
+                redirect('transaksi/PendDaerah');
+            } else {
+                $this->session->set_flashdata('message', 'Failed to update data');
+                redirect('transaksi/PendDaerah');
+            }
         }
         public function delete() {
             $this->load->model('Mpend'); 
@@ -482,10 +449,6 @@ class PendDaerah extends CI_Controller {
           
             echo json_encode($response);
           }
-
-          /* End Action datatable Record fynction */
-
-
           public function get_wajibpajak()
           {
               $page = $_GET['page'] ?: 1; 
@@ -506,27 +469,24 @@ class PendDaerah extends CI_Controller {
               echo json_encode($results);
           }
           public function get_rekening_by_idrapbd()
-          {
-              $idstsmaster = $this->input->post('idstsmaster');
-          
-              $rekdata = $this->db
-                  ->select('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
-                  ->from('mst_rekening')
-                  ->join('trx_rapbd', 'trx_rapbd.idrekening = mst_rekening.id')
-                  ->join('trx_stsdetail', 'trx_stsdetail.idrapbd = trx_rapbd.id')
-                  ->join('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster')
-                  ->where('trx_stsmaster.id', $idstsmaster)
-                  ->get()
-                  ->result();
-          
-              $opsirek = '<option></option>';
-              foreach ($rekdata as $ttd) {
-                  $opsirek .= '<option value="'.$ttd->kdrekening.'">'.$ttd->nmrekening.'</option>';
-              }
-          
-              echo $opsirek;
-          }
-          
+            {
+                $idstsmaster = $this->input->post('idstsmaster');
+
+                $rekdata = $this->db
+                    ->select('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
+                    ->from('mst_rekening')
+                    ->join('trx_rapbd', 'trx_rapbd.id_rekening = mst_rekening.id')
+                    ->where('trx_rapbd.idstsmaster', $idstsmaster) 
+                    ->get()
+                    ->result();
+
+                $opsirek = '<option></option>';
+                foreach ($rekdata as $ttd) {
+                    $opsirek .= '<option value="'.$ttd->kdrekening.'">'.$ttd->nmrekening.'</option>';
+                }
+
+                echo $opsirek;
+            }
 }
 ?>
 		

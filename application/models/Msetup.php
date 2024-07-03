@@ -248,6 +248,7 @@ class Msetup extends CI_Model {
 	  <script src="'.$base['url'].'assets/js/scripts.js"></script>
 	  <script src="'.$base['url'].'assets/js/custom.js"></script>
 	  <script src="'.$base['url'].'assets/js/select2.js"></script>
+	  <script src="'.$base['url'].'assets/js/datatableaction.js"></script>
 	  
 	</body>
 	</html>'

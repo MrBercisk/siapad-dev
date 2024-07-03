@@ -4,7 +4,7 @@ $(document).ready(function() {
         placeholder: $('#idrecord').data('placeholder'),
         minimumInputLength: 3,
     });
-   
+  
 
     $("#idrecord").change(function() {
         var recordId = $(this).val();
@@ -55,30 +55,8 @@ $(document).ready(function() {
                         $('#iddinas').val(iddinasId).trigger('change');
                         $('#nama_dinas_display').text(iddinasName);
     
-                        $('#tambah_data_button').show();
+                        $('#add-data').show();
                         $('#hapus_data').show();
-                        $('#cari_data').show();
-
-                        $('#tambah_data_button').off('click').on('click', function() {
-                            if (recordId) {
-                                $.ajax({
-                                    url: 'PendDaerah/add_data',
-                                    type: 'POST',
-                                    data: { id: recordId },
-                                    dataType: 'json',
-                                    success: function(response) {
-                                        if (response.status == 'success') {
-                                            alert('Data berhasil ditambahkan');
-                                            table.ajax.reload(null, false);
-                                        } else {
-                                            alert('Gagal menambahkan data');
-                                        }
-                                    },
-                                });
-                            } else {
-                                alert('Pilih data terlebih dahulu');
-                            }
-                        });
     
                         table.ajax.url('PendDaerah/get_datatable_data?id=' + recordId).load();
                         
@@ -185,50 +163,295 @@ $(document).ready(function() {
             }
         });
     });
-    $('#pendapatan').on('click', '.edit-data', function() {
-        var idstsmaster = $(this).data('idstsmaster');
-        var nourut = $(this).data('nourut');
-    
-        $.ajax({
-            url: 'PendDaerah/edit_datatable_row',
-            method: 'POST',
-            data: { idstsmaster: idstsmaster, nourut: nourut },
-            dataType: 'json',
-            success: function(response) {
-                $('#idstsmaster').val(response.idstsmaster);
-                $('#nourut').val(response.nourut);
-      
-                $('#editModal').modal('show');
-            },
-        });
-    });
-    $('#pendapatan').on('click', '.edit-data', function() {
+ 
+   
+    $('#pendapatan').on('click', '.edit-data', function(e) {
         var idstsmaster = $(this).data('idstsmaster');
         var nourut = $(this).data('nourut');
         var nobukti = $(this).data('nobukti');
+        var iduptd = $(this).data('iduptd');
+        var blnpajak = $(this).data('blnpajak');
+        var thnpajak = $(this).data('thnpajak');
+        var jumlah = $(this).data('jumlah');
+        var prs_denda = $(this).data('prs_denda');
+        var nil_denda = $(this).data('nil_denda');
+        var keterangan = $(this).data('keterangan');
+        var formulir = $(this).data('formulir');
+        var kodebayar = $(this).data('kodebayar');
+        var tgl_input = $(this).data('tgl_input');
+        var nopelaporan = $(this).data('nopelaporan');
         
-        // Set values to form fields
+        $.ajax({
+            url: 'PendDaerah/get_edit_data',
+            method: 'POST',
+            data: {
+                idstsmaster: idstsmaster,
+                nourut: nourut,
+                nobukti: nobukti,
+                iduptd: iduptd,
+                blnpajak: blnpajak,
+                thnpajak: thnpajak,
+                jumlah: jumlah,
+                prs_denda: prs_denda,
+                nil_denda: nil_denda,
+                keterangan: keterangan,
+                formulir: formulir,
+                kodebayar: kodebayar,
+                tgl_input: tgl_input,
+                nopelaporan: nopelaporan,
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#editTableForm input[name="idstsmaster"]').val(response.data.idstsmaster);
+                    $('#editTableForm input[name="nourut"]').val(response.data.nourut);
+                    $('#editTableForm input[name="nobukti"]').val(response.data.nobukti);
+                    $('#editTableForm input[name="iduptd"]').val(response.data.iduptd);
+                    $('#editTableForm input[name="blnpajak"]').val(response.data.blnpajak);
+                    $('#editTableForm input[name="thnpajak"]').val(response.data.thnpajak);
+                    $('#editTableForm input[name="jumlah"]').val(response.data.jumlah);
+                    $('#editTableForm input[name="prs_denda"]').val(response.data.prs_denda);
+                    $('#editTableForm input[name="nil_denda"]').val(response.data.nil_denda);
+                    $('#editTableForm input[name="keterangan"]').val(response.data.keterangan);
+                    $('#editTableForm input[name="formulir"]').val(response.data.formulir);
+                    $('#editTableForm input[name="kodebayar"]').val(response.data.kodebayar);
+                    $('#editTableForm input[name="tgl_input"]').val(response.data.tgl_input);
+                    $('#editTableForm input[name="nopelaporan"]').val(response.data.nopelaporan);
+                
+                    $('#editModal').modal('show');
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'Gagal mendapatkan data: ' + response.message,
+                        'error'
+                    );
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire(
+                    'An error occurred!',
+                    'An error occurred: ' + xhr.responseText,
+                    'error'
+                );
+            }
+        });
+    });
+    $('#editTableForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        $.ajax({
+            url: 'PendDaerah/update_data',
+            method: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#editModal').modal('hide');
+                            $('#pendapatan').DataTable().ajax.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'Gagal Update Data: ' + response.message,
+                        'error'
+                    );
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire(
+                    'An error occurred!',
+                    'An error occurred: ' + xhr.responseText,
+                    'error'
+                );
+            }
+        });
+    });
+    $('#formadd').on('submit', function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: 'PendDaerah/add_data',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#addModal').modal('hide');
+                            $('#pendapatan').DataTable().ajax.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+    $('#pendapatan').on('click', '.delete-data', function(e) {
+        var idstsmaster = $(this).data('idstsmaster');
+        var nourut = $(this).data('nourut');
+    
+        Swal.fire({
+            title: 'Anda yakin ingin menghapus data ini?',
+            text: "Akan menghapus data record ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'PendDaerah/delete',
+                    method: 'POST',
+                    data: {
+                        idstsmaster: idstsmaster,
+                        nourut: nourut
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#pendapatan').DataTable().ajax.reload();
+                            Swal.fire(
+                                'Deleted!',
+                                'Data Berhasil Dihapus!',
+                                'success'
+                            );
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'Gagal Hapus Data ' + response.message,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire(
+                            'An error occurred!',
+                            'An error occurred: ' + xhr.responseText,
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+    $('#pendapatan').on('click', '.add-data', function() {
+        var idstsmaster = $(this).data('idstsmaster');
+        
         $('#idstsmaster').val(idstsmaster);
-        $('#nourut').val(nourut);
-        $('#nobukti').val(nobukti);
-        $('#wajibpajak').val($(this).data('wajibpajak'));
-        $('#namarekening').val($(this).data('namarekening'));
-        $('#uptd').val($(this).data('uptd'));
-        $('#tglpajak').val($(this).data('tglpajak'));
-        $('#blnpajak').val($(this).data('blnpajak'));
-        $('#thnpajak').val($(this).data('thnpajak'));
-        $('#jumlah').val($(this).data('jumlah'));
-        $('#prs_denda').val($(this).data('prs_denda'));
-        $('#nil_denda').val($(this).data('nil_denda'));
-        $('#total').val($(this).data('total'));
-        $('#keterangan').val($(this).data('keterangan'));
-        $('#formulir').val($(this).data('formulir'));
-        $('#kodebayar').val($(this).data('kodebayar'));
-        $('#tgl_input').val($(this).data('tgl_input'));
-        $('#nopelaporan').val($(this).data('nopelaporan'));
-        
-        // Show modal
-        $('#editModal').modal('show');
+        $('#addModal').modal('show');
+    });
+  
+   
+    $('#pendapatan').on('click', '.delete-all-data', function(){
+        var idstsmaster = $(this).data('idstsmaster');
+        Swal.fire({
+            title: 'Anda yakin ingin menghapus semua data?',
+            text: "Akan menghapus semua data pada record ini!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'PendDaerah/delete_all_data',
+                    method: 'POST',
+                    data: {
+                        idstsmaster: idstsmaster
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#pendapatan').DataTable().ajax.reload();
+                            Swal.fire(
+                                'Deleted!',
+                                'Semua Data Berhasil Dihapus!',
+                                'success'
+                            );
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'Gagal Hapus Data ' + response.message,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire(
+                            'An error occurred!',
+                            'An error occurred: ' + xhr.responseText,
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
     });
     
+    
+    
+    function formatResult(result) {
+        return '<option value="' + result.id + '">' + result.text + '</option>';
+    }
+  
+
+    $('#idwp').select2({
+        ajax: {
+            url: 'PendDaerah/get_wajibpajak',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    page: params.page || 1
+                };
+            },
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+
+                return {
+                    results: data,
+                    pagination: {
+                        more: data.length === 10 
+                    }
+                };
+            },
+            cache: true
+        },
+        escapeMarkup: function(markup) {
+            return markup;
+        },
+        minimumInputLength: 0, 
+        templateResult: formatResult
+    });
+   
 });

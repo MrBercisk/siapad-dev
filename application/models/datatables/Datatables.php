@@ -59,8 +59,13 @@ class Datatables extends CI_Model {
         $this->db->from($this->table);
         return $this->db->count_all_results();
     }
-    public function tombol($id, $actions = ['edit', 'delete']) {
+    public function tombol($id, $actions = ['edit', 'delete', 'add']) {
         $tombol[] = '<div class="btn-group pull-right">';
+        if (in_array('add', $actions)) {
+            $tombol []= '
+                <a class="btn btn-xs btn-outline-success modin fa fa-plus" id="add" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalA" data-placement="bottom" title="Tambah data">
+                </a>';
+        }
         if (in_array('edit', $actions)) {
             $tombol []= '
                 <a class="btn btn-xs btn-outline-primary modin fa fa-edit" id="edit" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalE" data-placement="bottom" title="Perbarui data">
@@ -74,11 +79,11 @@ class Datatables extends CI_Model {
         $tombol []= '</div>';
         return $tombol;
     }
-    public function tombolPend($idstsmaster, $nourut, $actions = ['edit', 'delete']) {
+    public function tombolPend($idstsmaster, $actions = ['edit', 'delete']) {
         $tombol[] = '<div class="btn-group pull-right">';
         
         if (in_array('edit', $actions)) {
-            $tombol[] = '<a class="btn btn-xs btn-outline-primary modin fa fa-edit" id="edit" href="' . site_url('transaksi/PendDaerah/myModal/'.$idstsmaster.'/'.$nourut) . '" data-placement="bottom" title="Edit data">Edit</a>';
+            $tombol[] = '<button type="button" class="btn btn-xs btn-outline-primary modin fa fa-edit edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$idstsmaster.'">Edit</button>';
         }
         
         if (in_array('delete', $actions)) {

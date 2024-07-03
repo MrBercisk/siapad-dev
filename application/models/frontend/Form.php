@@ -157,7 +157,7 @@ class Form extends CI_Model
 		$form[] = '<input type="hidden" ' . $value . ' id="' . $id . '" name="' . $id . '" ' . $attrib . '>';
 		return $form;
 	}
-	public function modalKu($abjad, $label, $link, $actions = ['edit', 'delete'])
+	public function modalKu($abjad, $label, $link, $actions = ['edit', 'delete', 'add'])
 	{
 		$modal[] = '<div class="modal fade bd-example-modal-lg" id="myModal' . $abjad . '" tabindex="-1" role="dialog" aria-labelledby="myModalTitle" aria-hidden="true">
 	  <div class="modal-dialog">
@@ -176,6 +176,9 @@ class Form extends CI_Model
 
 		if (in_array('edit', $actions)) {
 			$modal[] = '<button type="submit" name="AKSI" value="Edit" class="btn btn-info">Save changes</button>';
+		}
+		if (in_array('edit', $actions)) {
+			$modal[] = '<button type="submit" name="AKSI" value="Add" class="btn btn-info">Submit</button>';
 		}
 		if (in_array('delete', $actions)) {
 			$modal[] = '<button type="submit" name="AKSI" value="Delete" class="btn btn-danger">Confirm Delete</button>';
