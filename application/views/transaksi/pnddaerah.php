@@ -10,16 +10,7 @@ endif;
 $theme['main'][]  = implode($sidebar);
 $datatables 	  = '<script type="text/javascript">
           $(document).ready(function(){
-                    var options = `<option value=""></option>`; 
-              for (var i = 1; i <= 31; i++) {
-                  options += `<option value="` + i + `">` + i + `</option>`;
-              }
-
-              $(`#tglpajak`).html(options); 
-
-              $(`#tglpajak`).select2({
-                  placeholder: `Pilih Tanggal`,
-              });
+              
             '.$jsedit.$jsdelete.'  
             
           });
@@ -81,7 +72,12 @@ $datatables 	  = '<script type="text/javascript">
         foreach ($rekdata as $ttd) {
             $opsirek .= '<option value="'.$ttd->kdrekening.'">'.$ttd->nmrekening.'</option>';
         }
-        
+  
+          $select_options = '';
+          for ($i = 1; $i <= 31; $i++) {
+              $select_options .= '<option value="' . $i . '">' . $i . '</option>';
+          }
+
 $theme['main'][] = 
 
     '<div id="page-title" class="page-title" data-title="'.$title.'"></div>
@@ -363,9 +359,9 @@ $theme['main'][] =
                                 </div>
                                 <div class="col-md-4">
                                  <label for="tanggal">Tanggal:</label>
-                                    <select class="form-control select2" id="tglpajak" name="tglpajak" style="width: 100%;" required>
+                                    <select class="form-control" id="tglpajak" name="tglpajak" style="width: 100%;" required>
                                         <option value="" disabled selected>Pilih Tanggal</option>
-                                   
+                                          '.$select_options.'
                                     </select>
                                 </div>
                                 <div class="col-md-4">
@@ -517,10 +513,11 @@ $theme['main'][] =
                                 </div>
                                 <div class="col-md-4">
                                  <label for="tanggal">Tanggal:</label>
-                                    <select class="form-control select2" id="tglpajak" name="tglpajak" style="width: 100%;" >
-                                        <option value="" disabled selected>Pilih Tanggal</option>
-                                   
+                                    <select name="tglpajak" id="tglpajak" class="form-control" style="width: 100%;">
+                                      <option value="" disabled selected>Pilih Tanggal</option>
+                                      '.$select_options.'
                                     </select>
+                                   
                                 </div>
                                 <div class="col-md-4">
                                  <label for="bulan">Bulan:</label>

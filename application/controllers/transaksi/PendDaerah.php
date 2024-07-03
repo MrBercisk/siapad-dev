@@ -416,7 +416,7 @@ class PendDaerah extends CI_Controller {
             $data = [
                /*  'idwp' => $this->input->post('idwp'), */
                 'iduptd' => $this->input->post('iduptd'),
-               /*  'tglpajak' => $this->input->post('tglpajak'), */
+                'tglpajak' => $this->input->post('tglpajak'),
                 /* 'idskpd' => $this->input->post('idskpd'), */
                 'nobukti' => $this->input->post('nobukti'),
                 'nourut' => $this->input->post('nourut'),
