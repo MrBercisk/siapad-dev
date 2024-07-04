@@ -57,6 +57,7 @@ $(document).ready(function() {
     
                         $('#add-data').show();
                         $('#hapus_data').show();
+                        $('#cari_data').show();
     
                         table.ajax.url('PendDaerah/get_datatable_data?id=' + recordId).load();
                         
@@ -75,7 +76,6 @@ $(document).ready(function() {
     });
     
   
-    
     var table = $('#pendapatan').DataTable({
         "processing": true,
         "serverSide": true,
@@ -84,6 +84,12 @@ $(document).ready(function() {
             "type": "POST",
             "data": function(d) {
                 d.id = $('#idrecord').val(); 
+            },
+            "dataSrc": function(json) {
+                $('#table-buttons').find('#idstsmaster').remove(); 
+                $('#table-buttons').append(json.extra_data);
+                console.log('idstsmasternya yang diambil:', json.extra_data); 
+                return json.data;
             }
         },
         "searching": false,
@@ -101,7 +107,7 @@ $(document).ready(function() {
             }
         ]
     });
-    
+  
    
         const editButton = document.getElementById('editButton');
         const submitButton = document.getElementById('submitButton');
@@ -167,9 +173,10 @@ $(document).ready(function() {
    
     $('#pendapatan').on('click', '.edit-data', function(e) {
         var idstsmaster = $(this).data('idstsmaster');
+        var iduptd = $(this).data('iduptd');
         var nourut = $(this).data('nourut');
         var nobukti = $(this).data('nobukti');
-        var iduptd = $(this).data('iduptd');
+        var tglpajak = $(this).data('tglpajak');
         var blnpajak = $(this).data('blnpajak');
         var thnpajak = $(this).data('thnpajak');
         var jumlah = $(this).data('jumlah');
@@ -186,9 +193,10 @@ $(document).ready(function() {
             method: 'POST',
             data: {
                 idstsmaster: idstsmaster,
+                iduptd: iduptd,
                 nourut: nourut,
                 nobukti: nobukti,
-                iduptd: iduptd,
+                tglpajak: tglpajak,
                 blnpajak: blnpajak,
                 thnpajak: thnpajak,
                 jumlah: jumlah,
@@ -204,9 +212,10 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     $('#editTableForm input[name="idstsmaster"]').val(response.data.idstsmaster);
+                    $('#editTableForm input[name="iduptd"]').val(response.data.iduptd);
                     $('#editTableForm input[name="nourut"]').val(response.data.nourut);
                     $('#editTableForm input[name="nobukti"]').val(response.data.nobukti);
-                    $('#editTableForm input[name="iduptd"]').val(response.data.iduptd);
+                    $('#editTableForm input[name="tglpajak"]').val(response.data.tglpajak);
                     $('#editTableForm input[name="blnpajak"]').val(response.data.blnpajak);
                     $('#editTableForm input[name="thnpajak"]').val(response.data.thnpajak);
                     $('#editTableForm input[name="jumlah"]').val(response.data.jumlah);
@@ -274,6 +283,18 @@ $(document).ready(function() {
             }
         });
     });
+
+    /* Add Data pendapatan */
+    $('#table-buttons').on('click', '#add-data', function() {
+        var idstsmaster = $('#idstsmaster').val();
+        if (idstsmaster) {
+            console.log('Tambah data dengan idstsmaster:', idstsmaster);
+            $('#addModal #idstsmaster').val(idstsmaster);
+        } else {
+            console.error('idstsmaster tidak ditemukan');
+        }
+    });
+    
     $('#formadd').on('submit', function(e) {
         e.preventDefault();
 
@@ -314,6 +335,9 @@ $(document).ready(function() {
             }
         });
     });
+    /* End add */
+
+
     $('#pendapatan').on('click', '.delete-data', function(e) {
         var idstsmaster = $(this).data('idstsmaster');
         var nourut = $(this).data('nourut');
@@ -363,59 +387,58 @@ $(document).ready(function() {
             }
         });
     });
-    $('#pendapatan').on('click', '.add-data', function() {
-        var idstsmaster = $(this).data('idstsmaster');
-        
-        $('#idstsmaster').val(idstsmaster);
-        $('#addModal').modal('show');
-    });
-  
+ 
    
-    $('#pendapatan').on('click', '.delete-all-data', function(){
-        var idstsmaster = $(this).data('idstsmaster');
-        Swal.fire({
-            title: 'Anda yakin ingin menghapus semua data?',
-            text: "Akan menghapus semua data pada record ini!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: 'PendDaerah/delete_all_data',
-                    method: 'POST',
-                    data: {
-                        idstsmaster: idstsmaster
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            $('#pendapatan').DataTable().ajax.reload();
+    $('#table-buttons').on('click', '.delete-all-data', function() {
+        var idstsmaster = $('#idstsmaster').val();
+        console.log('Hapus semua data dengan idstsmaster:', idstsmaster);
+        if (idstsmaster) {
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus semua data?',
+                text: "Akan menghapus semua data pada record ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: 'PendDaerah/delete_all_data',
+                        method: 'POST',
+                        data: {
+                            idstsmaster: idstsmaster
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                $('#pendapatan').DataTable().ajax.reload();
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Semua Data Berhasil Dihapus!',
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    'Gagal Hapus Data ' + response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function(xhr, status, error) {
                             Swal.fire(
-                                'Deleted!',
-                                'Semua Data Berhasil Dihapus!',
-                                'success'
-                            );
-                        } else {
-                            Swal.fire(
-                                'Error!',
-                                'Gagal Hapus Data ' + response.message,
+                                'An error occurred!',
+                                'An error occurred: ' + xhr.responseText,
                                 'error'
                             );
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire(
-                            'An error occurred!',
-                            'An error occurred: ' + xhr.responseText,
-                            'error'
-                        );
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        } else {
+            console.error('idstsmaster tidak ditemukan');
+        }
     });
     
     

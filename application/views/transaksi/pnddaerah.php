@@ -35,6 +35,10 @@ $datatables 	  = '<script type="text/javascript">
                 width: 100%;
                 overflow-x: auto;
             }
+               .action-buttons .btn {
+                 margin: 5px 0; /* 
+}
+
 
            </style>              
             
@@ -180,10 +184,15 @@ $theme['main'][] =
                       <div class="card-body">                   
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
-                      
+                                <div id="table-buttons">
+                                    <button type="button" class="btn btn-sm btn-success fa fa-plus add-data" id="add-data" data-toggle="modal" data-target="#addModal" style="display: none;"> Tambah</button>
+                                    <button type="button" class="btn btn-sm btn-danger fa fa-times delete-all-data" id="hapus_data" style="display: none;" > Hapus</button>
+                                    <button type="button" class="btn btn-sm btn-dark fa fa-binoculars search-data" id="cari_data" style="display: none;"> Cari</button>
+                                </div>
                        
-                              <table class="display" style="width:100% !important;" id="pendapatan">
-                                 
+                              <table class="table table-bordered table-stripped display" style="width:100% !important;" id="pendapatan">
+                              
+
                                 <thead>                                 
                                   <tr>
                                       <th>No. Urut</th>
@@ -203,10 +212,7 @@ $theme['main'][] =
                                       <th>Kode Bayar</th>
                                       <th>Tanggal Input</th>
                                       <th>No Pelaporan</th>
-                                      <th></th>
-                                      <th></th>
-                                      <th></th>
-                                      <th></th>
+                                      <th>Aksi</th>
                                   </tr>
                                 </thead>
                                 <tbody>   
@@ -366,7 +372,7 @@ $theme['main'][] =
                                 </div>
                                 <div class="col-md-4">
                                  <label for="bulan">Bulan:</label>
-                                    <select class="form-control select2" id="blnpajak" name="blnpajak" style="width: 100%;" required>
+                                    <select class="form-control" id="blnpajak" name="blnpajak" style="width: 100%;" required>
                                         <option value="" disabled selected>Pilih Bulan</option>
                                         <option value="01">Januari</option>
                                         <option value="02">Februari</option>

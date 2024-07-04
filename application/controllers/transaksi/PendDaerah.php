@@ -90,25 +90,22 @@ class PendDaerah extends CI_Controller {
             $sub_array[] = $row->tgl_input;
             $sub_array[] = $row->nopelaporan;
            /*  $sub_array[] = implode('',$this->Datatables->tombol($row->idstsmaster)); */
-            
-            $add_button = '<button type="button" class="btn btn-sm btn-outline-success modin fa fa-plus add-data" id="add-data"  data-toggle="modal" data-target="#addModal" data-idstsmaster="'.$row->idstsmaster.'"> Tambah</button>';
-            $sub_array[] = $add_button;
-            
-            $edit_button = '<button type="button" class="btn btn-sm btn-outline-primary modin fa fa-edit edit-data" id="edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'" data-nobukti="'.$row->nobukti.'"> Edit</button>';
-            $sub_array[] = $edit_button;
-
-            $delete_button = '<button type="button" class="btn btn-sm btn-outline-danger modin fa fa-times delete-data"  data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>';
-            $sub_array[] = $delete_button;
-
-            $delete_all_button = '<button type="button" class="btn btn-sm btn-outline-danger modin fa fa-times delete-all-data" id="hapus_data"  data-placement="bottom" title="Hapus Semua data" data-idstsmaster="'.$row->idstsmaster.'"> Hapus Semua</button>';
-            $sub_array[] = $delete_all_button;
-
-            $data[] = $sub_array;
+              
+           $edit_button = '<button type="button" class="btn btn-sm btn-primary modin fa fa-edit edit-data" id="edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'" data-nobukti="'.$row->nobukti.'"> Edit</button>';
+           $delete_button = '<button type="button" class="btn btn-sm btn-danger modin fa fa-times delete-data"  data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>';
+   
+           $buttons = '<div class="action-buttons">' . $edit_button . $delete_button . '</div>';
+           $sub_array[] = $buttons;
+        
+           $data[] = $sub_array;
         }
         
+        $hidden_input = '<input type="hidden" name="idstsmaster" id="idstsmaster" value="'.$idrecord.'">';
+
         $output = array(
-            "draw" => intval($_POST["draw"]),
-            "data" => $data
+            "draw" => intval($this->input->post("draw")),
+            "data" => $data,
+            "extra_data" => $hidden_input
         );
     
         echo json_encode($output);
@@ -355,7 +352,6 @@ class PendDaerah extends CI_Controller {
         /* End record function */
 
         
-
         /* Action datatable Record fynction */
         public function add_data() {
             $data = [
