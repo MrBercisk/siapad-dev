@@ -25,7 +25,6 @@ class PendDaerah extends CI_Controller {
 	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','transaksi/PendDaerah/myModal','#modalkuD');
 	 	$data['jsadd']	    = $Jssetup->jsModal('#add','Add','transaksi/PendDaerah/myModal','#modalkuA');
 		$data['forminsert'] = $this->Mpend->formInsert();
-		
 		$this->load->view('transaksi/pnddaerah',$data);
 	}
 	
@@ -68,6 +67,7 @@ class PendDaerah extends CI_Controller {
         $datatables->addJoin('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
         $datatables->addJoin('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
         $datatables->addWhere('trx_stsdetail.idstsmaster', $idrecord); 
+        $datatables->setOrder('trx_stsdetail.nourut', 'asc');
         $fetch_data = $datatables->make_datatables();
         $data = array();
         foreach ($fetch_data as $row) {
@@ -202,64 +202,24 @@ class PendDaerah extends CI_Controller {
             echo implode($form);
         }
     
-        public function aksi(){
-            $aksi = isset($_POST['AKSI']) ? $_POST['AKSI'] : header('location:'.site_url('404'));
-            $this->load->model('backend/Crud'); 
-            switch($aksi){
-                case 'Save':
-                    $data = [	'iddinas' 		=> $this->input->post('iddinas'),
-                                 'tahun' 			=> $this->input->post('tahun'),
-                                'idrekening' 		=> $this->input->post('idrekening'),
-                                'apbd' 		=> $this->input->post('apbd'),
-                                'apbdp' 		=> $this->input->post('apbdp'),
-                            ];
-                    $insert = $this->Crud->insert_data('trx_rapbd', $data);
-                    if ($insert) {
-                        $this->session->set_flashdata('message', 'Data has been saved successfully');
-                        redirect('transaksi/apbd');
-                    } else {
-                        $this->session->set_flashdata('message', 'Failed to save data');
-                        redirect('transaksi/apbd');
-                    }
-                break;
-                case 'Edit':
-                    $kode = $this->input->post('kode');
-                    $nourut = $this->input->post('nourut');
-                    $data = [	 'tglpajak' => $this->input->post('tglpajak'),
-                                    'idskpd' => $this->input->post('idskpd'),
-                                    'nobukti' => $this->input->post('nobukti'),
-                                    'blnpajak' =>  $this->input->post('blnpajak'),
-                                    'thnpajak' => $this->input->post('thnpajak'),
-                                    'jumlah' => $this->input->post('jumlah'),
-                                    'prs_denda' =>  $this->input->post('prs_denda'),
-                                    'nil_denda' => $this->input->post('nil_denda'),
-                                    'total' => $this->input->post('total'),
-                                    'keterangan' => $this->input->post('keterangan'),
-
-                            ];
-                    $update = $this->Crud->update_data('trx_stsdetail', ['idstsmaster' => $kode, 'nourut' => $nourut]);
-                    if ($update) {
-                        $this->session->set_flashdata('message', 'Data has been updated successfully');
-                        redirect('transaksi/PendDaerah');
-                    } else {
-                        $this->session->set_flashdata('message', 'Failed to update data');
-                        redirect('transaksi/PendDaerah');
-                    }
-                break;
-                case 'Delete':
-                    $kode = $this->input->post('kode');
-                    $nourut = $this->input->post('nourut');
-                    $this->Mpend->delete_record('trx_stsdetail', ['idstsmaster' => $kode, 'nourut' => $nourut]);       
-                    $this->session->set_flashdata('message', 'Data has been deleted successfully');
-                    redirect('transaksi/PendDaerah');
-                    
-                break;
-                default:
-                    header('location:'.site_url('404'));
-                break;
-            }
-        }
+        public function getRecordData()
+        {
+            $this->load->database();
+            
+            $this->db->select('id, nomor');
+            $recData = $this->db->get('trx_stsmaster')->result();
         
+            $opsiRec = array();
+            foreach ($recData as $record) {
+                $opsiRec[] = array(
+                    'id' => $record->id,
+                    'nomor' => $record->nomor
+                );
+            }
+        
+            header('Content-Type: application/json');
+            echo json_encode($opsiRec);
+        }
         /* Record fynction */
         public function add_record_data() {
             $isnonkas = $this->input->post('isnonkas') ? $this->input->post('isnonkas') : 0;
@@ -338,15 +298,14 @@ class PendDaerah extends CI_Controller {
             ];
     
 
-            $update = $this->Crud->update_data('trx_stsmaster', $data, ['id' => $idrecord]);
-    
+            $update = $this->Mpend->update_record_data($idrecord, $data);
             if ($update) {
-                $this->session->set_flashdata('message', 'Data has been updated successfully');
-                redirect('transaksi/PendDaerah');
-            } else {
-                $this->session->set_flashdata('message', 'Failed to update data');
-                redirect('transaksi/PendDaerah');
-            }
+                $response = ['success' => true, 'message' => 'Berhasil update Data.'];
+              } else {
+                $response = ['success' => false, 'message' => 'Gagal update Data'];
+              }
+            
+              echo json_encode($response);
         }
 
         /* End record function */
@@ -354,6 +313,26 @@ class PendDaerah extends CI_Controller {
         
         /* Action datatable Record fynction */
         public function add_data() {
+            $jumlah = $this->input->post('jumlah');
+            $prs_denda = $this->input->post('prs_denda');
+            
+            /* Hitung denda rp */
+            $nil_denda = ($jumlah * $prs_denda) / 100;
+            
+            /* Hitung total */
+            $total = $jumlah + $nil_denda;
+            
+            /* Ambil nourut terakhir */
+            $last_nourut = $this->Mpend->get_last_nourut(); 
+
+            if (!$last_nourut) {
+                $last_nourut = '0000';
+            }
+            
+            
+           /*  Tambahkan 1 ke nourut terakhir */
+            $next_nourut = str_pad((intval($last_nourut) + 1), strlen($last_nourut), '0', STR_PAD_LEFT);
+            
             $data = [
                 'idstsmaster' => $this->input->post('idstsmaster'),
                 'idwp' => $this->input->post('idwp'),
@@ -361,32 +340,72 @@ class PendDaerah extends CI_Controller {
                 'tglpajak' => $this->input->post('tglpajak'),
                 /* 'idskpd' => $this->input->post('idskpd'), */
                 'nobukti' => $this->input->post('nobukti'),
-                'nourut' => $this->input->post('nourut'),
-                'blnpajak' =>  $this->input->post('blnpajak'),
+                'nourut' => $next_nourut,
+                'blnpajak' => $this->input->post('blnpajak'),
                 'thnpajak' => $this->input->post('thnpajak'),
-                'jumlah' => $this->input->post('jumlah'),
-                'prs_denda' =>  $this->input->post('prs_denda'),
-                'nil_denda' => $this->input->post('nil_denda'),
-                /* 'total' => $this->input->post('total'), */
+                'jumlah' => $jumlah,
+                'prs_denda' => $prs_denda,
+                'nil_denda' => $nil_denda,
+                'total' => $total,
                 'keterangan' => $this->input->post('keterangan'),
                 'formulir' => $this->input->post('formulir'),
                 'kodebayar' => $this->input->post('kodebayar'),
                 'tgl_input' => $this->input->post('tgl_input'),
                 'nopelaporan' => $this->input->post('nopelaporan'),
             ];
-   
+        
             $insert = $this->Mpend->insertdata($data);
         
             if ($insert) {
                 $response = ['success' => true, 'message' => 'Berhasil Tambah Data.'];
-              } else {
+            } else {
                 $response = ['success' => false, 'message' => 'Gagal Tambah Data'];
-              }
-            
-              echo json_encode($response);
+            }
+        
+            echo json_encode($response);
         }
+        public function add_data_temp() {
+            $idstsmaster = $this->input->post('idstsmaster');
+            $jumlah = $this->input->post('jumlah');     
+           /*  $nosptpd = $this->input->post('nosptpd');   */
 
-      
+            /* Ambil nourut terakhir */
+            $last_nourut = $this->Mpend->get_last_nourut($idstsmaster);
+            if (!$last_nourut) {
+                $last_nourut = '0000';
+            }
+        
+            // Tambahkan 1 ke nourut terakhir
+            $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
+
+            $data = [
+                'idstsmaster' => $idstsmaster,          
+                'nobukti' => $this->input->post('nobukti'),
+                'idwp' => $this->input->post('idwp'),
+                'blnpajak' => $this->input->post('blnpajak'),
+                'thnpajak' => $this->input->post('thnpajak'),
+                'kodebayar' => $this->input->post('kodebayar'),
+                'jumlah' => $jumlah,
+                'nil_denda' => $this->input->post('nil_denda'),
+                'total' => $this->input->post('total'),
+                'tgl_input' => $this->input->post('tgl_input'),
+                'nopelaporan' => $this->input->post('nopelaporan'),
+                'formulir' => $this->input->post('formulir'),
+                'nourut' => $next_nourut,
+                
+            ];
+        
+            $insert = $this->Mpend->insertdata($data);
+        
+            if ($insert) {
+                $response = ['success' => true, 'message' => 'Berhasil Tambah Data.'];
+            } else {
+                $response = ['success' => false, 'message' => 'Gagal Tambah Data'];
+            }
+        
+            echo json_encode($response);
+        }
+        
         public function get_edit_data() {
             $this->load->model('Mpend'); 
 
@@ -410,10 +429,10 @@ class PendDaerah extends CI_Controller {
         
     
             $data = [
-               /*  'idwp' => $this->input->post('idwp'), */
+                'idwp' => $this->input->post('idwp'),
                 'iduptd' => $this->input->post('iduptd'),
+                'idrapbd' => $this->input->post('idrapbd'),
                 'tglpajak' => $this->input->post('tglpajak'),
-                /* 'idskpd' => $this->input->post('idskpd'), */
                 'nobukti' => $this->input->post('nobukti'),
                 'nourut' => $this->input->post('nourut'),
                 'blnpajak' =>  $this->input->post('blnpajak'),
@@ -421,7 +440,7 @@ class PendDaerah extends CI_Controller {
                 'jumlah' => $this->input->post('jumlah'),
                 'prs_denda' =>  $this->input->post('prs_denda'),
                 'nil_denda' => $this->input->post('nil_denda'),
-                /* 'total' => $this->input->post('total'), */
+                'total' => $this->input->post('total'),
                 'keterangan' => $this->input->post('keterangan'),
                 'formulir' => $this->input->post('formulir'),
                 'kodebayar' => $this->input->post('kodebayar'),
@@ -482,7 +501,7 @@ class PendDaerah extends CI_Controller {
           /* End Action datatable Record fynction */
 
 
-          public function get_wajibpajak()
+         /*  public function get_wajibpajak()
           {
               $page = $_GET['page'] ?: 1; 
               $limit = 10; 
@@ -500,7 +519,7 @@ class PendDaerah extends CI_Controller {
               }
           
               echo json_encode($results);
-          }
+          } */
           public function get_rekening_by_idrapbd()
           {
               $idstsmaster = $this->input->post('idstsmaster');
@@ -522,7 +541,69 @@ class PendDaerah extends CI_Controller {
           
               echo $opsirek;
           }
+          public function getapisimpada()
+          {
+              $nosptpd = empty($this->input->get('nosptpd')) ? 0 : $this->input->get('nosptpd');
+              
+              $urlApi = ENDPOINT_API_SIMPATDA . "?kodeBayar=$nosptpd";
           
+              $data = [
+                  'nosptpd' => $nosptpd
+              ];
+              $payload = json_encode($data);
+             
+              $curl = curl_init($urlApi);
+          
+              curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+              curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+              curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+              curl_setopt($curl, CURLOPT_HTTPGET, true);
+          
+              $response = curl_exec($curl);
+          
+              if (curl_errno($curl)) {
+                  echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
+              } else {
+                  $responseData = json_decode($response, true);
+                  $prettyResponse = json_encode($responseData, JSON_PRETTY_PRINT); 
+                  echo $prettyResponse;
+              }
+          
+              // Menutup koneksi Curl
+              curl_close($curl);
+          }
+          
+          public function getapisimpadabphtb()
+          {
+               $noformulir = empty($this->input->get('noformulir')) ? 0 : $this->input->get('noformulir');
+               
+               $urlApi = ENDPOINT_API_SIMPATDA_BPHTB . "?noformulir=$noformulir";
+
+               $data = [
+                'kodebayar' => $noformulir
+                ];
+                $payload = json_encode($data);
+                $curl = curl_init($urlApi);
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+                curl_setopt($curl, CURLOPT_POST, true);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+
+                $response = curl_exec($curl);
+                if (curl_errno($curl)) {
+                    echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
+                } else {
+                    $responseData = json_decode($response, true);
+                    $prettyResponse = json_encode($responseData, JSON_PRETTY_PRINT); 
+                    echo $prettyResponse;
+                }
+
+                // Menutup koneksi Curl
+                curl_close($curl);     
+                
+            }
+            
+
 }
 ?>
 		

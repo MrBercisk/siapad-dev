@@ -59,6 +59,15 @@ class Datatables extends CI_Model {
         $this->db->from($this->table);
         return $this->db->count_all_results();
     }
+    public function setOrder($column, $direction = 'asc') {
+        $allowed_columns = ['trx_stsdetail.nourut', 'trx_stsdetail.nobukti', 'trx_stsdetail.blnpajak', 'trx_stsdetail.thnpajak'];
+        
+        if (in_array($column, $allowed_columns)) {
+            $this->db->order_by($column, $direction);
+        } else {
+         
+        }
+    }
     public function tombol($id, $actions = ['edit', 'delete', 'add']) {
         $tombol[] = '<div class="btn-group pull-right">';
         if (in_array('add', $actions)) {

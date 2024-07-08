@@ -9,8 +9,12 @@ $theme['alert'][] ='<div class="alert alert-success">'.
 endif; 
 $theme['main'][]  = implode($sidebar);
 $datatables 	  = '<script type="text/javascript">
-          $(document).ready(function(){
-              
+                          
+                        $(document).ready(function(){
+                        document.getElementById("tahun").value = new Date().getFullYear();
+
+         
+   
             '.$jsedit.$jsdelete.'  
             
           });
@@ -49,30 +53,48 @@ $datatables 	  = '<script type="text/javascript">
             $opsidin .= '<option value="'.$din->id.'">'.$din->nama.'</option>';
         }
         $uptdData = $this->db->get('mst_uptd')->result();
-        $opsiUptd = '<option disabled selected></option>';
+        $opsiUptd = '<option disabled selected>Pilih UPTD</option>';
         foreach ($uptdData as $uptd) {
             $opsiUptd .= '<option value="'.$uptd->id.'">'.$uptd->nama.' ('.$uptd->singkat.')</option>';
         }
 
-        $recData = $this->db->get('trx_stsmaster')->result();
-        $opsiRec = '<option></option>';
-        foreach ($recData as $record) {
-            $opsiRec .= '<option value="'.$record->id.'">'.$record->nomor.'</option>';
-        }
-
+        
         $wpData = $this->db->get('mst_wajibpajak')->result();
-        $opsiwp = '<option></option>';
+        $opsiwp = '<option  disabled selected>Pilih WP</option>';
         foreach ($wpData as $wp) {
-            $opsiwp .= '<option value="'.$wp->id.'">'.$wp->nama.'</option>';
+          $opsiwp .= '<option value="'.$wp->id.'">'.$wp->nama.'</option>';
         }
+          $this->db->select('id, nomor');
+          $recData = $this->db->get('trx_stsmaster')->result();
 
+          $opsiRec = '<option disabled selected></option>';
+          foreach ($recData as $record) {
+              $opsiRec .= '<option value="'.$record->id.'">'.$record->nomor.'</option>';
+          }
+
+        $idstsmaster = 79959; 
+
+        $apbdData = $this->db
+        ->select('trx_rapbd.id,trx_rapbd.idrekening, trx_rapbd.iddinas, mst_rekening.idheader,mst_rekening.kdrekview, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
+        ->from('trx_rapbd')
+        ->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left')
+        ->where('trx_rapbd.iddinas', 1) 
+        ->get()
+        ->result();
+ 
+        $opsiapbd = '<option disabled selected></option>';
+        foreach ($apbdData as $apbd) {
+            $opsiapbd .= '<option value="'.$apbd->id.'">'.$apbd->nmrekening.'('.$apbd->kdrekview.')</option>'; // Menggunakan $apbd->idheader untuk nilai option
+        }
+      
+        
         $rekdata = $this->db
         ->select('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
         ->from('mst_rekening')
         ->where('mst_rekening.idheader', 3)
         ->get()
         ->result();
-        $opsirek = '<option disabled selected></option>';
+        $opsirek = '<option disabled selected>Pilih Rekening</option>';
         foreach ($rekdata as $ttd) {
             $opsirek .= '<option value="'.$ttd->kdrekening.'">'.$ttd->nmrekening.'</option>';
         }
@@ -187,7 +209,7 @@ $theme['main'][] =
                                 <div id="table-buttons">
                                     <button type="button" class="btn btn-sm btn-success fa fa-plus add-data" id="add-data" data-toggle="modal" data-target="#addModal" style="display: none;"> Tambah</button>
                                     <button type="button" class="btn btn-sm btn-danger fa fa-times delete-all-data" id="hapus_data" style="display: none;" > Hapus</button>
-                                    <button type="button" class="btn btn-sm btn-dark fa fa-binoculars search-data" id="cari_data" style="display: none;"> Cari</button>
+                                    <button type="button" class="btn btn-sm btn-dark fa fa-binoculars search-data" id="cari_data" data-toggle="modal" data-target="#searchModal" style="display: none;"> Cari</button>
                                 </div>
                        
                               <table class="table table-bordered table-stripped display" style="width:100% !important;" id="pendapatan">
@@ -309,8 +331,8 @@ $theme['main'][] =
           </div>
         </div>
       </div>
-     <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-         <div class="modal-dialog modal-lg" role="document">
+     <div class="modal" id="addModal">
+         <div class="modal-dialog modal-lg">
           <div class="modal-content">
           
             <!-- Modal Header -->
@@ -324,14 +346,9 @@ $theme['main'][] =
               <form id="formadd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/add_data').'">
                      <div class="row">
                                  <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
+                                  <input type="hidden" class="form-control" id="nourut" name="nourut">
                             
-                                <div class="col-md-6">
-                                                  <div class="form-group">
-                                                      <label for="nourut">Nourut</label>
-                                                      <input type="text" class="form-control" id="nourut" name="nourut">
-                                                  </div>
-                                </div>
-
+                            
                                 <div class="col-md-6">
                                                   <div class="form-group">
                                                       <label for="nobukti">Nobukti</label>
@@ -350,15 +367,15 @@ $theme['main'][] =
                                <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
-                                     <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" required>
-                                      '.$opsirek.'
+                                     <select id="kdrekening" name="kdrekening" class="form-control" data-placeholder="Pilih Rekening" style="width: 100%;" >
+                                      '.$opsiapbd.'
                                     </select>
                                   </div>
                                 </div>
                                <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="iddinas">UPTD</label>
-                                    <select name="iduptd" id="iduptd" class="form-control select2" data-placeholder="Pilih UPTD" style="width: 100%;">
+                                    <select name="iduptd" id="iduptd" class="form-control" data-placeholder="Pilih UPTD" style="width: 100%;">
                                         '.$opsiUptd.'
                                     </select>
                                   </div>
@@ -397,26 +414,26 @@ $theme['main'][] =
                               <div class="col-md-6">
                                   <div class="form-group">
                                      <label for="jumlah">Jumlah(Rp).</label>
-                                       <input type="number" class="form-control" id="jumlah" name="jumlah">
+                                       <input type="number" class="form-control jumlah" id="jumlah" name="jumlah" >
                                   </div>
                               </div>
                               <div class="col-md-6">
                                   <div class="form-group">
                                       <label for="prs_denda">Denda(%).</label>
-                                       <input type="number" class="form-control" id="prs_denda" name="prs_denda">
+                                       <input type="number" class="form-control prs_denda" id="prs_denda" name="prs_denda" >
                                  </div>
                               </div>
                               <div class="col-md-6">
                                   <div class="form-group">
                                       <label for="nil_denda">Denda(Rp.).</label>
-                                      <input type="number" class="form-control" id="nil_denda" name="nil_denda">
+                                      <input type="number" class="form-control nil_denda" id="nil_denda" name="nil_denda">
                                   </div>
                               </div>
                              
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="total">Total(Rp.).</label>
-                                      <input type="number" class="form-control" id="total" name="total" disabled>
+                                      <input type="number" class="form-control total" id="total" name="total" disabled>
                                   </div>
                               </div>
                               <div class="col-md-6">
@@ -472,8 +489,8 @@ $theme['main'][] =
       </div>
    
     <!-- Modal for Editing -->
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal" id="editModal">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editModalLabel">Edit Data</h5>
@@ -496,7 +513,7 @@ $theme['main'][] =
                                 <div class="col-md-12">
                                   <div class="form-group">
                                     <label for="idwp">Wajib Pajak</label>
-                                     <select id="idwp" name="idwp" class="form-control select2" data-placeholder="Pilih WP" style="width: 100%;" >
+                                     <select id="idwp2" name="idwp" class="form-control select2" data-placeholder="Pilih WP" style="width: 100%;" >
                                       '.$opsiwp.'
                                     </select>
                                   </div>
@@ -504,15 +521,15 @@ $theme['main'][] =
                                <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
-                                     <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
-                                      '.$opsirek.'
+                                     <select id="kdrekening" name="idrapbd" class="form-control" data-placeholder="Pilih Rekening" style="width: 100%;" >
+                                      '.$opsiapbd.'
                                     </select>
                                   </div>
                                 </div>
                                <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="iddinas">UPTD</label>
-                                    <select name="iduptd" id="iduptd" class="form-control select2" data-placeholder="Pilih UPTD" style="width: 100%;">
+                                    <select name="iduptd" id="iduptd" class="form-control" data-placeholder="Pilih UPTD" style="width: 100%;">
                                         '.$opsiUptd.'
                                     </select>
                                   </div>
@@ -549,29 +566,29 @@ $theme['main'][] =
                                       <input type="number" class="form-control" id="thnpajak" name="thnpajak" min="1900" max="9999" value="2024" >
                                   </div>
                               </div>
-                              <div class="col-md-6">
+                               <div class="col-md-6">
                                   <div class="form-group">
                                      <label for="jumlah">Jumlah(Rp).</label>
-                                       <input type="number" class="form-control" id="jumlah" name="jumlah">
+                                       <input type="number" class="form-control jumlah" id="jumlah" name="jumlah">
                                   </div>
                               </div>
                               <div class="col-md-6">
                                   <div class="form-group">
                                       <label for="prs_denda">Denda(%).</label>
-                                       <input type="number" class="form-control" id="prs_denda" name="prs_denda">
+                                       <input type="number" class="form-control prs_denda" id="prs_denda" name="prs_denda">
                                  </div>
                               </div>
                               <div class="col-md-6">
                                   <div class="form-group">
                                       <label for="nil_denda">Denda(Rp.).</label>
-                                      <input type="number" class="form-control" id="nil_denda" name="nil_denda">
+                                      <input type="number" class="form-control nil_denda" id="nil_denda" name="nil_denda">
                                   </div>
                               </div>
                              
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="total">Total(Rp.).</label>
-                                      <input type="number" class="form-control" id="total" name="total" disabled>
+                                      <input type="number" class="form-control total" id="total" name="total" disabled>
                                   </div>
                               </div>
                               <div class="col-md-6">
@@ -616,7 +633,7 @@ $theme['main'][] =
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary" id="saveChangesBtn">Save changes</button>
+                            <button type="submit" class="btn btn-primary" id="submitDataButton">Save changes</button>
                         </div>
                     </form>
                 </div>
@@ -626,7 +643,7 @@ $theme['main'][] =
     </div>
 
 
-      <div class="modal" id="CariModal">
+      <div class="modal" id="searchModal">
         <div class="modal-dialog">
           <div class="modal-content">
           
@@ -638,46 +655,103 @@ $theme['main'][] =
             
             <!-- Modal Body -->
             <div class="modal-body">
-              <form id="forminput" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/add_data').'">
+                   <form id="getApiForm" >
                      <div class="row">
-                     <input type="hidden" id="idrecord" name="idrecord">
+                                 <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
+                                  <input type="hidden" class="form-control" id="nourut" name="nourut">
+                                  <input type="hidden" class="form-control" id="nopelaporan" name="nopelaporan">
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="nosptpd">No. SPTPD/No Formulir</label>
+                                     <input type="text" id="nosptpd" class="form-control" name="nosptpd"  placeholder="Ketik No SPTPD / No Formulir lalu tekan Enter..." required>                       
+                                  </div>
+                                </div>
+                            
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="NoSSPD">No SSPD</label>
+                                     <input type="text" id="NoSSPD" class="form-control" name="nobukti" readonly>                       
+                                  </div>
+                                </div>
+
                               <div class="col-md-6">
                                   <div class="form-group">
-                                    <label for="iddinas">Nama Dinas</label>
-                                    <select name="iddinas" id="iddinas" class="form-control" placeholder="Pilih Nama Dinas" style="width: 100%;" required>
-                                        '.$opsidin.'
-                                    </select>
+                                    <label for="TGLKirim">Tgl Bayar</label>
+                                     <input type="text" id="TGLKirim" class="form-control" name="tgl_input" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="statusbayar">Status Bayar</label>
+                                     <input type="text" id="statusbayar" class="form-control" name="statusbayar" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="jumlahbayar">Jumlah Bayar</label>
+                                     <input type="text" id="jumlahbayar" class="form-control" name="jumlah" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="denda">Denda</label>
+                                     <input type="text" id="denda" class="form-control" name="nil_denda" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="totalbayar">Total Bayar</label>
+                                     <input type="text" id="totalbayar" class="form-control" name="total" readonly>                       
                                   </div>
                                 </div>
                             
-                                <div class="col-md-6">
+                              <div class="col-md-6">
                                   <div class="form-group">
-                                     <label for="nomor">Nomor:</label>
-                                     <input type="text" id="nobukti" class="form-control" name="nobukti" required>
-                                  </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                  <div class="form-group">
-                                     <label for="tanggal">Tanggal:</label>
-                                     <input type="date" id="tglpajak" class="form-control" name="tglpajak" required>
+                                    <label for="masapajak">Masa Pajak</label>
+                                     <input type="text" id="masapajak" class="form-control" name="blnpajak" readonly>                       
                                   </div>
                                 </div>
                             
-
-                                <div class="col-md-12">
-                                    <label for="keterangan">Keterangan:</label>
-                                    <input type="text" id="keterangan" class="form-control" name="keterangan">
-                                </div>  
-                            </div>
-                          
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="tahunpajak">Tahun Pajak</label>
+                                     <input type="text" id="tahunpajak" class="form-control" name="thnpajak" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="namaop">Nama WP</label>
+                                     <input type="text" id="namaop" class="form-control" name="idwp" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="jenisop">Jenis Pajak</label>
+                                     <input type="text" id="jenisop" class="form-control" name="jenisop" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="alamatop">Alamat</label>
+                                     <input type="text" id="alamatop" class="form-control" name="alamatop" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="npwpd">NPWPD</label>
+                                     <input type="text" id="npwpd" class="form-control" name="npwpd" readonly>                       
+                                  </div>
+                                </div>
+                     
+                                    
                           </div>
                           <div class="modal-footer">
-                              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                              <button type="submit" class="btn btn-primary">Submit</button>
+                              <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
+                              <button type="button" class="btn btn-success" id="fetchDataButton">Ok</button>
                           </div>
                           </form>
                   </div>
+                  
             
             <!-- Modal Footer -->
          

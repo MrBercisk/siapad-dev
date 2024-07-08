@@ -44,12 +44,26 @@ class Mpend extends CI_Model {
         $query = $this->db->get();
       
         if ($query->num_rows() > 0) {
-          return $query->row(); // Return a single row object
+          return $query->row(); 
         } else {
-          return null; // No data found
+          return null;
         }
       }
+      public function get_last_nourut($idstsmaster) {
 
+        $this->db->select('nourut');
+        $this->db->from('trx_stsdetail');
+        $this->db->where('idstsmaster', $idstsmaster);
+        $this->db->order_by('nourut', 'DESC');
+        $this->db->limit(1);
+        $query = $this->db->get();
+    
+        if ($query->num_rows() > 0) {
+            return $query->row()->nourut;
+        } else {
+            return false;
+        }
+    }
     public function delete($idstsmaster, $nourut)
     {
         $idstsmaster = $this->input->post('idstsmaster');
@@ -76,6 +90,32 @@ class Mpend extends CI_Model {
     {
         return $this->db->insert('trx_stsdetail', $data); 
     }
+    
+    public function insertdatatemp($data)
+    {
+        return $this->db->insert('trx_stsdetail_temp', $data); 
+    }
+    
+   /*  public function selectRekRAPBD($iddinas = 0, $tahun, $key = '', $start = 0, $limit = 0, $sort, $dir = 'ASC', &$total = 0) {
+        $key = $this->db->escape_like_str($key);
+        $like = "(b.kdrekening LIKE '%$key%' OR b.kdrekview LIKE '%$key%' OR b.nmrekening LIKE '%$key%')";
+
+        $this->db->select("a.id AS idrapbd, b.*", false)
+                 ->from('trx_rapbd a')
+                 ->join('mst_rekening b', 'b.id = a.idrekening', 'left')
+                 ->where('a.iddinas', $iddinas)
+                 ->where('a.tahun', $tahun)
+                 ->like($like);
+
+        $total = $this->db->count_all_results();
+
+        $this->db->order_by($sort, $dir);
+        if ($limit > 0) {
+            $this->db->limit($limit, $start);
+        }
+
+        return $this->db->get()->result_array();
+    } */
     
   /*   public function getDataByIdNourut($idstsmaster, $nourut) {
         return $this->db->get_where('trx_stsdetail', ['idstsmaster' => $idstsmaster, 'nourut' => $nourut])->row_array();
@@ -107,6 +147,10 @@ class Mpend extends CI_Model {
     
     public function updatedata($idstsmaster, $nourut, $data) {
         return $this->db->update('trx_stsdetail', $data, ['idstsmaster' => $idstsmaster, 'nourut' => $nourut]);
+    }
+
+    public function update_record_data($idrecord, $data) {
+        return $this->db->update('trx_stsmaster', $data, ['id' => $idrecord]);
     }
 
     public function formInsert(){

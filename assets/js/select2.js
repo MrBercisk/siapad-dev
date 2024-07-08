@@ -6,6 +6,186 @@ $(document).ready(function() {
     });
   
 
+    $('#idwp').select2({
+            placeholder: $('#idwp').data('placeholder'),
+            minimumInputLength: 5, 
+
+    });
+    $('#nosptpd').keypress(function(event) {
+        if (event.which === 13) {
+            event.preventDefault();
+    
+            var nosptpd = $('#nosptpd').val();
+            var NoSSPD = $('#NoSSPD').val();
+            var TGLKirim = $('#TGLKirim').val();
+            var statusbayar = $('#statusbayar').val();
+            var jumlahbayar = $('#jumlahbayar').val();
+            var denda = $('#denda').val();
+            var totalbayar = $('#totalbayar').val();
+            var masapajak = $('#masapajak').val();
+            var tahunpajak = $('#tahunpajak').val();
+            var namaop = $('#namaop').val();
+            var jenisop = $('#jenisop').val();
+            var alamatop = $('#alamatop').val();
+            var npwpd = $('#npwpd').val();
+            var kodebayar = nosptpd;
+           
+            $.ajax({
+                url: 'PendDaerah/getapisimpada',
+                type: 'GET',
+                data: {
+                    nosptpd: nosptpd,
+                    NoSSPD: NoSSPD,
+                    TGLKirim: TGLKirim,
+                    statusbayar: statusbayar,
+                    jumlahbayar: jumlahbayar,
+                    denda: denda,
+                    totalbayar: totalbayar,
+                    masapajak: masapajak,
+                    tahunpajak: tahunpajak,
+                    namaop: namaop,
+                    jenisop: jenisop,
+                    alamatop: alamatop,
+                    npwpd: npwpd,
+                    kodebayar: kodebayar,
+                    nopelaporan: nosptpd,
+                    /* idwp : namaop */
+                },
+                dataType: 'json',
+                success: function(response) {
+
+                    if (response && response.data) {
+                        console.log(response.data);
+                        $('#NoSSPD').val(response.data.NoSSPD);
+                        $('#TGLKirim').val(response.data.TGLKirim);
+                        $('#statusbayar').val(response.data.statusbayar);
+                        $('#jumlahbayar').val(response.data.jumlahbayar);
+                        $('#denda').val(response.data.denda);
+                        $('#totalbayar').val(response.data.totalbayar);
+                        $('#masapajak').val(response.data.masapajak);
+                        $('#tahunpajak').val(response.data.tahunpajak);
+                        $('#namaop').val(response.data.namaop);
+                        $('#jenisop').val(response.data.jenisop);
+                        $('#alamatop').val(response.data.alamatop);
+                        $('#npwpd').val(response.data.npwpd);
+                        $('#kodebayar').val(response.data.kodebayar);
+                        $('#nopelaporan').val(response.data.nosptpd);
+                        /* $('#idwp').val(response.data.namaop); */
+
+    
+                        Swal.fire({
+                            title: 'Success',
+                            text: 'Koneksi Berhasil, Data Wajib Pajak Pada Server SIAPAD Ditemukan',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+    
+                        $('#submitDataButton').removeClass('d-none');
+                    } else {
+                        clearFormFields();
+                        Swal.fire({
+                            title: 'Warning',
+                            text: 'Data SIMPADA tidak ditemukan',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Terjadi kesalahan saat menghubungi server.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    });
+    function clearFormFields() {
+        $('#nosptpd').val('');
+        $('#NoSSPD').val('');
+        $('#TGLKirim').val('');
+        $('#statusbayar').val('');
+        $('#jumlahbayar').val('');
+        $('#denda').val('');
+        $('#totalbayar').val('');
+        $('#masapajak').val('');
+        $('#tahunpajak').val('');
+        $('#namaop').val('');
+        $('#jenisop').val('');
+        $('#alamatop').val('');
+        $('#npwpd').val('');
+        $('#kodebayar').val('');
+        $('#submitDataButton').addClass('d-none');
+    }
+
+    $('#fetchDataButton').on('click', function(e) {
+        e.preventDefault();
+        var idstsmaster = $('#idstsmaster').val(); 
+        var namaop = $('#namaop').val(); 
+        var nosptpd = $('#nosptpd').val(); 
+        var nopelaporan = $('#nopelaporan').val(); 
+        var nourut = $('#nourut').val(); 
+        var NoSSPD = $('#NoSSPD').val();
+        var masapajak = $('#masapajak').val();
+        var tahunpajak = $('#tahunpajak').val();
+        var totalbayar = $('#totalbayar').val();
+        var denda = $('#denda').val();
+        var jumlahbayar = $('#jumlahbayar').val();
+        var TGLKirim = $('#TGLKirim').val();
+        var formulir = nosptpd.substring(4, 14); 
+    
+        $.ajax({
+            url: 'PendDaerah/add_data_temp',
+            type: 'POST',
+            data: {
+                idstsmaster: idstsmaster,
+                /* idwp: namaop, */
+                nourut: nourut,
+                kodebayar: nosptpd,
+                nopelaporan: nopelaporan,
+                nobukti: NoSSPD,
+                blnpajak: masapajak,
+                thnpajak: tahunpajak,
+                total: totalbayar,
+                nil_denda: denda,
+                jumlah: jumlahbayar,
+                tgl_input: TGLKirim,
+                formulir: formulir 
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response.data);
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#searchModal').modal('hide');
+                            $('#pendapatan').DataTable().ajax.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    });
+    
+
     $("#idrecord").change(function() {
         var recordId = $(this).val();
         if (recordId) {
@@ -174,12 +354,15 @@ $(document).ready(function() {
     $('#pendapatan').on('click', '.edit-data', function(e) {
         var idstsmaster = $(this).data('idstsmaster');
         var iduptd = $(this).data('iduptd');
+        var idwp = $(this).data('idwp');
+        var idrapbd = $(this).data('idrapbd');
         var nourut = $(this).data('nourut');
         var nobukti = $(this).data('nobukti');
         var tglpajak = $(this).data('tglpajak');
         var blnpajak = $(this).data('blnpajak');
         var thnpajak = $(this).data('thnpajak');
         var jumlah = $(this).data('jumlah');
+        var total = $(this).data('total');
         var prs_denda = $(this).data('prs_denda');
         var nil_denda = $(this).data('nil_denda');
         var keterangan = $(this).data('keterangan');
@@ -187,6 +370,7 @@ $(document).ready(function() {
         var kodebayar = $(this).data('kodebayar');
         var tgl_input = $(this).data('tgl_input');
         var nopelaporan = $(this).data('nopelaporan');
+        var alamatop = $(this).data('alamatop');
         
         $.ajax({
             url: 'PendDaerah/get_edit_data',
@@ -194,12 +378,15 @@ $(document).ready(function() {
             data: {
                 idstsmaster: idstsmaster,
                 iduptd: iduptd,
+                idwp: idwp,
+                idrapbd: idrapbd,
                 nourut: nourut,
                 nobukti: nobukti,
                 tglpajak: tglpajak,
                 blnpajak: blnpajak,
                 thnpajak: thnpajak,
                 jumlah: jumlah,
+                total: total,
                 prs_denda: prs_denda,
                 nil_denda: nil_denda,
                 keterangan: keterangan,
@@ -207,18 +394,23 @@ $(document).ready(function() {
                 kodebayar: kodebayar,
                 tgl_input: tgl_input,
                 nopelaporan: nopelaporan,
+                alamatop: alamatop,
             },
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
+                    console.log(response.data)
                     $('#editTableForm input[name="idstsmaster"]').val(response.data.idstsmaster);
                     $('#editTableForm input[name="iduptd"]').val(response.data.iduptd);
+                    $('#editTableForm input[name="idwp"]').val(response.data.idwp);
+                    $('#editTableForm input[name="idrapbd"]').val(response.data.idrapbd);
                     $('#editTableForm input[name="nourut"]').val(response.data.nourut);
                     $('#editTableForm input[name="nobukti"]').val(response.data.nobukti);
                     $('#editTableForm input[name="tglpajak"]').val(response.data.tglpajak);
                     $('#editTableForm input[name="blnpajak"]').val(response.data.blnpajak);
                     $('#editTableForm input[name="thnpajak"]').val(response.data.thnpajak);
                     $('#editTableForm input[name="jumlah"]').val(response.data.jumlah);
+                    $('#editTableForm input[name="total"]').val(response.data.total);
                     $('#editTableForm input[name="prs_denda"]').val(response.data.prs_denda);
                     $('#editTableForm input[name="nil_denda"]').val(response.data.nil_denda);
                     $('#editTableForm input[name="keterangan"]').val(response.data.keterangan);
@@ -226,7 +418,7 @@ $(document).ready(function() {
                     $('#editTableForm input[name="kodebayar"]').val(response.data.kodebayar);
                     $('#editTableForm input[name="tgl_input"]').val(response.data.tgl_input);
                     $('#editTableForm input[name="nopelaporan"]').val(response.data.nopelaporan);
-                
+                    $('#editTableForm input[name="alamatop"]').val(response.data.alamatop);
                     $('#editModal').modal('show');
                 } else {
                     Swal.fire(
@@ -245,6 +437,77 @@ $(document).ready(function() {
             }
         });
     });
+    $('#idwp2').select2({
+        placeholder: $('#idwp2').data('placeholder'),
+        minimumInputLength: 5, 
+
+        });
+        
+        $('#editForm').on('submit', function(e) {
+            e.preventDefault();
+        
+            $.ajax({
+                url: 'PendDaerah/update_record_data',
+                method: 'POST',
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#idrecord').val(response.data.idrecord);
+                                $('#ididinas').val(response.data.ididinas);
+                                $('#nomor').val(response.data.nomor);
+                                $('#isdispenda').val(response.data.isdispenda);
+                                $('#tanggal').val(response.data.tanggal);
+                                $('#keterangan').val(response.data.keterangan);
+                                
+                                var tmpbayarValue = response.data.tmpbayar;
+                                if (tmpbayarValue == 'B') {
+                                    $('#flexRadioDefault1').prop('checked', true);
+                                } else if (tmpbayarValue == 'D') {
+                                    $('#flexRadioDefault2').prop('checked', true);
+                                }
+                                
+                                var isdispendaValue = response.data.isdispenda;
+                                if (isdispendaValue == 1) {
+                                    $('#jenis').val('BPPRD');
+                                } else {
+                                    $('#jenis').val('Non BPPRD');
+                                }
+                                
+                                var isnonkasValue = response.data.isnonkas;
+                                if (isnonkasValue == 1) {
+                                    $('#isnonkas').prop('checked', true);
+                                } else {
+                                    $('#isnonkas').prop('checked', false);
+                                }
+    
+                            }
+                        });
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            'Gagal Update Data: ' + response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire(
+                        'An error occurred!',
+                        'An error occurred: ' + xhr.responseText,
+                        'error'
+                    );
+                }
+            });
+        });
+        
     $('#editTableForm').on('submit', function(e) {
         e.preventDefault();
         
@@ -283,12 +546,75 @@ $(document).ready(function() {
             }
         });
     });
+     
+    $('#table-buttons').on('click', '.delete-all-data', function() {
+        var idstsmaster = $('#idstsmaster').val();
+        console.log('Hapus semua data dengan idstsmaster:', idstsmaster);
+        if (idstsmaster) {
+            Swal.fire({
+                title: 'Anda yakin ingin menghapus semua data?',
+                text: "Akan menghapus semua data pada record ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: 'PendDaerah/delete_all_data',
+                        method: 'POST',
+                        data: {
+                            idstsmaster: idstsmaster
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                $('#pendapatan').DataTable().ajax.reload();
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Semua Data Berhasil Dihapus!',
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    'Gagal Hapus Data ' + response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire(
+                                'An error occurred!',
+                                'An error occurred: ' + xhr.responseText,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        } else {
+            console.error('idstsmaster tidak ditemukan');
+        }
+    });
+    
+    $('#table-buttons').on('click', '#cari_data', function() {
+        var idstsmaster = $('#idstsmaster').val();
+        if (idstsmaster) {
+            console.log('Cari data dengan idstsmaster:', idstsmaster);
+            $('#searchModal #idstsmaster').val(idstsmaster);
+        } else {
+            console.error('idstsmaster tidak ditemukan');
+        }
+    });
 
     /* Add Data pendapatan */
     $('#table-buttons').on('click', '#add-data', function() {
         var idstsmaster = $('#idstsmaster').val();
         if (idstsmaster) {
             console.log('Tambah data dengan idstsmaster:', idstsmaster);
+            
             $('#addModal #idstsmaster').val(idstsmaster);
         } else {
             console.error('idstsmaster tidak ditemukan');
@@ -387,94 +713,41 @@ $(document).ready(function() {
             }
         });
     });
- 
-   
-    $('#table-buttons').on('click', '.delete-all-data', function() {
-        var idstsmaster = $('#idstsmaster').val();
-        console.log('Hapus semua data dengan idstsmaster:', idstsmaster);
-        if (idstsmaster) {
-            Swal.fire({
-                title: 'Anda yakin ingin menghapus semua data?',
-                text: "Akan menghapus semua data pada record ini!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: 'PendDaerah/delete_all_data',
-                        method: 'POST',
-                        data: {
-                            idstsmaster: idstsmaster
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                $('#pendapatan').DataTable().ajax.reload();
-                                Swal.fire(
-                                    'Deleted!',
-                                    'Semua Data Berhasil Dihapus!',
-                                    'success'
-                                );
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    'Gagal Hapus Data ' + response.message,
-                                    'error'
-                                );
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire(
-                                'An error occurred!',
-                                'An error occurred: ' + xhr.responseText,
-                                'error'
-                            );
-                        }
-                    });
-                }
-            });
-        } else {
-            console.error('idstsmaster tidak ditemukan');
-        }
+    $('.modal').on('input', '.jumlah, .prs_denda', function() {
+        hitungdenda($(this).closest('.modal'));
     });
     
+    $('.modal').on('input', '.nil_denda', function() {
+        hitungprsdenda($(this).closest('.modal'));
+    });
     
+    // Fungsi hitung denda dengan selector modal sebagai parameter
+    function hitungdenda(modal) {
+        var jumlah = parseFloat(modal.find('.jumlah').val()) || 0;
+        var prs_denda = parseFloat(modal.find('.prs_denda').val()) || 0;
     
-    function formatResult(result) {
-        return '<option value="' + result.id + '">' + result.text + '</option>';
+        var nil_denda = (jumlah * prs_denda) / 100;
+        modal.find('.nil_denda').val(nil_denda);
+    
+        var total = jumlah + nil_denda;
+        modal.find('.total').val(total);
     }
-  
-
-    $('#idwp').select2({
-        ajax: {
-            url: 'PendDaerah/get_wajibpajak',
-            dataType: 'json',
-            delay: 250,
-            data: function(params) {
-                return {
-                    page: params.page || 1
-                };
-            },
-            processResults: function(data, params) {
-                params.page = params.page || 1;
-
-                return {
-                    results: data,
-                    pagination: {
-                        more: data.length === 10 
-                    }
-                };
-            },
-            cache: true
-        },
-        escapeMarkup: function(markup) {
-            return markup;
-        },
-        minimumInputLength: 0, 
-        templateResult: formatResult
+    
+    // Fungsi hitung persentase denda dengan selector modal sebagai parameter
+    function hitungprsdenda(modal) {
+        var jumlah = parseFloat(modal.find('.jumlah').val()) || 0;
+        var nil_denda = parseFloat(modal.find('.nil_denda').val()) || 0;
+        var prs_denda = (nil_denda / jumlah) * 100;
+        var total = jumlah + nil_denda;
+    
+        modal.find('.prs_denda').val(prs_denda);
+        modal.find('.total').val(total);
+    }
+    $('#idwp2').on('change', function() {
+        var idwpSelected = $(this).val();
+        console.log('Selected idwp:', idwpSelected); // Periksa nilai yang terpilih di console log
     });
+   
+
    
 });
