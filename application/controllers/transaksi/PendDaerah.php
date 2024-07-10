@@ -29,87 +29,91 @@ class PendDaerah extends CI_Controller {
 	}
 	
     public function get_datatable_data() {
-        $idrecord = $this->input->get('id');  
-    
+        $idrecord = $this->input->get('id');
+
         $datatables = $this->Datatables;
         $datatables->setTable("trx_stsdetail");
         $datatables->setSelectColumn([
-            'trx_stsdetail.idstsmaster', 
-            'trx_stsdetail.idwp', 
-            'trx_rapbd.id as rapbdid', 
-            'trx_rapbd.idrekening', 
-            'mst_wajibpajak.id', 
-            'mst_wajibpajak.nama as wajibpajak', 
-            'mst_uptd.id as uptdid', 
-            'mst_uptd.singkat as uptd', 
-            'mst_rekening.id as idrek', 
-            'mst_rekening.nmrekening as namarekening', 
-            'trx_stsdetail.nourut', 
-            'trx_stsdetail.tglpajak', 
-            'trx_stsdetail.idskpd', 
-            'trx_stsdetail.nobukti', 
-            'trx_stsdetail.blnpajak', 
-            'trx_stsdetail.thnpajak', 
-            'trx_stsdetail.jumlah', 
-            'trx_stsdetail.prs_denda', 
-            'trx_stsdetail.nil_denda', 
-            'trx_stsdetail.total', 
+            'trx_stsdetail.idstsmaster',
+            'trx_stsdetail.idwp',
+            'trx_rapbd.id as rapbdid',
+            'trx_rapbd.idrekening',
+            'mst_wajibpajak.id',
+            'mst_wajibpajak.nama as wajibpajak',
+            'mst_uptd.id as uptdid',
+            'mst_uptd.singkat as uptd',
+            'mst_rekening.id as idrek',
+            'mst_rekening.nmrekening as namarekening',
+            'trx_stsdetail.nourut',
+            'trx_stsdetail.tglpajak',
+            'trx_stsdetail.idskpd',
+            'trx_stsdetail.nobukti',
+            'trx_stsdetail.blnpajak',
+            'trx_stsdetail.thnpajak',
+            'trx_stsdetail.jumlah',
+            'trx_stsdetail.prs_denda',
+            'trx_stsdetail.nil_denda',
+            'trx_stsdetail.total',
             'trx_stsdetail.keterangan',
             'trx_stsdetail.formulir',
             'trx_stsdetail.kodebayar',
             'trx_stsdetail.tgl_input',
             'trx_stsdetail.nopelaporan',
+            'trx_stsmaster.iddinas'
         ]);
-        $datatables->setOrderColumn(["trx_stsdetail.nourut", "trx_stsdetail.nobukti", "trx_stsdetail.blnpajak", "trx_stsdetail.thnpajak"]);
+      
         $datatables->addJoin('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'left');
         $datatables->addJoin('mst_wajibpajak', 'mst_wajibpajak.id = trx_stsdetail.idwp', 'left');
         $datatables->addJoin('mst_uptd', 'mst_uptd.id = trx_stsdetail.iduptd', 'left');
         $datatables->addJoin('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
         $datatables->addJoin('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
-        $datatables->addWhere('trx_stsdetail.idstsmaster', $idrecord); 
+        $datatables->addWhere('trx_stsdetail.idstsmaster', $idrecord);
         $datatables->setOrder('trx_stsdetail.nourut', 'asc');
         $fetch_data = $datatables->make_datatables();
+        
         $data = array();
         foreach ($fetch_data as $row) {
-            $sub_array = array();
-            $sub_array[] = $row->nourut;
-            $sub_array[] = $row->nobukti;
-            $sub_array[] = $row->wajibpajak;
-            $sub_array[] = $row->namarekening;
-            $sub_array[] = $row->uptd;
-            $sub_array[] = $row->tglpajak;
-            $sub_array[] = $row->blnpajak;
-            $sub_array[] = $row->thnpajak;
-            $sub_array[] = $row->jumlah;
-            $sub_array[] = $row->prs_denda;
-            $sub_array[] = $row->nil_denda;
-            $sub_array[] = $row->total;
-            $sub_array[] = $row->keterangan;
-            $sub_array[] = $row->formulir;
-            $sub_array[] = $row->kodebayar;
-            $sub_array[] = $row->tgl_input;
-            $sub_array[] = $row->nopelaporan;
-           /*  $sub_array[] = implode('',$this->Datatables->tombol($row->idstsmaster)); */
-              
-           $edit_button = '<button type="button" class="btn btn-sm btn-primary modin fa fa-edit edit-data" id="edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'" data-nobukti="'.$row->nobukti.'"> Edit</button>';
-           $delete_button = '<button type="button" class="btn btn-sm btn-danger modin fa fa-times delete-data"  data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>';
-   
-           $buttons = '<div class="action-buttons">' . $edit_button . $delete_button . '</div>';
-           $sub_array[] = $buttons;
-        
-           $data[] = $sub_array;
+            $sub_array = array(
+                $row->nourut,
+                $row->nobukti,
+                $row->wajibpajak,
+                $row->namarekening,
+                $row->uptd,
+                $row->tglpajak,
+                $row->blnpajak,
+                $row->thnpajak,
+                $row->jumlah,
+                $row->prs_denda,
+                $row->nil_denda,
+                $row->total,
+                $row->keterangan,
+                $row->formulir,
+                $row->kodebayar,
+                $row->tgl_input,
+                $row->nopelaporan,
+                '<div class="action-buttons">' . 
+                '<button type="button" class="btn btn-sm btn-primary modin fa fa-edit edit-data" id="edit-data" data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'" data-nobukti="'.$row->nobukti.'"> Edit</button>' .
+                '<button type="button" class="btn btn-sm btn-danger modin fa fa-times delete-data" data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>' .
+                '</div>'
+            );
+            $data[] = $sub_array;
         }
         
-        $hidden_input = '<input type="hidden" name="idstsmaster" id="idstsmaster" value="'.$idrecord.'">';
-
+        $hidden_inputs = '<input type="hidden" name="idstsmaster" id="idstsmaster" value="'.$idrecord.'">';
+        if (!empty($fetch_data)) {
+            $hidden_inputs .= '<input type="hidden" name="iddinas" id="iddinas" value="'.$fetch_data[0]->iddinas.'">';
+        }
+        
         $output = array(
             "draw" => intval($this->input->post("draw")),
             "data" => $data,
-            "extra_data" => $hidden_input
+            "extra_data" => $hidden_inputs
         );
-    
+
         echo json_encode($output);
     }
+
+    
 	
        public function get_record_data() {
             $idrecord = $this->input->post('id');
@@ -228,44 +232,47 @@ class PendDaerah extends CI_Controller {
             $nomor = $this->input->post('nomor');
             $tahun = date('Y', strtotime($tanggal));
         
+            // Check if the nomor already exists in trx_stsmaster table
             $this->db->select('nomor');
             $this->db->from('trx_stsmaster');
             $this->db->where('nomor', $nomor);
-            $existing_nomor = $this->db->get()->row();
+            $query = $this->db->get();
         
-            if ($existing_nomor) {
-                $this->session->set_flashdata('massage', 'Nomor record sudah ada, gagal tambah data');
-                redirect('transaksi/PendDaerah');
-                return;
-            }
-        
-            $this->db->select('isdispenda');
-            $this->db->from('mst_dinas');
-            $this->db->where('id', $iddinas);
-            $isdispenda_result = $this->db->get()->row();
-        
-            $isdispenda = $isdispenda_result ? $isdispenda_result->isdispenda : 0;
-        
-            $data = [
-                'iddinas' => $iddinas,
-                'nomor' => $nomor,
-                'tanggal' => $tanggal,
-                'keterangan' => $this->input->post('keterangan'),
-                'tahun' => $tahun,
-                'isnonkas' => $isnonkas,
-                'isdispenda' => $isdispenda,
-                'tmpbayar' => $this->input->post('tmpbayar'),
-            ];
-        
-            $this->db->insert('trx_stsmaster', $data);
-            if ($this->db->affected_rows() > 0) {
-                $this->session->set_flashdata('message', 'Berhasil Tambah Record Baru');
-                redirect('transaksi/PendDaerah');
+            if ($query->num_rows() > 0) {
+                // If nomor already exists, return error response
+                $response = ['success' => false, 'message' => 'Nomor sudah ada. Tidak dapat menambahkan record baru.'];
             } else {
-                $this->session->set_flashdata('error', 'Gagal Tambah Record Baru');
-                redirect('transaksi/PendDaerah');
+                // Nomor does not exist, proceed to insert data
+                $this->db->select('isdispenda');
+                $this->db->from('mst_dinas');
+                $this->db->where('id', $iddinas);
+                $isdispenda_result = $this->db->get()->row();
+        
+                $isdispenda = $isdispenda_result ? $isdispenda_result->isdispenda : 0;
+        
+                $data = [
+                    'iddinas' => $iddinas,
+                    'nomor' => $nomor,
+                    'tanggal' => $tanggal,
+                    'keterangan' => $this->input->post('keterangan'),
+                    'tahun' => $tahun,
+                    'isnonkas' => $isnonkas,
+                    'isdispenda' => $isdispenda,
+                    'tmpbayar' => $this->input->post('tmpbayar'),
+                ];
+        
+                $insert = $this->Mpend->insertdataRecord($data);
+        
+                if ($insert) {
+                    $response = ['success' => true, 'message' => 'Berhasil Tambah Record.'];
+                } else {
+                    $response = ['success' => false, 'message' => 'Gagal Tambah Record'];
+                }
             }
+        
+            echo json_encode($response);
         }
+        
              
         public function update_record_data() {
             
@@ -313,6 +320,7 @@ class PendDaerah extends CI_Controller {
         
         /* Action datatable Record fynction */
         public function add_data() {
+            $idstsmaster = $this->input->post('idstsmaster');
             $jumlah = $this->input->post('jumlah');
             $prs_denda = $this->input->post('prs_denda');
             
@@ -322,23 +330,22 @@ class PendDaerah extends CI_Controller {
             /* Hitung total */
             $total = $jumlah + $nil_denda;
             
-            /* Ambil nourut terakhir */
-            $last_nourut = $this->Mpend->get_last_nourut(); 
-
-            if (!$last_nourut) {
-                $last_nourut = '0000';
-            }
             
-            
-           /*  Tambahkan 1 ke nourut terakhir */
-            $next_nourut = str_pad((intval($last_nourut) + 1), strlen($last_nourut), '0', STR_PAD_LEFT);
+           /* Ambil nourut terakhir */
+           $last_nourut = $this->Mpend->get_last_nourut($idstsmaster);
+           if (!$last_nourut) {
+               $last_nourut = '0000';
+           }
+       
+           // Tambahkan 1 ke nourut terakhir
+           $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
             
             $data = [
-                'idstsmaster' => $this->input->post('idstsmaster'),
+                'idstsmaster' => $idstsmaster,
                 'idwp' => $this->input->post('idwp'),
                 'iduptd' => $this->input->post('iduptd'),
+                'idrapbd' => $this->input->post('idrapbd'),
                 'tglpajak' => $this->input->post('tglpajak'),
-                /* 'idskpd' => $this->input->post('idskpd'), */
                 'nobukti' => $this->input->post('nobukti'),
                 'nourut' => $next_nourut,
                 'blnpajak' => $this->input->post('blnpajak'),
@@ -366,45 +373,59 @@ class PendDaerah extends CI_Controller {
         }
         public function add_data_temp() {
             $idstsmaster = $this->input->post('idstsmaster');
-            $jumlah = $this->input->post('jumlah');     
-           /*  $nosptpd = $this->input->post('nosptpd');   */
-
-            /* Ambil nourut terakhir */
+            $nobukti = $this->input->post('nobukti');
+            $kodebayar = $this->input->post('kodebayar');
+            $jumlah = $this->input->post('jumlah');
+            $nosptpd = $this->input->post('nosptpd');
+        
+            // Cek apakah data yang diperlukan kosong
+            if (empty($idstsmaster) || empty($kodebayar)) {
+                $response = ['success' => false, 'message' => 'Isi NoSPTPD terlebih dahulu'];
+                echo json_encode($response);
+                return;
+            }
+        
             $last_nourut = $this->Mpend->get_last_nourut($idstsmaster);
             if (!$last_nourut) {
                 $last_nourut = '0000';
             }
         
-            // Tambahkan 1 ke nourut terakhir
             $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
-
-            $data = [
-                'idstsmaster' => $idstsmaster,          
-                'nobukti' => $this->input->post('nobukti'),
-                'idwp' => $this->input->post('idwp'),
-                'blnpajak' => $this->input->post('blnpajak'),
-                'thnpajak' => $this->input->post('thnpajak'),
-                'kodebayar' => $this->input->post('kodebayar'),
-                'jumlah' => $jumlah,
-                'nil_denda' => $this->input->post('nil_denda'),
-                'total' => $this->input->post('total'),
-                'tgl_input' => $this->input->post('tgl_input'),
-                'nopelaporan' => $this->input->post('nopelaporan'),
-                'formulir' => $this->input->post('formulir'),
-                'nourut' => $next_nourut,
-                
-            ];
         
-            $insert = $this->Mpend->insertdata($data);
-        
-            if ($insert) {
-                $response = ['success' => true, 'message' => 'Berhasil Tambah Data.'];
+            $check_duplicate = $this->Mpend->check_duplicate_data($idstsmaster, $kodebayar);
+            if ($check_duplicate) {
+                $response = ['success' => false, 'message' => 'Data Sudah Pernah Diinput'];
             } else {
-                $response = ['success' => false, 'message' => 'Gagal Tambah Data'];
+                $data = [
+                    'idstsmaster' => $idstsmaster,
+                    'nobukti' => $nobukti,
+                    'idwp' => $this->input->post('idwp'),
+                    'idrapbd' => $this->input->post('idrapbd'),
+                    'iduptd' => $this->input->post('iduptd'),
+                    'blnpajak' => $this->input->post('blnpajak'),
+                    'thnpajak' => $this->input->post('thnpajak'),
+                    'kodebayar' => $kodebayar,
+                    'jumlah' => $jumlah,
+                    'nil_denda' => $this->input->post('nil_denda'),
+                    'total' => $this->input->post('total'),
+                    'tgl_input' => $this->input->post('tgl_input'),
+                    'nopelaporan' => $this->input->post('nopelaporan'),
+                    'formulir' => $this->input->post('formulir'),
+                    'nourut' => $next_nourut,
+                ];
+        
+                $insert = $this->Mpend->insertdata($data);
+        
+                if ($insert) {
+                    $response = ['success' => true, 'message' => 'Berhasil Tambah Data.'];
+                } else {
+                    $response = ['success' => false, 'message' => 'Gagal Tambah Data'];
+                }
             }
         
             echo json_encode($response);
         }
+        
         
         public function get_edit_data() {
             $this->load->model('Mpend'); 
@@ -426,6 +447,15 @@ class PendDaerah extends CI_Controller {
             $this->load->model('Mpend'); 
             $idstsmaster = $this->input->post('idstsmaster');
             $nourut = $this->input->post('nourut');
+            $jumlah = $this->input->post('jumlah');
+            $prs_denda = $this->input->post('prs_denda');
+            
+            /* Hitung denda rp */
+            $nil_denda = ($jumlah * $prs_denda) / 100;
+            
+            /* Hitung total */
+            $total = $jumlah + $nil_denda;
+            
         
     
             $data = [
@@ -437,10 +467,10 @@ class PendDaerah extends CI_Controller {
                 'nourut' => $this->input->post('nourut'),
                 'blnpajak' =>  $this->input->post('blnpajak'),
                 'thnpajak' => $this->input->post('thnpajak'),
-                'jumlah' => $this->input->post('jumlah'),
-                'prs_denda' =>  $this->input->post('prs_denda'),
-                'nil_denda' => $this->input->post('nil_denda'),
-                'total' => $this->input->post('total'),
+                'jumlah' => $jumlah,
+                'prs_denda' => $prs_denda,
+                'nil_denda' => $nil_denda,
+                'total' => $total,
                 'keterangan' => $this->input->post('keterangan'),
                 'formulir' => $this->input->post('formulir'),
                 'kodebayar' => $this->input->post('kodebayar'),
@@ -520,27 +550,47 @@ class PendDaerah extends CI_Controller {
           
               echo json_encode($results);
           } */
-          public function get_rekening_by_idrapbd()
-          {
-              $idstsmaster = $this->input->post('idstsmaster');
-          
-              $rekdata = $this->db
-                  ->select('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
-                  ->from('mst_rekening')
-                  ->join('trx_rapbd', 'trx_rapbd.idrekening = mst_rekening.id')
-                  ->join('trx_stsdetail', 'trx_stsdetail.idrapbd = trx_rapbd.id')
-                  ->join('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster')
-                  ->where('trx_stsmaster.id', $idstsmaster)
-                  ->get()
-                  ->result();
-          
-              $opsirek = '<option></option>';
-              foreach ($rekdata as $ttd) {
-                  $opsirek .= '<option value="'.$ttd->kdrekening.'">'.$ttd->nmrekening.'</option>';
-              }
-          
-              echo $opsirek;
-          }
+         
+          public function get_namarekening_by_iddinas() {
+            $iddinas = $this->input->post('iddinas');
+        
+            $apbdData = $this->db
+                ->select('trx_rapbd.id, trx_rapbd.idrekening, trx_rapbd.iddinas, mst_rekening.idheader, mst_rekening.kdrekview, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
+                ->from('trx_rapbd')
+                ->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left')
+                ->where('trx_rapbd.iddinas', $iddinas)
+                ->get()
+                ->result();
+            
+            $options = '<option disabled selected></option>';
+            foreach ($apbdData as $apbd) {
+                $options .= '<option value="'.$apbd->id.'">'.$apbd->nmrekening.'('.$apbd->kdrekview.')</option>'; 
+            }
+            
+            echo $options;
+        }
+        
+        public function get_data_from_stsdetail() {
+            $nosptpd = $this->input->get('kodebayar') ?: 0;
+        
+            $this->db->select('a.idstsmaster, a.idwp, a.idrapbd, a.iduptd, a.tglpajak, a.nobukti, a.blnpajak, a.thnpajak, a.jumlah, a.prs_denda, a.nil_denda, a.total, a.keterangan, a.formulir, a.kodebayar, a.tgl_input, a.nopelaporan, b.nama, b.alamat, b.npwpd, d.nmrekening');
+            $this->db->from('trx_stsdetail a');
+            $this->db->where('a.kodebayar', $nosptpd);
+            $this->db->join('mst_wajibpajak b', 'a.idwp = b.id', 'left'); 
+            $this->db->join('trx_rapbd c', 'a.idrapbd = c.id', 'left'); 
+            $this->db->join('mst_rekening d', 'c.idrekening = d.id', 'left'); 
+        
+            $query = $this->db->get();
+            
+            $result = $query->result_array();
+            
+            if (empty($result)) {
+                echo json_encode(['error' => 'No data found for the given nosptpd']);
+            } else {
+                echo json_encode($result, JSON_PRETTY_PRINT);
+            }
+        }
+        
           public function getapisimpada()
           {
               $nosptpd = empty($this->input->get('nosptpd')) ? 0 : $this->input->get('nosptpd');
@@ -572,6 +622,7 @@ class PendDaerah extends CI_Controller {
               // Menutup koneksi Curl
               curl_close($curl);
           }
+          
           
           public function getapisimpadabphtb()
           {

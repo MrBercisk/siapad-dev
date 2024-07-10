@@ -86,6 +86,10 @@ class Mpend extends CI_Model {
         $this->db->where('idstsmaster', $idstsmaster);
         return $this->db->delete('trx_stsdetail'); 
     }
+    public function insertdataRecord($data)
+    {
+        return $this->db->insert('trx_stsmaster', $data); 
+    }
     public function insertdata($data)
     {
         return $this->db->insert('trx_stsdetail', $data); 
@@ -133,9 +137,39 @@ class Mpend extends CI_Model {
             return false;
         }
     }
-   
+    public function check_duplicate_data($idstsmaster, $kodebayar) {
+        $this->db->where('idstsmaster', $idstsmaster);
+        $this->db->where('kodebayar', $kodebayar);
+        $query = $this->db->get('trx_stsdetail'); 
+        
+        return $query->num_rows() > 0; 
+    }
+    public function check_duplicate_record($nomor) {
+        $this->db->from('trx_stsmaster');
+        $this->db->where('nomor', $nomor);
+        $query = $this->db->get('trx_stsmaster'); 
+        
+        return $query->num_rows() > 0; 
+    }
 
+    public function get_idwp_by_namaop($namaop) {
+        // Query untuk mencari idwp berdasarkan namaop
+        $this->db->select('id'); // Ganti 'id' sesuai dengan kolom yang menyimpan idwp
+        $this->db->from('mst_wajibpajak'); // Ganti 'mst_wajibpajak' sesuai dengan nama tabel yang benar
+        $this->db->where('nama', $namaop); // Ganti 'namawp' sesuai dengan kolom yang menyimpan nama WP
 
+        // Lakukan query dan ambil hasilnya
+        $query = $this->db->get();
+        
+        // Periksa apakah hasil query mengembalikan baris data
+        if ($query->num_rows() > 0) {
+            // Ambil idwp dari hasil query
+            $row = $query->row();
+            return $row->id; // Mengembalikan nilai idwp
+        } else {
+            return NULL; // Mengembalikan NULL jika tidak ditemukan idwp
+        }
+    }
     public function databyid($id)
     {
         $this->db->select('*');

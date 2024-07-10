@@ -11,6 +11,7 @@ $theme['main'][]  = implode($sidebar);
 $datatables 	  = '<script type="text/javascript">
                           
                         $(document).ready(function(){
+                  
                         document.getElementById("tahun").value = new Date().getFullYear();
 
          
@@ -20,7 +21,35 @@ $datatables 	  = '<script type="text/javascript">
           });
 					 </script>       
            <style>
-      
+                    #loading-overlay {
+                  display: none;
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background-color: rgba(255, 255, 255, 0.8); 
+                  z-index: 9999;
+                  text-align: center;
+                  backdrop-filter: blur(5px); 
+              }
+
+              #loading-spinner {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+              }
+
+              #loading-text {
+                  position: absolute;
+                  top: 60%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  font-size: 18px;
+                  font-weight: bold;
+              }
+
             #submitButton:hover {
                 opacity: 0.5; /* Opacity tetap saat kursor di atas tombol */
             }
@@ -62,7 +91,7 @@ $datatables 	  = '<script type="text/javascript">
         $wpData = $this->db->get('mst_wajibpajak')->result();
         $opsiwp = '<option  disabled selected>Pilih WP</option>';
         foreach ($wpData as $wp) {
-          $opsiwp .= '<option value="'.$wp->id.'">'.$wp->nama.'</option>';
+          $opsiwp .= '<option value="'.$wp->id.'">'.$wp->nama.' - '.$wp->alamat.'</option>';
         }
           $this->db->select('id, nomor');
           $recData = $this->db->get('trx_stsmaster')->result();
@@ -84,7 +113,7 @@ $datatables 	  = '<script type="text/javascript">
  
         $opsiapbd = '<option disabled selected></option>';
         foreach ($apbdData as $apbd) {
-            $opsiapbd .= '<option value="'.$apbd->id.'">'.$apbd->nmrekening.'('.$apbd->kdrekview.')</option>'; // Menggunakan $apbd->idheader untuk nilai option
+            $opsiapbd .= '<option value="'.$apbd->id.'">'.$apbd->nmrekening.'('.$apbd->kdrekview.')</option>'; 
         }
       
         
@@ -106,7 +135,9 @@ $datatables 	  = '<script type="text/javascript">
 
 $theme['main'][] = 
 
-    '<div id="page-title" class="page-title" data-title="'.$title.'"></div>
+    '  
+    <div id="page-title" class="page-title" data-title="'.$title.'"></div>
+   
     <div class="main-content">
         <section class="section">
           <div class="section-header">
@@ -118,6 +149,7 @@ $theme['main'][] =
           </div>
           
             <div class="container-fluid">
+           
               <div class="section-body">
                 <div class="row">           
                   <div class="col-12 col-md-12">
@@ -209,7 +241,10 @@ $theme['main'][] =
                                 <div id="table-buttons">
                                     <button type="button" class="btn btn-sm btn-success fa fa-plus add-data" id="add-data" data-toggle="modal" data-target="#addModal" style="display: none;"> Tambah</button>
                                     <button type="button" class="btn btn-sm btn-danger fa fa-times delete-all-data" id="hapus_data" style="display: none;" > Hapus</button>
-                                    <button type="button" class="btn btn-sm btn-dark fa fa-binoculars search-data" id="cari_data" data-toggle="modal" data-target="#searchModal" style="display: none;"> Cari</button>
+                                  
+                                    <button type="button" class="btn btn-sm btn-dark fa fa-binoculars search-data" id="cari_data" data-toggle="modal" data-target="#searchModal" style="display: none;"> Cari by API</button>
+                                  
+                                    <button type="button" class="btn btn-sm btn-primary fa fa-binoculars search-data" id="cari_data_table" data-toggle="modal" data-target="#searchTableModal" style="display: none;"> Cari by table</button>
                                 </div>
                        
                               <table class="table table-bordered table-stripped display" style="width:100% !important;" id="pendapatan">
@@ -364,11 +399,11 @@ $theme['main'][] =
                                     </select>
                                   </div>
                                 </div>
-                               <div class="col-md-6">
+                                <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
-                                     <select id="kdrekening" name="kdrekening" class="form-control" data-placeholder="Pilih Rekening" style="width: 100%;" >
-                                      '.$opsiapbd.'
+                                     <select id="kdrekening" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
+                                     <option disabled selected></option>
                                     </select>
                                   </div>
                                 </div>
@@ -380,30 +415,13 @@ $theme['main'][] =
                                     </select>
                                   </div>
                                 </div>
-                                <div class="col-md-4">
+                                 <div class="col-md-4">
                                  <label for="tanggal">Tanggal:</label>
-                                    <select class="form-control" id="tglpajak" name="tglpajak" style="width: 100%;" required>
-                                        <option value="" disabled selected>Pilih Tanggal</option>
-                                          '.$select_options.'
-                                    </select>
+                                    <input type="number" name="tglpajak" id="tglpajak" class="form-control min="01" max="31" value="01" placeholder="Pilih Tanggal">                  
                                 </div>
                                 <div class="col-md-4">
                                  <label for="bulan">Bulan:</label>
-                                    <select class="form-control" id="blnpajak" name="blnpajak" style="width: 100%;" required>
-                                        <option value="" disabled selected>Pilih Bulan</option>
-                                        <option value="01">Januari</option>
-                                        <option value="02">Februari</option>
-                                        <option value="03">Maret</option>
-                                        <option value="04">April</option>
-                                        <option value="05">Mei</option>
-                                        <option value="06">Juni</option>
-                                        <option value="07">Juli</option>
-                                        <option value="08">Agustus</option>
-                                        <option value="09">September</option>
-                                        <option value="10">Oktober</option>
-                                        <option value="11">November</option>
-                                        <option value="12">Desember</option>
-                                    </select>
+                                  <input type="number" name="blnpajak" id="blnpajak" class="form-control min="01" max="12" value="01" placeholder="Pilih Bulan">    
                                 </div>
                                 <div class="col-md-4">
                                   <div class="form-group">
@@ -501,6 +519,7 @@ $theme['main'][] =
                 <div class="modal-body">
                       <form id="editTableForm" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/update_data').'">
                         <input type="hidden" name="idstsmaster" id="id="idstsmaster">
+                        <input type="hidden" name="iddinas" id="id="iddinas">
                         <input type="hidden" name="nourut" id="id="nourut">
                         <div class="row">
                                 <div class="col-md-6">
@@ -521,8 +540,8 @@ $theme['main'][] =
                                <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
-                                     <select id="kdrekening" name="idrapbd" class="form-control" data-placeholder="Pilih Rekening" style="width: 100%;" >
-                                      '.$opsiapbd.'
+                                     <select id="kdrekening2" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
+                                     <option disabled selected></option>
                                     </select>
                                   </div>
                                 </div>
@@ -536,29 +555,11 @@ $theme['main'][] =
                                 </div>
                                 <div class="col-md-4">
                                  <label for="tanggal">Tanggal:</label>
-                                    <select name="tglpajak" id="tglpajak" class="form-control" style="width: 100%;">
-                                      <option value="" disabled selected>Pilih Tanggal</option>
-                                      '.$select_options.'
-                                    </select>
-                                   
+                                    <input type="number" name="tglpajak" id="tglpajak" class="form-control min="01" max="31" value="01">                  
                                 </div>
                                 <div class="col-md-4">
                                  <label for="bulan">Bulan:</label>
-                                    <select class="form-control select2" id="blnpajak" name="blnpajak" style="width: 100%;" >
-                                        <option value="" disabled selected>Pilih Bulan</option>
-                                        <option value="01">Januari</option>
-                                        <option value="02">Februari</option>
-                                        <option value="03">Maret</option>
-                                        <option value="04">April</option>
-                                        <option value="05">Mei</option>
-                                        <option value="06">Juni</option>
-                                        <option value="07">Juli</option>
-                                        <option value="08">Agustus</option>
-                                        <option value="09">September</option>
-                                        <option value="10">Oktober</option>
-                                        <option value="11">November</option>
-                                        <option value="12">Desember</option>
-                                    </select>
+                                  <input type="number" name="blnpajak" id="blnpajak" class="form-control min="01" max="12" value="01">    
                                 </div>
                                 <div class="col-md-4">
                                   <div class="form-group">
@@ -748,6 +749,126 @@ $theme['main'][] =
                           <div class="modal-footer">
                               <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
                               <button type="button" class="btn btn-success" id="fetchDataButton">Ok</button>
+                          </div>
+                          </form>
+                  </div>
+                  
+            
+            <!-- Modal Footer -->
+         
+          
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="searchTableModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+          
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Cari SPTPD</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body">
+                   <form id="getTableForm" >
+                     <div class="row">
+                                 <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
+                                  <input type="hidden" class="form-control" id="nourut" name="nourut">
+                                  <input type="hidden" class="form-control" id="idrapbd" name="idrapbd">
+                                  <input type="hidden" class="form-control" id="iduptd" name="iduptd">
+                                  <input type="hidden" class="form-control" id="idwp" name="idwp">
+                                  <input type="hidden" class="form-control" id="nopelaporan2" name="nopelaporan">
+
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="nosptpd">No. SPTPD/No Formulir</label>
+                                     <input type="text" id="nosptpd2" class="form-control" name="kodebayar"  placeholder="Ketik No SPTPD / No Formulir lalu tekan Enter..." required>                       
+                                  </div>
+                                </div>
+                            
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="NoSSPD">No SSPD</label>
+                                     <input type="text" id="NoSSPD2" class="form-control" name="nobukti" readonly>                       
+                                  </div>
+                                </div>
+
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="TGLKirim">Tgl Bayar</label>
+                                     <input type="text" id="TGLKirim2" class="form-control" name="tgl_input" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="statusbayar">Status Bayar</label>
+                                     <input type="text" id="statusbayar2" class="form-control" name="statusbayar" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="jumlahbayar">Jumlah Bayar</label>
+                                     <input type="text" id="jumlahbayar2" class="form-control" name="jumlah" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="denda">Denda</label>
+                                     <input type="text" id="denda2" class="form-control" name="nil_denda" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="totalbayar">Total Bayar</label>
+                                     <input type="text" id="totalbayar2" class="form-control" name="total" readonly>                       
+                                  </div>
+                                </div>
+                            
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="masapajak">Masa Pajak</label>
+                                     <input type="text" id="blnpajak2" class="form-control" name="blnpajak" readonly>                       
+                                  </div>
+                                </div>
+                            
+                              <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="tahunpajak">Tahun Pajak</label>
+                                     <input type="text" id="thnpajak2" class="form-control" name="thnpajak" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="namaop">Nama WP</label>
+                                     <input type="text" id="namaop2" class="form-control" name="nama" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="jenisop">Jenis Pajak</label>
+                                     <input type="text" id="jenisop2" class="form-control" name="nmrekening" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="alamatop">Alamat</label>
+                                     <input type="text" id="alamatop2" class="form-control" name="alamatop" readonly>                       
+                                  </div>
+                                </div>
+                              <div class="col-md-12">
+                                  <div class="form-group">
+                                    <label for="npwpd">NPWPD</label>
+                                     <input type="text" id="npwpd2" class="form-control" name="npwpd" readonly>                       
+                                  </div>
+                                </div>
+                     
+                                    
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
+                              <button type="button" class="btn btn-success" id="fetchTableButton">Ok</button>
                           </div>
                           </form>
                   </div>
