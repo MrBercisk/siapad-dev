@@ -110,7 +110,8 @@ class Obreklame extends CI_Controller {
 		switch($aksi){
 			case 'Save':
 				$data = [	'jnsukuran' 		=> $this->input->post('jnsukuran'),
-							'idwp'=> $this->input->post('idwp')];
+							'idwp'=> $this->input->post('idwp')
+						];
 				$insert = $this->Crud->insert_data('mst_wpreklame', $data);
 				if ($insert) {
 					$this->session->set_flashdata('message', 'Data has been saved successfully');

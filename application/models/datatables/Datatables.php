@@ -68,21 +68,17 @@ class Datatables extends CI_Model {
          
         }
     }
-    public function tombol($id, $actions = ['edit', 'delete', 'add']) {
+    public function tombol($id, $actions = ['edit', 'delete']) {
         $tombol[] = '<div class="btn-group pull-right">';
-        if (in_array('add', $actions)) {
-            $tombol []= '
-                <a class="btn btn-xs btn-outline-success modin fa fa-plus" id="add" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalA" data-placement="bottom" title="Tambah data">
-                </a>';
-        }
+       
         if (in_array('edit', $actions)) {
             $tombol []= '
-                <a class="btn btn-xs btn-outline-primary modin fa fa-edit" id="edit" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalE" data-placement="bottom" title="Perbarui data">
+                <a class="btn btn-xs btn-primary modin fa fa-edit" id="edit" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalE" data-placement="bottom" title="Perbarui data">
                 </a>';
         }
         if (in_array('delete', $actions)) {
             $tombol []= '
-                <a class="btn btn-xs btn-outline-danger modin fa fa-trash" id="delete" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalD" data-placement="bottom" title="Hapus">
+                <a class="btn btn-xs btn-danger modin fa fa-trash" id="delete" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalD" data-placement="bottom" title="Hapus">
                 </a>';
         }
         $tombol []= '</div>';

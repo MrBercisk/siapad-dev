@@ -10,8 +10,62 @@ $(document).ready(function() {
             minimumInputLength: 5, 
 
     });
+    $('.opsiwp').select2({
+        ajax: {
+            url: 'SkpdReklame/get_wp_data',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term, 
+                    limit: 10,
+                    offset: params.page ? (params.page - 1) * 5 : 0 
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nama,
+                            nomor: item.nomor, 
+                            tgljthtmp: item.tgljthtmp, 
+                        };
+                    }),
+                    pagination: {
+                        more: data.length === 10
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Pilih WP',
+        templateResult: formatWp,
+        templateSelection: formatWpSelection
+    });
+
+    function formatWp(wp) {
+        if (wp.loading) {
+            return wp.text;
+        }
+        var $container = $('<div>' + wp.text + '</div>');
+        return $container;
+    }
+
+    function formatWpSelection(wp) {
+        return wp.text || wp.id;
+    }
+
+    $('.opsiwp').on('select2:select', function (e) {
+        var data = e.params.data;
+        $('.nomor').val(data.nomor); 
+        $('.tgljthtmp').val(data.tgljthtmp); 
+    });
+    
+
     $('#kdrekening').select2({
-            placeholder: $('#kdrekening').data('placeholder'),
+        placeholder: $('#kdrekening').data('placeholder'),
 
     });
     $('#kdrekening2').select2({
@@ -256,7 +310,60 @@ $(document).ready(function() {
             }
         });
     });
-    
+     
+    var table = $('#pendapatan').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "url": "PendDaerah/get_datatable_data",
+            "type": "POST",
+            "data": function(d) {
+                d.id = $('#idrecord').val(); 
+                d.iddinas = $('#iddinas').val();
+            },
+            "dataSrc": function(json) {
+                $('#table-buttons').find('#idstsmaster').remove();
+                $('#table-buttons').find('#iddinas').remove(); 
+                $('#table-buttons').append(json.extra_data);
+                console.log('idstsmasternya dan iddinas yang diambil:', json.extra_data);
+                return json.data;
+            },
+            "data": function() {
+                return {};
+            }
+        },
+        "searching": false,
+        "ordering": false,
+        "info": false,
+        "lengthChange": false,
+        "paging": false,
+        "scrollX": true,
+        "columnDefs": [
+            {
+                "targets": 0,
+                "orderable": false,
+                "width": "1%"
+            },
+            {
+                "targets": -1,
+                "width": "10%"
+            }
+        ],
+        "drawCallback": function(settings) {
+            var api = this.api();
+            var start = api.page.info().start;
+            api.column(0, { page: "current" }).nodes().each(function(cell, i) {
+                cell.innerHTML = start + i + 1;
+            });
+        },
+        "buttons": [
+            "copyHtml5",
+            "excelHtml5",
+            "csvHtml5",
+            "pdfHtml5"
+        ]
+    });
+
 
     $("#idrecord").change(function() {
         var recordId = $(this).val();
@@ -286,9 +393,9 @@ $(document).ready(function() {
     
                         var isdispendaValue = response.data.isdispenda;
                         if (isdispendaValue == 1) {
-                            $('#jenis').val('BPPRD');
+                            $('#jenis').val('Bapenda');
                         } else {
-                            $('#jenis').val('Non BPPRD');
+                            $('#jenis').val('Non Bapenda');
                         }
     
                         var isnonkasValue = response.data.isnonkas;
@@ -305,7 +412,7 @@ $(document).ready(function() {
     
                         $('#add-data').show();
                         $('#hapus_data').show();
-                        $('#cari_data').show();
+                       /*  $('#cari_data').show(); */
                         $('#cari_data_table').show();
     
                         table.ajax.url('PendDaerah/get_datatable_data?id=' + recordId + '&iddinas=' + iddinasId).load();
@@ -324,58 +431,7 @@ $(document).ready(function() {
         }
     });
     
-    
-    var table = $('#pendapatan').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-            "url": "PendDaerah/get_datatable_data",
-            "type": "POST",
-            "data": function(d) {
-                d.id = $('#idrecord').val(); 
-                d.iddinas = $('#iddinas').val();
-            },
-            "dataSrc": function(json) {
-                $('#table-buttons').find('#idstsmaster').remove();
-                $('#table-buttons').find('#iddinas').remove(); 
-                $('#table-buttons').append(json.extra_data);
-                console.log('idstsmasternya dan iddinas yang diambil:', json.extra_data);
-                return json.data;
-            }
-        },
-        "searching": false,
-        "ordering": false,
-        "info": false,
-        "lengthChange": false,
-        "paging": false,
-        "scrollX": true,
-        "columnDefs": [
-            {
-                "targets": 0,
-                "orderable": false,
-                "width": "1%"
-            },
-            {
-                "targets": -1,
-                "width": "10%"
-            }
-        ],
-         "drawCallback": function(settings) {
-            var api = this.api();
-            var start = api.page.info().start;
-            api.column(0, { page: "current" }).nodes().each(function(cell, i) {
-                cell.innerHTML = start + i + 1;
-            });
-        },
-        "buttons": [
-            "copyHtml5",
-            "excelHtml5",
-            "csvHtml5",
-            "pdfHtml5"
-        ]
-    });
-    
-  
+   
    
         const editButton = document.getElementById('editButton');
         const submitButton = document.getElementById('submitButton');
@@ -827,8 +883,7 @@ $(document).ready(function() {
                         $('#idrapbd').val(record.idrapbd);
                         $('#iduptd').val(record.iduptd);
 
-                        var statusbayar = record.tgl_input ? 1 : 0;
-                        $('#statusbayar2').val(statusbayar);
+                        $('#statusbayar2').val(1);
                         
                         Swal.fire({
                             title: 'Success',
@@ -1073,6 +1128,6 @@ $(document).ready(function() {
         console.log('Selected idwp:', idwpSelected); 
     });
    
+    
 
-   
 });

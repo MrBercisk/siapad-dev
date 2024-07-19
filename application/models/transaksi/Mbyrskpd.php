@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class Mpend extends CI_Model {
+class Mbyrskpd extends CI_Model {
     
     public function get_data_by_idsts_nourut($idstsmaster, $nourut) {
         $this->db->select([

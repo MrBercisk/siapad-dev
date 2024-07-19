@@ -248,6 +248,7 @@ class Msetup extends CI_Model {
 	  <script src="'.$base['url'].'assets/js/scripts.js"></script>
 	  <script src="'.$base['url'].'assets/js/custom.js"></script>
 	  <script src="'.$base['url'].'assets/js/select2.js"></script>
+	  <script src="'.$base['url'].'assets/js/skpd.js"></script>
 	  <script src="'.$base['url'].'assets/js/datatableaction.js"></script>
 	  
 	</body>
@@ -335,6 +336,32 @@ class Msetup extends CI_Model {
         }
         return null;
     }
+	public function get_tanda_tangan_skpd_1($tanda_tangan_1) {
+        if ($tanda_tangan_1) {
+            $ttddetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $tanda_tangan_1)
+                ->get()
+                ->row_array();
+            
+            return $ttddetail;
+        }
+        return null;
+    }
+	public function get_tanda_tangan_skpd_2($tanda_tangan_2) {
+        if ($tanda_tangan_2) {
+            $ttddetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $tanda_tangan_2)
+                ->get()
+                ->row_array();
+            
+            return $ttddetail;
+        }
+        return null;
+    }
 	public function get_pembuat($pembuat_checkbox, $pembuat) {
         if ($pembuat_checkbox && $pembuat) {
             $pembuatdetail = $this->db
@@ -361,11 +388,12 @@ class Msetup extends CI_Model {
 		}
         return null;
     }
-	public function get_dinas($dinas) {
-		if($dinas){
+	public function get_dinas($iddinas) {
+		if($iddinas){
 			$dinDetail = $this->db
 			->select('id,nama')
 			->from('mst_dinas')
+			->where('id', $iddinas)
 			->get()
 			->row_array();
 			return $dinDetail;

@@ -12,6 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 define('ENDPOINT_API_SIMPATDA', 'http://103.140.188.162:7073/GetSimpatda');
+define('ENDPOINT_API_SIMPATDA_REKLAME', 'http://103.140.188.162:7073/GetReklame');
 define('ENDPOINT_API_SIMPATDA_SVR', 'http://192.168.1.98/DevDispendaApi/BPPRDPayment/GetSIAPAD');
 define('ENDPOINT_API_SIMPATDA_BPHTB', 'http://192.168.1.98/DevDispendaApi/BPPRDPayment/GetBPHTB/');
 

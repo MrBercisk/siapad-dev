@@ -24,9 +24,60 @@ class PendDaerah extends CI_Controller {
 	 	$data['jsedit']		= $Jssetup->jsModal('#edit','Edit','transaksi/PendDaerah/myModal','#modalkuE');
 	 	$data['jsdelete']	= $Jssetup->jsModal('#delete','Delete','transaksi/PendDaerah/myModal','#modalkuD');
 	 	$data['jsadd']	    = $Jssetup->jsModal('#add','Add','transaksi/PendDaerah/myModal','#modalkuA');
-		$data['forminsert'] = $this->Mpend->formInsert();
 		$this->load->view('transaksi/pnddaerah',$data);
 	}
+    function selectByIdSKPD($id = 0)
+    {
+        $result = $this->db
+            ->where('id', $id)
+            ->get('trx_stsmaster');
+
+        if ($result->num_rows() > 0) {
+            $row = $result->row();
+            $data['nomor'] = $row->nomor;
+            $data['tanggal'] = $row->tanggal;
+            $data['iddinas'] = $row->iddinas;
+            $data['isdispenda'] = $row->isdispenda;
+            $data['tmpbayar'] = $row->tmpbayar;
+            $data['keterangan'] = $row->keterangan;
+
+            //get detail yang ada pasangannya 
+            $result = $this->db
+                ->select("a.nourut, a.nobukti, a.idskpd, e.nomor AS noskpd, a.idwp, CONCAT(e.nama, ' - ', e.nomor) AS nmwp, 
+                    c.id AS idrek, c.nmrekening AS nmrek, 
+                    a.iduptd, f.singkat AS nmuptd, 
+                    a.blnpajak AS bln, a.thnpajak AS thn, 
+                    a.jumlah, a.prs_denda AS persen, LOWER(a.nil_denda) AS bunga, a.total, a.keterangan", false)
+                ->join('trx_rapbd b', 'b.id=a.idrapbd')
+                ->join('mst_rekening c', 'c.id=b.idrekening')
+                ->join('trx_skpdreklame d', 'd.id=a.idskpd')
+                ->join('mst_wajibpajak e', 'e.id=d.idwp')
+                ->join('mst_uptd f', 'f.id=a.iduptd')
+                ->where('a.idstsmaster', $id)
+                ->where('c.jenis', 'REK')
+                ->get('trx_stsdetail a');
+
+            //get total all items
+            $urutrs = $this->db
+                ->select("max(nourut) AS maxurut", false)
+                ->where('idstsmaster', $id)
+                ->get('trx_stsdetail');
+
+            if ($urutrs->num_rows() > 0) {
+                $maxurut = $urutrs->row()->maxurut;
+            } else {
+                $maxurut = '0000';
+            }
+
+            $data['maxurut'] = $maxurut;
+            $data['items'] = $result->result_array();
+        } else {
+            $data = array();
+        }
+
+
+        return $data;
+    }
 	
     public function get_datatable_data() {
         $idrecord = $this->input->get('id');
@@ -232,17 +283,15 @@ class PendDaerah extends CI_Controller {
             $nomor = $this->input->post('nomor');
             $tahun = date('Y', strtotime($tanggal));
         
-            // Check if the nomor already exists in trx_stsmaster table
             $this->db->select('nomor');
             $this->db->from('trx_stsmaster');
             $this->db->where('nomor', $nomor);
             $query = $this->db->get();
         
             if ($query->num_rows() > 0) {
-                // If nomor already exists, return error response
                 $response = ['success' => false, 'message' => 'Nomor sudah ada. Tidak dapat menambahkan record baru.'];
             } else {
-                // Nomor does not exist, proceed to insert data
+            
                 $this->db->select('isdispenda');
                 $this->db->from('mst_dinas');
                 $this->db->where('id', $iddinas);
@@ -376,7 +425,6 @@ class PendDaerah extends CI_Controller {
             $nobukti = $this->input->post('nobukti');
             $kodebayar = $this->input->post('kodebayar');
             $jumlah = $this->input->post('jumlah');
-            $nosptpd = $this->input->post('nosptpd');
         
             // Cek apakah data yang diperlukan kosong
             if (empty($idstsmaster) || empty($kodebayar)) {

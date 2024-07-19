@@ -1,5 +1,33 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class Mwp extends CI_Model {
+	
+    public function selectBySKPD($key='',$skpd='', $start=0, $limit=0, $sort, $dir='ASC', &$total=0){
+        $key = $this->db->escape_like_str($key);
+        $where = "(a.nama LIKE '%$key%' OR a.nomor LIKE '%$key%' OR a.pemilik LIKE '%$key%' 
+        OR a.nama LIKE '%$skpd%' OR a.nomor LIKE '%$skpd%' OR a.pemilik LIKE '%$skpd%')";
+        $total = $this->db
+            ->where($where)
+            ->where('notype', 'No. SKP')
+            ->count_all_results('mst_wajibpajak a');
+
+        $result = $this->db
+            ->select("a.id, a.nama, CONCAT(a.nama, ' - ', a.nomor) AS nmwp, a.alamat, a.idkelurahan, b.nama AS kelurahan, 
+                b.idkecamatan, c.nama AS kecamatan, a.nomor, a.notype, a.tglskp, a.tgljthtmp, 
+                a.idrekening, d.nmrekening, d.jenis,
+                c.iduptd, e.nama AS nmuptd, e.singkat AS nmuptdsingkat,
+                a.awalpajakbln, a.awalpajakthn, a.akhirpajakbln, a.akhirpajakthn, a.isclosed,f.keterangan", false)
+            ->join('mst_rekening d', 'd.id=a.idrekening')
+            ->join('mst_kelurahan b', 'b.id=a.idkelurahan', 'left')
+            ->join('mst_kecamatan c', 'c.id=b.idkecamatan', 'left')
+            ->join('mst_uptd e', 'e.id=c.iduptd', 'left')
+            ->join('trx_skpdreklame f', 'f.idwp=a.id', 'left')
+            ->where($where)
+            ->where('a.notype', 'No. SKP')
+            ->order_by($sort, $dir)
+            ->get('mst_wajibpajak a', $limit, $start);
+
+        return $result;
+    }
     public function formInsert(){
 		$form[] = '
 			<form id="forminput" method="post" enctype="multipart/form-data" action="'.site_url('master/WP/aksi').'" class="form-row">
