@@ -1,10 +1,10 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
-class Apbd extends CI_Controller
+class Apbdp extends CI_Controller
 {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('transaksi/MApbd');
+        $this->load->model('transaksi/MApbdp');
         // $this->load->model('master/MDinas');
     }
     public function index()
@@ -21,19 +21,18 @@ class Apbd extends CI_Controller
                 'title'       => $setpage->title,
                 'link'        => $setpage->link,
                 'topbar'      => $template['topbar'],
-                'modalEdit'   => $this->Form->modalKu('E', 'Edit', 'transaksi/Apbd/aksi', ['edit']),
-                'modalDelete' => $this->Form->modalKu('D', 'Delete', 'transaksi/Apbd/aksi', ['delete']),
+                'modalEdit'   => $this->Form->modalKu('E', 'Edit', 'transaksi/Apbdp/aksi', ['edit']),
+                'modalDelete' => $this->Form->modalKu('D', 'Delete', 'transaksi/Apbdp/aksi', ['delete']),
                 'sidebar'     => $template['sidebar'],
-                'jstable'     => $Jssetup->jsDatatable('#ftf', 'transaksi/Apbd/getDinas'),
-                'jsedit'      => $Jssetup->jsModal('#edit', 'Edit', 'transaksi/Apbd/myModal', '#modalkuE'),
-                'jsdelete'    => $Jssetup->jsModal('#delete', 'Delete', 'transaksi/Apbd/myModal', '#modalkuD'),
-                'forminsert'  => implode('', $this->MApbd->formInsert()),
-                'formCari'  => implode('', $this->MApbd->formCari()),
-                'filters'  => implode('', $this->MApbd->filterCari()),
-                // 'formTambah'  => implode('', $this->MApbd->formModal())
+                'jstable'     => $Jssetup->jsDatatable('#ftf', 'transaksi/Apbdp/getDinas'),
+                'jsedit'      => $Jssetup->jsModal('#edit', 'Edit', 'transaksi/Apbdp/myModal', '#modalkuE'),
+                'jsdelete'    => $Jssetup->jsModal('#delete', 'Delete', 'transaksi/Apbdp/myModal', '#modalkuD'),
+                'forminsert'  => implode('', $this->MApbdp->formInsert()),
+                'formCari'  => implode('', $this->MApbdp->formCari()),
+                // 'formTambah'  => implode('', $this->MApbdp->formModal())
             ];
 
-        $this->load->view('transaksi/Apbd', $data);
+        $this->load->view('transaksi/Apbdp', $data);
     }
 
     public function getDinas()
@@ -115,8 +114,8 @@ class Apbd extends CI_Controller
                 $joinTables          = [];
                 $selectFields         = 'id, iddinas, tahun, idrekening, apbd,apbdp';
                 $kode                 = $this->Crud->gandengan('trx_rapbd', $joinTables, $selectFields, 'id="' . $this->input->post('idnya') . '"')[0];
-                $namarekening = $this->MApbd->dinasByName('id', $kode->idrekening, 'mst_rekening', 'nmrekening');
-                $namadinas = $this->MApbd->dinasByName('id', $kode->iddinas, 'mst_dinas', 'nama');
+                $namarekening = $this->MApbdp->dinasByName('id', $kode->idrekening, 'mst_rekening', 'nmrekening');
+                $namadinas = $this->MApbdp->dinasByName('id', $kode->iddinas, 'mst_dinas', 'nama');
                 $form[]     = '
 				<div class="row">
                     <div class="col-md-12">'
@@ -160,7 +159,7 @@ class Apbd extends CI_Controller
             case 'Save':
                 $nama = $this->input->post('dinas');
                 // dinasByName($kunci,$where, $table, $selected)
-                $iddinas = $this->MApbd->dinasByName('nama', $nama, 'mst_dinas', 'id');
+                $iddinas = $this->MApbdp->dinasByName('nama', $nama, 'mst_dinas', 'id');
                 // var_dump($iddinas[0]->id);
                 // die;
                 $data = [

@@ -21,12 +21,12 @@ $("#dinas, #tahun").change(function() {
     });
   
     var table = $("#ftf").DataTable({
-        
+        "paging": false,
+        "lengthChange": false,
+        "searching": false,
+        "info": false,
         "processing": true,
         "serverSide": true,
-        "searching": false, 
-        "paging": true,   
-
         "ajax": {
             url: "' . site_url($escaped_link) . '",
             type: "POST",
@@ -52,23 +52,6 @@ $("#dinas, #tahun").change(function() {
             api.column(0, { page: "current" }).nodes().each(function(cell, i) {
                 cell.innerHTML = start + i + 1;
             });
-        },
-        "rowGroup": {
-              "dataSrc": function(row) {
-               
-                let kdrekening = row[2];
-                let parts = kdrekening.split(".");
-                console.log(parts);
-                if (parts.length === 5) {
-                    return parts.slice(0, 4).join(".");
-                }
-                return kdrekening;
-            },
-            "startRender": function(rows, group) {
-                 let namaRekening = rows.data()[0][1];
-                 let kdRekening = rows.data()[0][2];
-                return kdRekening + " - " + namaRekening;
-            }
         },
         "buttons": [
             "copyHtml5",
@@ -143,7 +126,6 @@ $theme['main'][] =
                         </ul>
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
-                          
                           ' . $datatables . '
                           </div>
                           <div class="tab-pane fade" id="insert" role="tabpanel" aria-labelledby="profile-tab">

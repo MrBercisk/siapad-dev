@@ -21,20 +21,17 @@ class Msetup extends CI_Model
 			  <link rel="stylesheet" href="' . $base['url'] . 'assets/css/boxicons.min.css">
 			  <link rel="stylesheet" href="' . $base['url'] . 'assets/css/components.css">
   			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/css/select.bootstrap4.min.css">
-			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/select2/dist/css/select2.css">
+			  <script src="' . $base['url'] . 'assets/modules/jquery.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/datatables.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>
+			  
 			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/datatables/datatables.min.css">
 			  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"> 
 			  <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.2/css/rowGroup.dataTables.min.css"> 
-			 
-			  <script src="' . $base['url'] . 'assets/modules/jquery.min.js"></script>
-			 
-			  <script src="' . $base['url'] . 'assets/modules/datatables/datatables.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>	  
-			 <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script> 
+			  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script> 
 			  <script src="https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>
-
+			 
 			 
 			  <style>
 					/* Custom CSS to ensure menu alignment */
@@ -252,7 +249,10 @@ class Msetup extends CI_Model
 				</div>
 				
 				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-			 
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/select2/dist/css/select2.css">
+				
+				<script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>
+
 				<script src="' . $base['url'] . 'assets/modules/popper.js"></script>
 				<script src="' . $base['url'] . 'assets/modules/tooltip.js"></script>
 				<script src="' . $base['url'] . 'assets/modules/bootstrap/js/bootstrap.min.js"></script>
@@ -262,8 +262,6 @@ class Msetup extends CI_Model
 				<script src="' . $base['url'] . 'assets/js/scripts.js"></script>
 				<script src="' . $base['url'] . 'assets/js/custom.js"></script>
 				<script src="' . $base['url'] . 'assets/js/select2.js"></script>
-
-
 				
 				</body>
 				</html>';
@@ -449,6 +447,7 @@ class Msetup extends CI_Model
 	}
 	public function detailTtd($nama = '')
 	{
+
 		$ttddata = $this->db
 			->select('mst_tandatangan.id, mst_tandatangan.nip, mst_tandatangan.nama, mst_tandatangan.jabatan1, mst_tandatangan.jabatan2')
 			->from('mst_tandatangan')
@@ -480,19 +479,5 @@ class Msetup extends CI_Model
 			->result();
 
 		return $ttddata;
-	}
-
-	public function jupukJenisPajak()
-	{
-		$jnspajak = array(
-			'4.1.1.01'    => 'Pajak Hotel',
-			'4.1.1.02' => 'Pajak Restoran',
-			'4.1.1.03' => 'Pajak Hiburan',
-			'4.1.1.07' => 'Pajak Parkir',
-			'4.1.1.08' => 'Pajak Air Tanah',
-			'4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam',
-
-		);
-		return $jnspajak;
 	}
 }
