@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
-class MApbd extends CI_Model
+class MApbdp extends CI_Model
 {
   public function formInsert()
   {
@@ -127,7 +127,7 @@ class MApbd extends CI_Model
 									<label for="tahun">Tahun</label>
 						</div>
 						<div class="col-sm-9">
-							<select id="tahun" name="tahun" class="form-control" data-placeholder="Pilih Tahun">
+							<select id="tahun" name="tahun" class="form-control" data-placeholder="Pilih Dinas">
 									' . $lastFiveYears . '
 							</select>
 						</div>
@@ -135,36 +135,6 @@ class MApbd extends CI_Model
 				</div>
 		</div>
 		';
-    return $formCari;
-  }
-
-  public function filterCari()
-  {
-
-    $datadinas = $this->db
-      ->select('nama, singkat, urut, id')
-      ->from('mst_dinas')
-      ->get()
-      ->result();
-    $opsidinas = '<option></option>';
-    foreach ($datadinas as $dinas) {
-      $opsidinas .= '<option value="' . $dinas->id . '">' . $dinas->nama . '</option>';
-    }
-
-
-    $currentYear = (int)date('Y');
-    $lastFiveYears = '';
-    for ($i = 0; $i < 5; $i++) {
-      $lastFiveYears .= '<option value="' . ($currentYear - $i) . '">' . ($currentYear - $i) . '</option>';
-    }
-    $formCari[] = '
-   <div class="container">
-    <div class="form-group row">
-        <label for="rekenings" class="col-sm-3 col-form-label text-left">Pilih Rekening</label>
-        <div class="col-sm-9 text-left"><input type="text" name="rekenings" id="rekenings" class="form-control select2"></div>
-    </div>
-    </div>
-      ';
     return $formCari;
   }
 

@@ -11,6 +11,33 @@ class Form extends CI_Model
         </div>';
 		return $form;
 	}
+
+
+	public function inputRowsText($id = NULL, $label = NULL, $classlabel = NULL, $classinput = NULL, $value = NULL, $attrib = NULL)
+	{
+		$form[] = '
+		<div class="form-group row">
+           <label for="' . $id . '" class="' . $classlabel . ' col-form-label">' . $label . '</label>
+			<div class="col-sm-9">
+				<input type="text"  class="form-control ' . $classinput . '" value="' . $value . '" id="' . $id . '" name="' . $id . '" ' . $attrib . '>
+			</div>
+		   </div>';
+		return $form;
+	}
+	public function inputRowsTextArea($id = NULL, $label = NULL, $classlabel = NULL, $classinput = NULL, $value = NULL, $attrib = NULL)
+	{
+		// <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+		$form[] = '
+		<div class="form-group row">
+           <label for="' . $id . '" class="' . $classlabel . ' col-form-label">' . $label . '</label>
+			<div class="col-sm-9">
+				<textarea rows="3"  class="form-control ' . $classinput . '"  id="' . $id . '" name="' . $id . '" ' . $attrib . '>' . $value . '</textarea>
+			</div>
+		   </div>';
+		return $form;
+	}
+
+
 	public function inputReadonly($id = NULL, $label = NULL, $value = NULL, $attrib = NULL)
 	{
 		$form[] = '
@@ -29,6 +56,7 @@ class Form extends CI_Model
         </div>';
 		return $form;
 	}
+
 	public function inputCheckbox($id = NULL, $label = NULL, $value = NULL, $attrib = NULL)
 	{
 		$checked = ($value == 1 || $value == 'true') ? 'checked' : '';
@@ -225,7 +253,31 @@ class Form extends CI_Model
 		  </form>
 		</div>
 	  </div>
-	</div>';
+		</div>';
 		return $modal;
+	}
+
+	public function inputRowsSelect($id = NULL, $label = NULL, $classlabel = NULL, $classinput = NULL, $value = NULL, $attrib = NULL)
+	{
+		$form[] = '
+		<div class="form-group row">
+           <label for="' . $id . '" class="' . $classlabel . ' col-form-label">' . $label . '</label>
+			<div class="col-sm-9">
+			<select class="form-control  ' . $classinput . '"  id="' . $id . '" name="' . $id . '" ' . $attrib . '>
+                        "' . $value . '"
+                      </select>
+			</div>
+		   </div>';
+		return $form;
+	}
+
+	public function inputTextHidden($id = NULL, $label = NULL, $value = NULL, $attrib = NULL)
+	{
+		$form[] = '
+		<div class="form-group">
+           <label for="' . $id . '">' . $label . '</label>
+           <input type="hidden"  class="form-control" value="' . $value . '" id="' . $id . '" name="' . $id . '" ' . $attrib . '>
+        </div>';
+		return $form;
 	}
 }

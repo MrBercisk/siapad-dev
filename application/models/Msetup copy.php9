@@ -21,20 +21,17 @@ class Msetup extends CI_Model
 			  <link rel="stylesheet" href="' . $base['url'] . 'assets/css/boxicons.min.css">
 			  <link rel="stylesheet" href="' . $base['url'] . 'assets/css/components.css">
   			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/css/select.bootstrap4.min.css">
-			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/select2/dist/css/select2.css">
+			  <script src="' . $base['url'] . 'assets/modules/jquery.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/datatables.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>
+			  
 			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/datatables/datatables.min.css">
 			  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"> 
 			  <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.2/css/rowGroup.dataTables.min.css"> 
-			 
-			  <script src="' . $base['url'] . 'assets/modules/jquery.min.js"></script>
-			 
-			  <script src="' . $base['url'] . 'assets/modules/datatables/datatables.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>	  
-			 <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script> 
+			  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script> 
 			  <script src="https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>
-
+			 
 			 
 			  <style>
 					/* Custom CSS to ensure menu alignment */
@@ -98,7 +95,6 @@ class Msetup extends CI_Model
 			</head>
 			<body>
 			
-
 			<div id="app">
 				<div class="main-wrapper main-wrapper-1">
 				<div class="navbar-bg"></div>
@@ -253,7 +249,10 @@ class Msetup extends CI_Model
 				</div>
 				
 				<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-			 
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/select2/dist/css/select2.css">
+				
+				<script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>
+
 				<script src="' . $base['url'] . 'assets/modules/popper.js"></script>
 				<script src="' . $base['url'] . 'assets/modules/tooltip.js"></script>
 				<script src="' . $base['url'] . 'assets/modules/bootstrap/js/bootstrap.min.js"></script>
@@ -263,14 +262,10 @@ class Msetup extends CI_Model
 				<script src="' . $base['url'] . 'assets/js/scripts.js"></script>
 				<script src="' . $base['url'] . 'assets/js/custom.js"></script>
 				<script src="' . $base['url'] . 'assets/js/select2.js"></script>
-        <script src="'.$base['url'].'assets/js/skpd.js"></script>
-	      <script src="'.$base['url'].'assets/js/datatableaction.js"></script>
-
 				
 				</body>
 				</html>';
 		return $theme;
-
 	}
 
 	public function setup()
@@ -375,75 +370,9 @@ class Msetup extends CI_Model
 		return null;
 	}
 
-	
-	
-	public function get_title($uri_segment = 'dashboard') {
-        $this->db->select('*');
-        $this->db->from('menu');
-        $this->db->where('link', $uri_segment);
-        $query = $this->db->get();
-        if ($query->num_rows() > 0) {
-            return $query->row();
-        } else {
-            return "Title Not Found";
-        }
-    }
-	public function get_tanda_tangan($ttd_checkbox, $tanda_tangan) {
-        if ($ttd_checkbox && $tanda_tangan) {
-            $ttddetail = $this->db
-                ->select('id, nama, nip, jabatan1, jabatan2')
-                ->from('mst_tandatangan')
-                ->where('id', $tanda_tangan)
-                ->get()
-                ->row_array();
-            
-            return $ttddetail;
-        }
-        return null;
-    }
-	public function get_tanda_tangan_skpd_1($tanda_tangan_1) {
-        if ($tanda_tangan_1) {
-            $ttddetail = $this->db
-                ->select('id, nama, nip, jabatan1, jabatan2')
-                ->from('mst_tandatangan')
-                ->where('id', $tanda_tangan_1)
-                ->get()
-                ->row_array();
-            
-            return $ttddetail;
-        }
-        return null;
-    }
-	public function get_tanda_tangan_skpd_2($tanda_tangan_2) {
-        if ($tanda_tangan_2) {
-            $ttddetail = $this->db
-                ->select('id, nama, nip, jabatan1, jabatan2')
-                ->from('mst_tandatangan')
-                ->where('id', $tanda_tangan_2)
-                ->get()
-                ->row_array();
-            
-            return $ttddetail;
-        }
-        return null;
-    }
-	public function get_pembuat($pembuat_checkbox, $pembuat) {
-        if ($pembuat_checkbox && $pembuat) {
-            $pembuatdetail = $this->db
-                ->select('id, nama, nip, jabatan1, jabatan2')
-                ->from('mst_tandatangan')
-                ->where('id', $pembuat)
-                ->get()
-                ->row_array();
-            
-            return $pembuatdetail;
-        }
-        return null;
-    }
-	
-	public function get_rekening($kdrekening) {
-		if($kdrekening){
-
+	public function get_rekening($kdrekening)
+	{
+		if ($kdrekening) {
 			$rekdetail = $this->db
 				->select('id,kdrekening, nmrekening')
 				->from('mst_rekening')
@@ -452,15 +381,16 @@ class Msetup extends CI_Model
 				->row_array();
 			return $rekdetail;
 		}
-
-	public function get_dinas($iddinas) {
-		if($iddinas){
+		return null;
+	}
+	public function get_dinas($dinas)
+	{
+		if ($dinas) {
 			$dinDetail = $this->db
-			->select('id,nama')
-			->from('mst_dinas')
-			->where('id', $iddinas)
-			->get()
-			->row_array();
+				->select('id,nama')
+				->from('mst_dinas')
+				->get()
+				->row_array();
 			return $dinDetail;
 		}
 		return null;
@@ -517,6 +447,7 @@ class Msetup extends CI_Model
 	}
 	public function detailTtd($nama = '')
 	{
+
 		$ttddata = $this->db
 			->select('mst_tandatangan.id, mst_tandatangan.nip, mst_tandatangan.nama, mst_tandatangan.jabatan1, mst_tandatangan.jabatan2')
 			->from('mst_tandatangan')
@@ -548,19 +479,5 @@ class Msetup extends CI_Model
 			->result();
 
 		return $ttddata;
-	}
-
-	public function jupukJenisPajak()
-	{
-		$jnspajak = array(
-			'4.1.1.01'    => 'Pajak Hotel',
-			'4.1.1.02' => 'Pajak Restoran',
-			'4.1.1.03' => 'Pajak Hiburan',
-			'4.1.1.07' => 'Pajak Parkir',
-			'4.1.1.08' => 'Pajak Air Tanah',
-			'4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam',
-
-		);
-		return $jnspajak;
 	}
 }

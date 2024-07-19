@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
     
     $('#idrecord').select2({
@@ -1128,6 +1129,5 @@ $(document).ready(function() {
         console.log('Selected idwp:', idwpSelected); 
     });
    
-    
-
+   
 });
