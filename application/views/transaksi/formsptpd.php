@@ -6,23 +6,29 @@ if ($this->session->flashdata('message')) :
     $this->session->flashdata('message') . '
 					</div>';
 endif;
-$escaped_link = 'transaksi/Apbd/getDinas';
 $theme['main'][] = implode($sidebar);
+$escaped_link = 'transaksi/FormSptpd/getDinas';
+// $cetak = 'transaksi/FormSptpd/Cetak';
+
 $datatables = '<script type="text/javascript">
 $(document).ready(function(){
-$("#dinas, #tahun").change(function() {
+	$("#filters").click(function(){
+   var $icon = $(this).find("i");
+    if ($icon.hasClass("fa-search")) {
+        $icon.removeClass("fa-search").addClass("spinner-border");
+        $(this).prop("disabled", true);
+    }
+    var nomor = $("#nomor").val();
+    var rekening = $("#rekening").val();
+    var npwpd = $("#npwpd").val();
+    var nop = $("#nop").val();
+    var wajibpajak = $("#wajibpajak").val();
     var tahun = $("#tahun").val();
-    var dinas = $("#dinas option:selected").text();
-     $("#mtahun").val(tahun);
-     $("#mdinas").val(dinas);
-     $("#ttambah").removeAttr("disabled");
-      $("#ttambah").removeClass("btn-secodary").addClass("btn-success");
         cariData();
-    });
-  
+  });
     var table = $("#ftf").DataTable({
         
-        "processing": true,
+        "processing": false,
         "serverSide": true,
         "searching": false, 
         "paging": true,   
@@ -31,8 +37,19 @@ $("#dinas, #tahun").change(function() {
             url: "' . site_url($escaped_link) . '",
             type: "POST",
             data: function(d) {
-                d.dinas = $("#dinas").val();
-                d.tahun = $("#tahun").val();
+               d.nomor = $("#nomor").val();
+               d.rekening = $("#rekening").val();
+               d.npwpd = $("#npwpd").val();
+               d.nop = $("#nop").val();
+               d.wajibpajak = $("#wajibpajak").val();
+               d.tahun = $("#tahun").val();
+            },
+             "error": function(xhr, error, code) {
+                var $icon = $("#filters").find("i");
+                if ($icon.hasClass("spinner-border")) {
+                    $icon.removeClass("spinner-border").addClass("fas fa-search");
+                }
+                $("#filters").prop("disabled", false);
             }
         },
         "columnDefs": [
@@ -52,23 +69,12 @@ $("#dinas, #tahun").change(function() {
             api.column(0, { page: "current" }).nodes().each(function(cell, i) {
                 cell.innerHTML = start + i + 1;
             });
-        },
-        "rowGroup": {
-              "dataSrc": function(row) {
-               
-                let kdrekening = row[2];
-                let parts = kdrekening.split(".");
-                console.log(parts);
-                if (parts.length === 5) {
-                    return parts.slice(0, 4).join(".");
-                }
-                return kdrekening;
-            },
-            "startRender": function(rows, group) {
-                 let namaRekening = rows.data()[0][1];
-                 let kdRekening = rows.data()[0][2];
-                return kdRekening + " - " + namaRekening;
-            }
+
+               $("#filters").prop("disabled", false);
+                var $icon = $("#filters").find("i");
+                if ($icon.hasClass("spinner-border")) {
+                    $icon.removeClass("spinner-border").addClass("fas fa-search");
+               }
         },
         "buttons": [
             "copyHtml5",
@@ -78,35 +84,43 @@ $("#dinas, #tahun").change(function() {
         ]
     });
 
-    function cariData() {
+  function cariData() {
         table.ajax.reload();
     }
 
-    
-     $("#refres").click(function() { 
-     window.location.reload();
-    });
-    
-
-' . $jsedit  . $jsdelete . '  
+' . $jsedit . $jsdelete . $datepick . '  
 });
 </script>
-<table class="table table-striped" style="width:100% !important;" id="ftf">
+<table class="table table-striped table-responsive" style="width:100% !important;" id="ftf">
    <thead>                                 
      <tr>
          <th>NO</th>
-         <th>NAMA DINAS</th>
-         <th>KODE REKENING</th>
-         <th>APBD</th>
-		 <th>APBDP</th>
+         <th>Nomor</th>
+         <th>Tanggal</th>
+         <th>Tgl. Terbit</th>
+         <th>Wajib Pajak</th>
+         <th>NPWPD</th>
+         <th>Rekening</th>
+         <th>Bulan</th>
+         <th>Tahun</th>
+         <th>Pokok</th>
+         <th>Denda</th>
+         <th>Jumlah</th>
+         <th>Keterangan</th>
 		 <th></th>
      </tr>
    </thead>
    <tbody>                                 
    </tbody>
 </table>';
+$select2 = '
+
+
+';
 $theme['main'][] =
-  '<div id="page-title" class="page-title" data-title="' . $title . '"></div>
+  '
+
+  <div id="page-title" class="page-title" data-title="' . $title . '"></div>
     <div class="main-content">
         <section class="section m-0">
           <div class="section-header">
@@ -116,16 +130,6 @@ $theme['main'][] =
               <div class="breadcrumb-item"><a href="#">' . $title . '</a></div>
             </div>
           </div>
-
-           <div class="section-headers">
-           ' . $formCari . '
-             <div class="section-header-breadcrumb mr-4">
-                 <!-- <div class="breadcrumb-item mr-2"><a href="#" class="btn btn-sm btn-icon icon-left btn-success"><i class="fas fa-plus"></i> TAMBAH</a></div> -->
-				         <div class="breadcrumb-items"><a href="#" id="refres" class="btn btn-sm btn-icon icon-left btn-info"><i class="fas fa-sync"></i>REFRESH</a></div>
-            </div>
-          </div>
-
-          
             <div class="container-fluid">
               <div class="section-body">
                 <div class="row">
@@ -143,18 +147,29 @@ $theme['main'][] =
                         </ul>
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
+                          <div class="text-right mb-3">
+                          <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                           <i class="fas fa-filter"></i> Filters
+                          </a>
+                           <div class="collapse mb-3" id="collapseExample">
+                          ' . $filters . '
+                          </div>
+                          </div>
                           
                           ' . $datatables . '
                           </div>
                           <div class="tab-pane fade" id="insert" role="tabpanel" aria-labelledby="profile-tab">
-						             ' . $forminsert . '
+						  ' . $forminsert . '
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
               </div>
-            </div> 
+            </div>
 		</section>
-      </div>' . implode('', $modalEdit) . implode('', $modalDelete);
+      </div>
+      
+      
+      ' . implode('', $modalEdit) . implode('', $modalDelete);
 echo preg_replace('/\r|\n|\t/', '', implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));
