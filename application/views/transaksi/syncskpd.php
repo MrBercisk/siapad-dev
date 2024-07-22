@@ -61,6 +61,7 @@ $theme['main'][] =
                                     <th>KELURAHAN</th>
                                     <th>KECAMATAN</th>
                                     <th>NO.SKPD</th>
+                                    <th>NO.PELAPORAN</th>
                                     <th>MASA PAJAK</th>
                                     <th>TGL.JTH.TMP</th>
                                     <th>THN</th>

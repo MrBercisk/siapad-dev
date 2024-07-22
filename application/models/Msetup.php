@@ -346,48 +346,7 @@ class Msetup extends CI_Model
 			return "Title Not Found";
 		}
 	}
-	public function get_tanda_tangan($ttd_checkbox, $tanda_tangan)
-	{
-		if ($ttd_checkbox && $tanda_tangan) {
-			$ttddetail = $this->db
-				->select('id, nama, nip, jabatan1, jabatan2')
-				->from('mst_tandatangan')
-				->where('id', $tanda_tangan)
-				->get()
-				->row_array();
 
-			return $ttddetail;
-		}
-		return null;
-	}
-	public function get_pembuat($pembuat_checkbox, $pembuat)
-	{
-		if ($pembuat_checkbox && $pembuat) {
-			$pembuatdetail = $this->db
-				->select('id, nama, nip, jabatan1, jabatan2')
-				->from('mst_tandatangan')
-				->where('id', $pembuat)
-				->get()
-				->row_array();
-
-			return $pembuatdetail;
-		}
-		return null;
-	}
-
-	
-	
-	public function get_title($uri_segment = 'dashboard') {
-        $this->db->select('*');
-        $this->db->from('menu');
-        $this->db->where('link', $uri_segment);
-        $query = $this->db->get();
-        if ($query->num_rows() > 0) {
-            return $query->row();
-        } else {
-            return "Title Not Found";
-        }
-    }
 	public function get_tanda_tangan($ttd_checkbox, $tanda_tangan) {
         if ($ttd_checkbox && $tanda_tangan) {
             $ttddetail = $this->db
@@ -452,6 +411,7 @@ class Msetup extends CI_Model
 				->row_array();
 			return $rekdetail;
 		}
+	}
 
 	public function get_dinas($iddinas) {
 		if($iddinas){

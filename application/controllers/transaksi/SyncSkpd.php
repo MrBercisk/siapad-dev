@@ -68,7 +68,7 @@ class SyncSkpd extends CI_Controller
         echo json_encode($json);
     }
 
- 
+ /* 
     public function selectBySKPD()
     {
         // Get parameters from input
@@ -130,7 +130,7 @@ class SyncSkpd extends CI_Controller
                 'data' => $result
             ]));
     }
-    
+     */
     public function getSkpd()
     {
         $tanggal = $this->input->post('tanggal');

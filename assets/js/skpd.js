@@ -445,14 +445,20 @@ $(document).ready(function() {
             { data: 'ALamatObjek' },
             { data: 'kelurahan' },
             { data: 'kecamatan' },
-            { data: 'NOSKPDN' },
-            { data: 'masapajak' },
+            { 
+                data: 'payment_code', 
+                render: function(data, type, row) {
+                    return data ? data.substring(4, 14) : '';
+                } 
+            },
+            { data: 'NOSKPDN'},
+            { data: 'masapajak'},
             { data: 'TglJatuhTempo' },
             { data: 'tahun' },
             { data: 'jumlahbayar' },
             { data: 'denda' },
             { data: 'totalbayar' },
-            { data: 'tanggalbayar' },
+            { data: 'tanggal' },
             { data: 'JenisReklame' }
         ],
         select: {

@@ -59,18 +59,14 @@ public function insertWajibPajak($nama) {
     return $this->db->insert_id();
 }
 
-// Fungsi untuk memperbarui data di tabel trx_skpdreklame
 public function updateTrxSkpdReklame($idwp, $data) {
-    // Update data di tabel trx_skpdreklame dengan idwp
     $this->db->where('idwp', $idwp);
     return $this->db->update('trx_skpdreklame_temp', $data);
 }
 
-// Fungsi untuk menyisipkan data ke tabel trx_skpdreklame
 public function insertTrxSkpdReklame($idwp, $data) {
     $data['idwp'] = $idwp;
     
-    // Menyisipkan data baru ke trx_skpdreklame
     return $this->db->insert('trx_skpdreklame_temp', $data);
 }
 
@@ -82,11 +78,9 @@ public function insertTrxSkpdReklame($idwp, $data) {
       $query = $this->db->get('trx_skpdreklame_temp');
 
       if ($query->num_rows() > 0) {
-          // Update existing record
           $this->db->where('id', $data['id']);
           $this->db->update('trx_skpdreklame_temp', $data);
       } else {
-          // Insert new record
           $this->db->insert('trx_skpdreklame_temp', $data);
       }
   }
