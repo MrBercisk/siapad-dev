@@ -26,13 +26,69 @@ class MSyncSkpd extends CI_Model
                       
                         <div class="col-md-2">
                             <div class="button-group">
-                                <button type="button" class="btn btn-sm btn-success fa fa-save add-data" id="submit"> Simpan</button>
+                                <button type="button" class="btn btn-sm btn-success fa fa-save add-data" id="btnCheckData"> Simpan</button>
                             </div>
                         </div>
                     </form>
                 </div>
         ';
     return $formCari;
+  }
+  public function getWajibPajakIdByName($nama) {
+
+    $this->db->select('id, nama, alamat');
+    $this->db->from('mst_wajibpajak');
+    $this->db->where('LOWER(nama)', strtolower($nama)); 
+    $query = $this->db->get();
+
+
+    if ($query->num_rows() > 0) {
+        return $query->row();
+    } else {
+        return null;
+    }
+}
+public function insertWajibPajak($nama) {
+    $data = array(
+        'nama' => $nama
+    );
+
+    $this->db->insert('mst_wajibpajak', $data);
+
+
+    return $this->db->insert_id();
+}
+
+// Fungsi untuk memperbarui data di tabel trx_skpdreklame
+public function updateTrxSkpdReklame($idwp, $data) {
+    // Update data di tabel trx_skpdreklame dengan idwp
+    $this->db->where('idwp', $idwp);
+    return $this->db->update('trx_skpdreklame_temp', $data);
+}
+
+// Fungsi untuk menyisipkan data ke tabel trx_skpdreklame
+public function insertTrxSkpdReklame($idwp, $data) {
+    $data['idwp'] = $idwp;
+    
+    // Menyisipkan data baru ke trx_skpdreklame
+    return $this->db->insert('trx_skpdreklame_temp', $data);
+}
+
+
+
+  public function insertOrUpdate($data)
+  {
+      $this->db->where('id', $data['id']);
+      $query = $this->db->get('trx_skpdreklame_temp');
+
+      if ($query->num_rows() > 0) {
+          // Update existing record
+          $this->db->where('id', $data['id']);
+          $this->db->update('trx_skpdreklame_temp', $data);
+      } else {
+          // Insert new record
+          $this->db->insert('trx_skpdreklame_temp', $data);
+      }
   }
   public function insertdata($data)
   {

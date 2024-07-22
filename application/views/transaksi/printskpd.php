@@ -107,19 +107,22 @@
     <h3>DAFTAR SKPD PAJAK REKLAME</h3>
     <h3>MASA PAJAK <?= $format_bulan?> <?= $format_tahun ?></h3>
 </div>
-    <table border="1">
-        <thead>
-        <tr>
-            <th>NO</th>
-            <th>Tanggal</th>
-            <th>Nomor</th>
-            <th>Nama</th>
-            <th>Alamat</th>
-            <th>Jumlah</th>
-            <th>Bunga</th>
-            <th>Total</th>
-        </tr>
-        </thead>
+    <table border="1" cellpading="4">
+    <thead>
+                    <tr style="background-color:#f5f5f5;">
+                        <th rowspan="2" width="5%">NO</th>
+                        <th colspan="2" width="25%">SURAT KETETAPAN</th>
+                        <th rowspan="2" width="20%">NAMA</th>
+                        <th rowspan="2" width="25%">ALAMAT</th>
+                        <th rowspan="2" width="10%">JUMLAH</th>
+                        <th rowspan="2" width="7.5%">BUNGA</th>
+                        <th rowspan="2" width="7.5%">TOTAL</th>
+                    </tr>
+                    <tr style="background-color:#f5f5f5;">
+                        <th width="12.5%">TANGGAL</th>
+                        <th width="12.5%">NOMOR</th>
+                    </tr>
+                </thead>
         <tbody>
     <?php
     $bulan_indonesia = array(
@@ -149,7 +152,6 @@
             $tanggal = date('d', strtotime($row->tglskp));
             $tahun = date('Y', strtotime($row->tglskp));
 
-            // Cek apakah bulan dan tahun sesuai dengan yang diinput
             if ($bulan_saat_ini == $format_bulan && $tahun == $format_tahun) {
                 $total_hari_ini += $row->jumlah;
                 $total_bunga += $row->bunga;
