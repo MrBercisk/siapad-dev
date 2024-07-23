@@ -50,10 +50,7 @@ $(document).ready(function() {
     function formatRecordSelection(record) {
         return record.text || record.nomor + ' ('+ record.tanggal + ')' ;
     }
-   /*  $('#opsireklame').on('select2:select', function (e) {
-        var idwpSelected = $(this).val();
-        console.log('Selected idreklame:', idwpSelected); 
-    }); */
+
     $('#opsireklame').on('select2:select', function (e)  {
         var recordId = $(this).val();
         if (recordId) {
@@ -105,7 +102,7 @@ $(document).ready(function() {
                         $('#add-data').show();
                         $('#hapus_data').show();
                         $('#cari_data_table').show();
-                        console.log("tes ini id record nya:",recordId);
+                        console.log("tes ini id record nya:", recordId + ' dan id dinas nya:', iddinasId);
                         table.ajax.url('PembayaranSkpd/get_datatable_data?id=' + recordId + '&iddinas=' + iddinasId).load();
                                         
                     } else {
@@ -253,9 +250,9 @@ $(document).ready(function() {
                 d.iddinas = $('#iddinas').val();
             },
             "dataSrc": function(json) {
-                $('#table-buttons').find('#idstsmaster').remove();
-                $('#table-buttons').find('#iddinas').remove(); 
-                $('#table-buttons').append(json.extra_data);
+                $('#table-buttons-skpd').find('#idstsmaster').remove();
+                $('#table-buttons-skpd').find('#iddinas').remove(); 
+                $('#table-buttons-skpd').append(json.extra_data);
                 console.log('idstsmasternya dan iddinas yang diambil:', json.extra_data);
                 return json.data;
             },
@@ -440,9 +437,15 @@ $(document).ready(function() {
         },
         columns: [
             { data: null, defaultContent: '', orderable: false, className: 'select-checkbox', width: '5%' },
-            { data: 'NPWPD' },
+            { data: 'NOSKPDN' },
             { data: 'NamaObjekPajak' },
             { data: 'ALamatObjek' },
+            { 
+                data: 'nomor', 
+                render: function(data, type, row) {
+                    return data ? data : ''; 
+                }
+            },
             { data: 'kelurahan' },
             { data: 'kecamatan' },
             { 
@@ -451,15 +454,22 @@ $(document).ready(function() {
                     return data ? data.substring(4, 14) : '';
                 } 
             },
-            { data: 'NOSKPDN'},
-            { data: 'masapajak'},
+            { data: 'NPWPD' },
+         
+            { data: 'masapajak' }, 
             { data: 'TglJatuhTempo' },
             { data: 'tahun' },
             { data: 'jumlahbayar' },
             { data: 'denda' },
             { data: 'totalbayar' },
             { data: 'tanggal' },
-            { data: 'JenisReklame' }
+            { data: 'JenisReklame' },
+          /*   { 
+                data: null, 
+                defaultContent: '<button class="btn btn-primary btn-edit">Edit</button>', 
+                orderable: false, 
+                width: '5%' 
+            } */
         ],
         select: {
             style: 'multi',
@@ -468,181 +478,155 @@ $(document).ready(function() {
         order: [[1, 'asc']]
     });
     
-    var selectedRowData = null;
 
-    $('#select-all').on('click', function() {
-        var rows = table.rows({ 'search': 'applied' }).nodes();
-        $('input[type="checkbox"]', rows).prop('checked', this.checked);
-        
-        if (this.checked) {
-            table.rows().select();
-            var selectedData = table.rows({ 'search': 'applied' }).data().toArray();
-            console.log('Data yang dipilih:', selectedData);
-        } else {
-            table.rows().deselect();
-            console.log('Tidak ada data yang dipilih');
-        }
-    });
-    
+    let inidataygdipilih = null;
+
     $('#syncTable tbody').on('change', 'input[type="checkbox"]', function() {
         if (!this.checked) {
-            var el = $('#select-all').get(0);
-            if (el && el.checked && ('indeterminate' in el)) {
-                el.indeterminate = true;
+            var ini = $('#select-all').get(0);
+            if (ini && ini.checked && ('indeterminate' in ini)) {
+                ini.indeterminate = true;
             }
         }
     });
-    
+
     $('#syncTable tbody').on('click', 'tr', function() {
-        selectedRowData = table.row(this).data(); 
-        console.log('Selected row data:', selectedRowData);
+        inidataygdipilih = table.row(this).data(); 
+        console.log('ini data yg dipilih:', inidataygdipilih);
     });
-    
+
     $('#btnCheckData').on('click', function() {
-        if (selectedRowData) {
-            Swal.fire({
-                title: 'Warning',
-                text: 'Apakah Anda yakin ingin menginput data ini?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, simpan',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: 'SyncSkpd/check_namaobjekpajak',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            namaobjekpajak: selectedRowData.NamaObjekPajak,
-                            alamatobjek: selectedRowData.ALamatObjek,
-                            noskpdn: selectedRowData.NOSKPDN,
-                            tahun: selectedRowData.tahun,
-                            tanggal: selectedRowData.tanggal,
-                            tanggalbayar: selectedRowData.tanggalbayar,
-                            totalbayar: selectedRowData.totalbayar,
-                            jumlahbayar: selectedRowData.jumlahbayar,
-                            denda: selectedRowData.denda,
-                            jenisreklame: selectedRowData.JenisReklame,
-                            nama: selectedRowData.Nama,
-                            statusbayar: selectedRowData.Statusbayar,
-                            tgljatuhtempo: selectedRowData.TglJatuhTempo,
-                            npwpd: selectedRowData.NPWPD,
-                            kelurahan: selectedRowData.kelurahan,
-                        },
-                        success: function(response) {
-                            if (response.exists) {
-                                console.log('Data yang cocok ditemukan di database:');
-                                console.log('Data yang cocok:', response.data);
-                            } else {
-                                if (response.message) {
-                                    console.log(response.message);
-                                    if (response.idwp) {
+        if (inidataygdipilih) {
+            let inipaymentcode = inidataygdipilih.payment_code || ''; 
+            let paymentCode = inipaymentcode.length >= 14 ? inipaymentcode.substring(4, 14) : ''; 
+            
+            $.ajax({
+                url: 'SyncSkpd/checkAndAddWp', 
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    namaobjekpajak: inidataygdipilih.NamaObjekPajak,
+                    alamatobjek: inidataygdipilih.ALamatObjek,
+                    noskpdn: inidataygdipilih.NOSKPDN,
+                    masapajak: inidataygdipilih.masaPajak, 
+                    tahun: inidataygdipilih.tahun,
+                    tanggal: inidataygdipilih.tanggal,
+                    tanggalbayar: inidataygdipilih.tanggalbayar,
+                    jumlahbayar: inidataygdipilih.jumlahbayar,
+                    denda: inidataygdipilih.denda,
+                    totalbayar: inidataygdipilih.totalbayar,
+                    jenisreklame: inidataygdipilih.JenisReklame,
+                    nama: inidataygdipilih.Nama,
+                    statusbayar: inidataygdipilih.Statusbayar,
+                    tgljatuhtempo: inidataygdipilih.TglJatuhTempo,
+                    npwpd: inidataygdipilih.NPWPD,
+                    kelurahan: inidataygdipilih.kelurahan,
+                    paymentcode: paymentCode,
+                    nokohir: '' 
+                },
+                success: function(response) {
+                    if (response.exists) {
+                        Swal.fire({
+                            title: 'Data Pada Database Sudah Ada',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Data Pajak Reklame Belum Ada',
+                            text: 'Masukkan nomor kohir untuk data baru:',
+                            input: 'text',
+                            inputPlaceholder: 'Nomor Kohir',
+                            showCancelButton: true,
+                            confirmButtonText: 'Simpan',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed && result.value) {
+                                let inputannokohir = result.value;
+                                let nokohirnya = inputannokohir + '/' + paymentCode;
+                                
+                                $.ajax({
+                                    url: 'SyncSkpd/checkAndAddWp',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        namaobjekpajak: inidataygdipilih.NamaObjekPajak,
+                                        alamatobjek: inidataygdipilih.ALamatObjek,
+                                        noskpdn: inidataygdipilih.NOSKPDN,
+                                        masapajak: inidataygdipilih.masaPajak,
+                                        tahun: inidataygdipilih.tahun,
+                                        tanggal: inidataygdipilih.tanggal,
+                                        tanggalbayar: inidataygdipilih.tanggalbayar,
+                                        jumlahbayar: inidataygdipilih.jumlahbayar,
+                                        denda: inidataygdipilih.denda,
+                                        totalbayar: inidataygdipilih.totalbayar,
+                                        jenisreklame: inidataygdipilih.JenisReklame,
+                                        nama: inidataygdipilih.Nama,
+                                        statusbayar: inidataygdipilih.Statusbayar,
+                                        tgljatuhtempo: inidataygdipilih.TglJatuhTempo,
+                                        npwpd: inidataygdipilih.NPWPD,
+                                        kelurahan: inidataygdipilih.kelurahan,
+                                        paymentcode: paymentCode,
+                                        nokohir: nokohirnya 
+                                    },
+                                    success: function(response) {
+                                        if (response.exists) {
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: response.message,
+                                                icon: 'error'
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                title: 'Berhasil!',
+                                                text: 'Data berhasil disimpan dengan nomor kohir: ' + nokohirnya,
+                                                icon: 'success'
+                                            }).then(() => {
+                                                $('#syncTable').DataTable().ajax.reload();
+                                            });
+                                        } 
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Error occurred:', status, error);
                                         Swal.fire({
-                                            title: 'Berhasil!',
-                                            text: 'Data berhasil disimpan',
-                                            icon: 'success'
+                                            title: 'Error!',
+                                            text: 'Terjadi kesalahan saat menyimpan data: ' + error,
+                                            icon: 'error'
                                         });
                                     }
-                                } else {
-                                    console.log('NamaObjekPajak, AlamatObjek, dan/atau NOSKPDN tidak ditemukan di database.');
-                                }
+                                });
                             }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error occurred:', status, error);
-                            Swal.fire({
-                                title: 'Error!',
-                                text: 'Terjadi kesalahan saat menyimpan data: ' + error,
-                                icon: 'error'
-                            });
-                        }
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error occurred:', status, error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat memeriksa data: ' + error,
+                        icon: 'error'
                     });
                 }
             });
         } else {
             Swal.fire({
                 title: 'Peringatan!',
-                text: 'Tidak ada item yang dipilih.',
+                text: 'Anda belum memilih item.',
                 icon: 'warning'
             });
         }
     });
-    
-    
-    
-    
-   /*  
-    $('#btnCheckData').on('click', function() {
-        var selectedRows = table.rows('.selected').nodes();
-        var selectedData = [];
-        
-        selectedRows.each(function(index, tr) {
-            var row = table.row(tr).data();
-            selectedData.push({
-                id: row.id,
-                NPWPD: row.NPWPD,
-                NamaObjekPajak: row.NamaObjekPajak,
-                ALamatObjek: row.ALamatObjek,
-                kelurahan: row.kelurahan,
-                kecamatan: row.kecamatan,
-                NOSKPDN: row.NOSKPDN,
-                masapajak: row.masapajak,
-                TglJatuhTempo: row.TglJatuhTempo,
-                tahun: row.tahun,
-                jumlahbayar: row.jumlahbayar,
-                denda: row.denda,
-                totalbayar: row.totalbayar,
-                tanggalbayar: row.tanggalbayar,
-                JenisReklame: row.JenisReklame
-            });
-        });
-        
-        if (selectedData.length > 0) {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Anda akan menyimpan data yang dipilih.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, simpan!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "SyncSkpd/submit",
-                        type: "POST",
-                        data: { data: selectedData },
-                        success: function(response) {
-                            console.log(response);
-                            Swal.fire(
-                                'Tersimpan!',
-                                'Data berhasil disimpan.',
-                                'success'
-                            );
-                        },
-                        error: function(xhr, status, error) {
-                            console.error(xhr.responseText);
-                            Swal.fire(
-                                'Gagal!',
-                                'Terjadi kesalahan saat menyimpan data.',
-                                'error'
-                            );
-                        }
-                    });
-                }
-            });
-        } else {
-            Swal.fire(
-                'Tidak ada data!',
-                'Tidak ada data yang dipilih.',
-                'warning'
-            );
-        }
+
+    $('#syncTable tbody').on('click', '.btn-edit', function() {
+        var data = table.row($(this).parents('tr')).data();
+        $('#editRowId').val(table.row($(this).parents('tr')).index());
+        $('#editWajibPajak').val(data.NamaObjekPajak);
+        $('#editKelurahan').val(data.kelurahan);
+        $('#editKecamatan').val(data.kecamatan);
+        var nomor = data.NOSKPDN + '/' + (data.payment_code ? data.payment_code.substring(4, 14) : '');
+        $('#editNomor').val(nomor);
+        $('#editModal').modal('show');
     });
-    
-     */
 
     table.clear().draw();
 
@@ -767,7 +751,7 @@ $(document).ready(function() {
     });
      */
   
-    let selectedRows = [];
+    /* let selectedRows = [];
     $('#syncTable').on('change', '.submit-checkbox', function() {
         let rowData = {
             id: $(this).data('id'),
@@ -844,7 +828,7 @@ $('#submit').on('click', function() {
             confirmButtonText: 'OK'
         });
     }
-});
+}); */
 $('#delete').on('click', function() {
     var selectedData = [];
     $('.delete-checkbox:checked').each(function() {
@@ -936,5 +920,33 @@ $('#forminputskpd').on('submit', function(e) {
         }
     });
 });
+$('#table-buttons-skpd').on('click', '#add-data', function() {
+    var idstsmaster = $('#idstsmaster').val();
+    var iddinas = $('#iddinas').val(); 
+
+    if (idstsmaster && iddinas) {
+        console.log('Tambah data dengan idstsmaster:', idstsmaster, 'dan iddinas:', iddinas);
+        
+        $('#addModal #idstsmaster').val(idstsmaster);
+        $('#addModal #iddinas').val(iddinas); 
+
+        $.ajax({
+            url: 'PembayaranSkpd/get_namarekening_by_iddinas',
+            type: 'POST',
+            data: { iddinas: iddinas },
+            success: function(response) {
+                $('#addModal select[name="idrapbd"]').html(response);
+                $('#addModal').modal('show');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error mendapatkan nmrekening:', error);
+                $('#addModal').modal('show');
+            }
+        });
+    } else {
+        console.error('idstsmaster atau iddinas tidak ditemukan');
+    }
+});
+
 
 });

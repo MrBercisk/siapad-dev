@@ -105,4 +105,20 @@ public function submitData($id) {
     }
     return false;
 }
+    public function updateNomor($NPWPD, $nomor) {
+    $this->db->set('nomor', $nomor);
+    $this->db->where('NPWPD', $NPWPD);
+    return $this->db->update('mst_wajibpajak');
+}
+
+public function getDatabaseData($tanggal) {
+
+    $this->db->select('mst.nopelaporan, mst_nomor, mst.npwpd, mst.nama, mst.alamat');
+    $this->db->from('trx_skpdreklame skpd'); 
+    $this->db->join('mst_wajibpajak mst', 'skpd.idwp = mst.id', 'left'); 
+    $this->db->where('skpd.tanggal', $tanggal);
+
+    $query = $this->db->get();
+    return $query->result_array();
+}
 }

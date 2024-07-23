@@ -24,7 +24,7 @@ class SyncSkpd extends CI_Controller
                 'modalEdit'   => $this->Form->modalKu('E', 'Edit', 'transaksi/SyncSkpd/aksi', ['edit']),
                 'modalDelete' => $this->Form->modalKu('D', 'Delete', 'transaksi/SyncSkpd/aksi', ['delete']),
                 'sidebar'     => $template['sidebar'],
-                'jstable'     => $Jssetup->jsDatatable('#ftf', 'transaksi/SyncSkpd/getSkpd'),
+                'jstable'     => $Jssetup->jsDatatable('#skpdTable', 'transaksi/SyncSkpd/getSkpd'),
                 'jsedit'      => $Jssetup->jsModal('#edit', 'Edit', 'transaksi/SyncSkpd/myModal', '#modalkuE'),
                 'jsdelete'    => $Jssetup->jsModal('#delete', 'Delete', 'transaksi/SyncSkpd/myModal', '#modalkuD'),
                 'formCari'  => implode('', $this->MSyncSkpd->formCari()),
@@ -221,32 +221,57 @@ class SyncSkpd extends CI_Controller
 
     public function getapisimpadareklame()
     {
-            $tanggal = empty($this->input->get('tanggal')) ? 0 : $this->input->get('tanggal');
-            $urlApi = ENDPOINT_API_SIMPATDA_REKLAME . "?tanggal=$tanggal";
-            $data = [
-                'tanggal' => $tanggal
-            ];
-         
-            $payload = json_encode($data);
-            $curl = curl_init($urlApi);
+        $tanggal = empty($this->input->get('tanggal')) ? 0 : $this->input->get('tanggal');
+        $urlApi = ENDPOINT_API_SIMPATDA_REKLAME . "?tanggal=$tanggal";
+        $data = [
+            'tanggal' => $tanggal
+        ];
+    
+        $payload = json_encode($data);
+        $curl = curl_init($urlApi);
+        
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+        curl_setopt($curl, CURLOPT_HTTPGET, true);
+    
+        $response = curl_exec($curl);
+    
+        if (curl_errno($curl)) {
+            echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
+        } else {
+            $respondatanya = json_decode($response, true);
             
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-            curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-            curl_setopt($curl, CURLOPT_HTTPGET, true);
-
-            $response = curl_exec($curl);
-              
-                if (curl_errno($curl)) {
-                    echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
-                } else {
-                    $responseData = json_decode($response, true);
-                    $prettyResponse = json_encode($responseData, JSON_PRETTY_PRINT); 
-                    echo $prettyResponse;
+            if (isset($respondatanya['data']) && is_array($respondatanya['data'])) {
+                $this->load->database();
+                
+                $keyunik = array_column($respondatanya['data'], 'NOSKPDN');
+                
+                if (!empty($keyunik)) {
+                    $this->db->select('nopelaporan AS NOSKPDN, nomor');
+                    $this->db->from('mst_wajibpajak');
+                    $this->db->where_in('nopelaporan', $keyunik);
+                    $query = $this->db->get();
+                    $kohir = $query->result_array();
+                    
+                    $nomorMap = array_column($kohir, 'nomor', 'NOSKPDN');
+                    
+                    foreach ($respondatanya['data'] as &$item) {
+                        $noskpd = $item['NOSKPDN'];
+                        $nokohir = isset($nomorMap[$noskpd]) ? $nomorMap[$noskpd] : '';
+    
+                        $item['nomor'] = substr($nokohir, 0, 4);
+                    }
                 }
-            curl_close($curl);
+            }
+    
+            $prettyResponse = json_encode($respondatanya, JSON_PRETTY_PRINT);
+            echo $prettyResponse;
+        }
+    
+        curl_close($curl);
     }
-
+    
     public function cekData($data){
         $cek = $this->db->select('id AS idrwp','nomor')
         ->where('nopelaporan', $data)
@@ -258,7 +283,7 @@ class SyncSkpd extends CI_Controller
         }
 
     }
-    public function check_namaobjekpajak() {
+    public function checkAndAddWp() {
         $namaobjekpajak = $this->input->post('namaobjekpajak');
         $alamatobjek = $this->input->post('alamatobjek');
         $noskpdn = $this->input->post('noskpdn');
@@ -272,130 +297,88 @@ class SyncSkpd extends CI_Controller
         $jenisreklame = $this->input->post('jenisreklame');
         $nama = $this->input->post('nama');
         $statusbayar = $this->input->post('statusbayar');
-        
         $tgljatuhtempo = $this->input->post('tgljatuhtempo');
         $npwpd = $this->input->post('npwpd');
-
+        $nokohir = $this->input->post('nokohir');
+    
         $isbayar = ($statusbayar === 'LUNAS') ? 1 : 0;
         $tgljatuhtempo = date('Y-m-d', strtotime(str_replace('-', '/', $tgljatuhtempo)));
         $tanggal = date('Y-m-d', strtotime(str_replace('-', '/', $tanggal)));
-
         $bulan = date('m', strtotime(str_replace('-', '/', $masapajak)));
+    
         $this->load->database();
-   
-        $this->db->select('
-        mst_wajibpajak.id, 
-        mst_wajibpajak.nama, 
-        mst_wajibpajak.alamat, 
-        mst_wajibpajak.tgljthtmp, 
-        mst_wajibpajak.npwpd, 
-        mst_wajibpajak.nopelaporan, 
-        mst_wajibpajak.idkelurahan, 
-        trx_skpdreklame.idwp,
-        trx_skpdreklame.blnpajak,
-        trx_skpdreklame.thnpajak,
-        trx_skpdreklame.tanggal,
-        trx_skpdreklame.tglbayar,
-        trx_skpdreklame.jumlah,
-        trx_skpdreklame.bunga,
-        trx_skpdreklame.total,
-        trx_skpdreklame.keterangan,
-        trx_skpdreklame.teks,
-        trx_skpdreklame.nopelaporan,
-        trx_skpdreklame.isbayar,
-        ');
+        $this->db->select('mst_wajibpajak.id AS idwp, mst_wajibpajak.nomor');
         $this->db->from('mst_wajibpajak');
-        $this->db->join('trx_skpdreklame', 'trx_skpdreklame.idwp = mst_wajibpajak.id');
-        
+        $this->db->join('trx_skpdreklame', 'trx_skpdreklame.idwp = mst_wajibpajak.id', 'left');
         $this->db->like('mst_wajibpajak.nama', $namaobjekpajak);
         $this->db->like('mst_wajibpajak.alamat', $alamatobjek);
         $this->db->where('trx_skpdreklame.nopelaporan', $noskpdn);
         
         $query = $this->db->get();
-        $results = $query->result_array();
+        $result = $query->row_array();
     
-        if (!empty($results)) {
-            $existingIdwp = $results[0]['idwp'];
-            
-            $this->db->trans_start();
-            
-            $this->db->where('id', $existingIdwp);
-            $this->db->update('mst_wajibpajak', [
-                'nama' => $namaobjekpajak,
-                'alamat' => $alamatobjek,
-                'tgljthtmp' => $tgljatuhtempo,
-                'npwpd' => $npwpd,
-                'nopelaporan' => $noskpdn,
-            ]);
-    
-            $this->db->where('idwp', $existingIdwp);
-            $this->db->update('trx_skpdreklame', [
-                'nopelaporan' => $noskpdn,
-                'blnpajak' => $bulan,
-                'thnpajak' => $tahun,
-                'tanggal' => $tanggal,
-                'tglbayar' => $tanggalbayar,
-                'jumlah' => $jumlahbayar,
-                'bunga' => $denda,
-                'total' => $totalbayar,
-                'keterangan' => $jenisreklame,
-                'teks' => $nama,
-                'isbayar' => $isbayar,
-            ]);
-            
-            $this->db->trans_complete(); 
-    
-            if ($this->db->trans_status() === FALSE) {
-              
-                echo json_encode(['exists' => true, 'message' => 'Failed to update data.']);
-            } else {
-       
-                echo json_encode(['exists' => true, 'message' => 'Data updated successfully.']);
-            }
+        if ($result) {
+            echo json_encode(['exists' => true, 'message' => 'Data sudah pernah diinput.']);
         } else {
-
-            $this->db->trans_start();
-
-            $this->db->insert('mst_wajibpajak', [
-                'nama' => $namaobjekpajak,
-                'alamat' => $alamatobjek,
-                'tgljthtmp' => $tgljatuhtempo,
-                'npwpd' => $npwpd,
-                'nopelaporan' => $noskpdn,
-            ]);
-    
-            $idwp = $this->db->insert_id(); 
-    
-            $this->db->insert('trx_skpdreklame', [
-                'idwp' => $idwp,
-                'nopelaporan' => $noskpdn,
-                'blnpajak' => $bulan,
-                'thnpajak' => $tahun,
-                'tanggal' => $tanggal,
-                'tglbayar' => $tanggalbayar,
-                'jumlah' => $jumlahbayar,
-                'bunga' => $denda,
-                'total' => $totalbayar,
-                'keterangan' => $jenisreklame,
-                'teks' => $nama,
-                'isbayar' => $isbayar,
-             
-            ]);
-    
-            $this->db->trans_complete(); 
-    
-            if ($this->db->trans_status() === FALSE) {
-         
-                echo json_encode(['exists' => false, 'message' => 'Failed to insert data.']);
+            if (empty($nokohir)) {
+                echo json_encode(['exists' => false, 'require_kohir' => true, 'message' => 'Nomor kohir diperlukan untuk data baru.']);
             } else {
-              
-                echo json_encode(['exists' => false, 'message' => 'Data inserted successfully.', 'idwp' => $idwp]);
+                $this->db->trans_start();
+                $this->db->insert('mst_wajibpajak', [
+                    'nama' => $namaobjekpajak,
+                    'alamat' => $alamatobjek,
+                    'tgljthtmp' => $tgljatuhtempo,
+                    'npwpd' => $npwpd,
+                    'nopelaporan' => $noskpdn,
+                    'nomor' => $nokohir,
+                ]);
+    
+                $idwp = $this->db->insert_id();
+                $this->db->insert('trx_skpdreklame', [
+                    'idwp' => $idwp,
+                    'nopelaporan' => $noskpdn,
+                    'blnpajak' => $bulan,
+                    'thnpajak' => $tahun,
+                    'tanggal' => $tanggal,
+                    'tglbayar' => $tanggalbayar,
+                    'jumlah' => $jumlahbayar,
+                    'bunga' => $denda,
+                    'total' => $totalbayar,
+                    'keterangan' => $jenisreklame,
+                    'teks' => $nama,
+                    'isbayar' => $isbayar,
+                ]);
+                $this->db->trans_complete();
+    
+                if ($this->db->trans_status() === FALSE) {
+                    echo json_encode(['exists' => false, 'message' => 'Gagal menyimpan data.']);
+                } else {
+                    echo json_encode(['exists' => false, 'message' => 'Data berhasil disimpan.', 'nama' => $namaobjekpajak]);
+                }
             }
         }
     }
     
+    
+    
+    public function updateNomor() {
+        $nokohir = $this->input->post('nokohir');
+        $payment_code = $this->input->post('payment_code');
+        $nomor = $nokohir . '/' . $payment_code;
+        if (empty($nokohir) || empty($payment_code)) {
+            echo json_encode(['status' => 'error', 'message' => 'nokohir dan payment_code harus diisi.']);
+            return;
+        }
+
+        $result = $this->MSyncSkpd->updateNomor($nokohir, $nomor);
+
+        if ($result) {
+            echo json_encode(['status' => 'success', 'message' => 'Data berhasil diperbarui.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data.']);
+        }
+    }
    
- 
     
     public function submit() {
         $data = json_decode($this->input->raw_input_stream, true);
@@ -446,5 +429,14 @@ class SyncSkpd extends CI_Controller
     
         echo json_encode($response);
     }
-    
+    public function getDatabaseData() {
+        $tanggal = $this->input->get('tanggal');
+
+        if ($tanggal) {
+            $data = $this->MSyncSkpd->getDatabaseData($tanggal);
+            echo json_encode(['data' => $data]);
+        } else {
+            echo json_encode(['data' => []]);
+        }
+    }
 }

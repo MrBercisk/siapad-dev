@@ -214,7 +214,7 @@ $theme['main'][] =
                       <div class="card-body">                   
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
-                                <div id="table-buttons">
+                                <div id="table-buttons-skpd">
                                     <button type="button" class="btn btn-sm btn-success fa fa-plus add-data" id="add-data" data-toggle="modal" data-target="#addModal" style="display: none;"> Tambah</button>
                                     <button type="button" class="btn btn-sm btn-danger fa fa-times delete-all-data" id="hapus_data" style="display: none;" > Hapus</button>
                                   
@@ -353,7 +353,7 @@ $theme['main'][] =
             <div class="modal-body">
               <form id="formadd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/add_data').'">
                      <div class="row">
-                                 <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
+                                 <input type="text" class="form-control" id="idstsmaster" name="idstsmaster">
                                   <input type="hidden" class="form-control" id="nourut" name="nourut">
                             
                             
