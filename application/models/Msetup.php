@@ -372,9 +372,9 @@ class Msetup extends CI_Model
 		return null;
 	}
 
-	public function get_rekening($kdrekening)
+	public function get_rekening($kdrekening = '')
 	{
-		if ($kdrekening) {
+		if ($kdrekening != '' || $kdrekening == null) {
 			$rekdetail = $this->db
 				->select('id,kdrekening, nmrekening')
 				->from('mst_rekening')
@@ -382,8 +382,16 @@ class Msetup extends CI_Model
 				->get()
 				->row_array();
 			return $rekdetail;
+		} else {
+			$rekdetail = $this->db
+				->select('id,kdrekening, nmrekening')
+				->from('mst_rekening')
+				// ->where('kdrekening', $kdrekening)
+				->get()
+				->row_array();
+			return $rekdetail;
 		}
-		return null;
+		// return null;
 	}
 	public function get_dinas($dinas)
 	{

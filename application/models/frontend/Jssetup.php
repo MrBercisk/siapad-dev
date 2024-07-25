@@ -140,6 +140,7 @@ class Jssetup extends CI_Model
                 success: function(data) {
                     $("' . $panggil . '").empty();
                     $("' . $panggil . '").html(data);
+                   
                 }
             });
         });

@@ -238,4 +238,18 @@ class Form extends CI_Model
         </div>';
 		return $form;
 	}
+
+	public function inputSelectText($id = NULL, $label = NULL, $classlabel = NULL, $value = NULL, $attrib = NULL)
+	{
+		$form[] = '
+		<div class="form-group">
+           <label for="' . $id . '" class="' . $classlabel . ' col-form-label">' . $label . '</label>
+			<div class="col-sm">
+			<select class="form-control  "  id="' . $id . '" name="' . $id . '" ' . $attrib . '>
+                        "' . $value . '"
+                      </select>
+			</div>
+		   </div>';
+		return $form;
+	}
 }

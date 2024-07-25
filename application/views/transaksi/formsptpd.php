@@ -12,6 +12,9 @@ $escaped_link = 'transaksi/FormSptpd/getDinas';
 
 $datatables = '<script type="text/javascript">
 $(document).ready(function(){
+  console.log("ss");
+  $(".select2").select2();
+
 	$("#filters").click(function(){
    var $icon = $(this).find("i");
     if ($icon.hasClass("fa-search")) {
@@ -89,6 +92,8 @@ $(document).ready(function(){
     }
 
 ' . $jsedit . $jsdelete . $datepick . '  
+
+  
 });
 </script>
 <table class="table table-striped table-responsive" style="width:100% !important;" id="ftf">

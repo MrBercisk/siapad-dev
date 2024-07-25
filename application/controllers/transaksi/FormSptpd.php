@@ -156,19 +156,47 @@ class FormSptpd extends CI_Controller
 				}
 				$form[] 	= '
 				<div class="row">
-					<div class="col-md-12">'
-					. implode($this->Form->inputText('nama', 'Nama Dinas', $kode->nama)) .
+				<div class="col-12">'
+					. implode($this->Form->inputRowsText('nomore', 'Nomor', 'col-sm-3', 'form-control-sm')) .
 					'</div>
-					<div class="col-md-12">'
-					. implode($this->Form->inputText('singkat', 'Singkatan', $kode->singkat)) .
+				<div class="col-12">'
+					. implode($this->Form->inputRowsText('rekeninge', 'Rekening', 'col-sm-3', 'form-control-sm', '', 'readonly')) .
 					'</div>
-					<div class="col-md-12">'
-					. implode($this->Form->inputText('urut', 'No. Urut', $kode->urut)) .
+			<div class="col-12">'
+					. implode($this->Form->inputRowsText('npwpde', 'NPWPD', 'col-sm-3', 'form-control-sm', '', 'readonly')) .
 					'</div>
-					<div class="col-md-12">'
-					. implode($this->Form->inputText('isdispenda', 'Instdispenda', intval($kode->isdispenda))) .
-					'</div>' . implode($this->Form->hiddenText('kode', $kode->id)) . '
-				</div>';
+		<div class="col-12">'
+					. implode($this->Form->inputRowsText('nope', 'NOP', 'col-sm-3', 'form-control-sm', '', 'readonly')) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsSelect('wajibpajake', 'Wajib Pajak', 'col-sm-3', 'form-control-sm select2')) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsText('tanggale', 'Tanggal', 'col-sm-3', 'form-control-sm datepicker')) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsText('tglterbite', 'Tgl. Terbit', 'col-sm-3', 'form-control-sm datepicker')) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsSelect('bulane', 'Bulan', 'col-sm-3', 'form-control-sm', $milehSasi)) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsSelect('tahune', 'Tahun', 'col-sm-3', 'form-control-sm', $milehTahun)) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsText('pokoke', 'Pokok', 'col-sm-3', 'form-control-sm')) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsText('dendae', 'Denda', 'col-sm-3', 'form-control-sm')) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsText('jumlahe', 'Jumlah', 'col-sm-3', 'form-control-sm')) .
+					'</div>
+			<div class="col-12">'
+					. implode($this->Form->inputRowsTextArea('keterangane', 'Keterangan', 'col-sm-3', 'form-control-sm')) .
+					'</div>
+				</div>
+				';
 
 				break;
 			case 'Delete':
@@ -200,14 +228,8 @@ class FormSptpd extends CI_Controller
 
 				if ($this->MformSptpd->isExists($nomor, $idwp, $bulan, $tahun)) {
 					$this->session->set_flashdata('message', 'Failed to save data');
-					// var_dump("masuk");
-					// die;
 					redirect('transaksi/FormSptpd');
 				}
-
-				// die;
-
-
 				$data = [
 					'nomor' => $this->input->post('nomors'),
 					'tanggal' => $this->input->post('tanggals'),
@@ -234,10 +256,18 @@ class FormSptpd extends CI_Controller
 			case 'Edit':
 				$kode = $this->input->post('kode');
 				$data = [
-					'nama' 		=> $this->input->post('nama'),
-					'singkat' 	=> $this->input->post('singkat'),
-					'urut'		=> $this->input->post('urut'),
-					'isdispenda' => $this->input->post('isdispenda')
+					'nomor' => $this->input->post('nomors'),
+					'tanggal' => $this->input->post('tanggals'),
+					'idwp' => $this->input->post('idwps'),
+					'idrekening' => $this->input->post('idreks'),
+					'blnpajak' => $this->input->post('bulans'),
+					'thnpajak' => $this->input->post('tahuns'),
+					'jumlah' => $this->input->post('jumlahs'),
+					'keterangan' => $this->input->post('keterangans'),
+					'pokok' => $this->input->post('pokoks'),
+					'denda' => $this->input->post('dendas'),
+					'tgl_input' => $this->input->post('tglterbits'),
+					'keterangan' => $this->input->post('keterangans'),
 				];
 				$update = $this->Crud->update_data('mst_dinas', $data, ['id' => $kode]);
 				if ($update) {

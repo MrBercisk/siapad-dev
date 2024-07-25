@@ -6,14 +6,18 @@ class Datatables extends CI_Model
     private $order_column = array();
     private $search_columns = array();
     private $join = array();
+    private $where = array();
     public function setTable($table)
     {
         $this->table = $table;
     }
-    public function addWhere($column, $value)
+    public function addWhere($column, $value = null)
     {
-        // $this->db->where($column, $value);
-        $this->db->where($column, $value);
+        if ($value === null) {
+            $this->where[$column] = null;
+        } else {
+            $this->where[$column] = $value;
+        }
     }
     public function addLike($column, $value, $after = NULL)
     {
@@ -44,6 +48,13 @@ class Datatables extends CI_Model
         foreach ($this->join as $join) {
             $this->db->join($join['table'], $join['condition'], $join['type']);
         }
+        foreach ($this->where as $column => $value) {
+            if ($value === null) {
+                $this->db->where($column);
+            } else {
+                $this->db->where($column, $value);
+            }
+        }
         if (!empty($this->input->post("search")["value"])) {
             $this->db->group_start();
             foreach ($this->search_columns as $column) {
@@ -61,6 +72,8 @@ class Datatables extends CI_Model
     public function make_datatables()
     {
         $this->_make_query();
+        // var_dump($this->db->last_query());
+        // die;
         if ($this->input->post("length") != -1) {
             $this->db->limit($this->input->post('length'), $this->input->post('start'));
         }
@@ -69,11 +82,25 @@ class Datatables extends CI_Model
     public function get_filtered_data()
     {
         $this->_make_query();
+        foreach ($this->where as $column => $value) {
+            if ($value === null) {
+                $this->db->where($column);
+            } else {
+                $this->db->where($column, $value);
+            }
+        }
         return $this->db->get()->num_rows();
     }
     public function get_all_data()
     {
         $this->db->from($this->table);
+        foreach ($this->where as $column => $value) {
+            if ($value === null) {
+                $this->db->where($column);
+            } else {
+                $this->db->where($column, $value);
+            }
+        }
         return $this->db->count_all_results();
     }
     public function tombol($id, $actions = ['edit', 'delete'])
@@ -165,5 +192,29 @@ class Datatables extends CI_Model
             $this->addWhere("a.thnpajak", $tahun);
         }
         return $this->db->count_all_results();
+    }
+    public function get_filtered_dataku($where = array())
+    {
+        $this->_make_query();
+        foreach ($where as $column => $value) {
+            if ($value === null) {
+                $this->addWhere($column);
+            } else {
+                $this->addWhere($column, $value);
+            }
+        }
+        return $this->db->get()->num_rows();
+    }
+    public function get_all_dataku($where = array())
+    {
+        $this->db->from($this->table);
+        foreach ($where as $column => $value) {
+            if ($value === null) {
+                $this->addWhere($column);
+            } else {
+                $this->addWhere($column, $value);
+            }
+            return $this->db->count_all_results();
+        }
     }
 }

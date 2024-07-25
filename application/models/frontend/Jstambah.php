@@ -65,4 +65,14 @@ class Jstambah extends CI_Model
 
         return $options;
     }
+
+    public function milehRekening()
+    {
+        $ttddata = $this->Msetup->get_rekening();
+        $opsittd = '<option></option>';
+        foreach ($ttddata as $ttd) {
+            $opsittd .= '<option value="' . $ttd->id . '">' . $ttd->nama . '</option>';
+        }
+        return $opsittd;
+    }
 }
