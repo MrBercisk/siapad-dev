@@ -6,6 +6,7 @@ if ($this->session->flashdata('message')) :
     $this->session->flashdata('message') . '
 					</div>';
 endif;
+$escaped_link = 'transaksi/Apbd/getDinas';
 $theme['main'][] = implode($sidebar);
 $datatables = '<script type="text/javascript">
 $(document).ready(function(){  
@@ -17,10 +18,10 @@ $(document).ready(function(){
                 icon: \'info\',
                 confirmButtonText: \'OK\'
             });
+         
 '. $jsedit  . $jsdelete . '  
 });
 </script>
-
 ';
 $theme['main'][] =
   '<div id="page-title" class="page-title" data-title="' . $title . '"></div>
@@ -54,14 +55,14 @@ $theme['main'][] =
                               <thead>                                 
                                 <tr>
                                     <th><input type="checkbox" id="select-all"></th>
-                                    <th>NO.PELAPORAN</th>
+                                    <th>NPWPD</th>
                                     <th>WAJIB PAJAK</th>
                                     <th>ALAMAT</th>
                                     <th>NO.KOHIR</th>
                                     <th>KELURAHAN</th>
                                     <th>KECAMATAN</th>
                                     <th>NO.SKPD</th>
-                                    <th>NPWPD</th>
+                                    <th>NO.PELAPORAN</th>
                                     <th>MASA PAJAK</th>
                                     <th>TGL.JTH.TMP</th>
                                     <th>THN</th>
@@ -70,7 +71,8 @@ $theme['main'][] =
                                     <th>TOTAL</th>
                                     <th>TGL.TERBIT</th>
                                     <th>KETERANGAN</th>
-           
+                                    <th></th>
+                                    
                                 </tr>
                               </thead>
                               <tbody>     

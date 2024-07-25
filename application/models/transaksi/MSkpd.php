@@ -1,6 +1,25 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class MSkpd extends CI_Model {
-	public function getSkpdData($thnpajak, $blnpajak) {
+	public function get_saldo($thnpajak, $blmpajak)
+	{
+		$tahun = substr($thnpajak, 0, 4);
+		$this->db->select('SUM(a.total) as saldo');
+		$this->db->from('trx_skpdreklame a');
+		$this->db->join('mst_wajibpajak b', 'b.id = a.idwp', 'inner');
+		$this->db->where('YEAR(b.tglskp)', $tahun);
+		$this->db->where('DATE_FORMAT(b.tglskp, "%Y-%m") <', $tahun . '-' . $blmpajak);
+		$this->db->where('a.isbayar', 1);
+		$query = $this->db->get();
+		
+		if ($query->num_rows() > 0) {
+			return $query->row()->saldo;
+		} else {
+			return 0;
+		}
+	}
+	
+	public function getSkpdData2($thnpajak, $blnpajak) {
+		$tahun = substr($thnpajak, 0, 4);
         $this->db->select("
             trx_skpdreklame.id as id_skpd, 
             trx_skpdreklame.idwp,
@@ -23,13 +42,44 @@ class MSkpd extends CI_Model {
         ");
         $this->db->from('trx_skpdreklame');
         $this->db->join('mst_wajibpajak', 'mst_wajibpajak.id = trx_skpdreklame.idwp', 'inner');
-        $this->db->where('trx_skpdreklame.thnpajak', $thnpajak);
-        $this->db->where('trx_skpdreklame.blnpajak', $blnpajak);
+        $this->db->where('YEAR(mst_wajibpajak.tglskp)', $tahun);
+		$this->db->where('DATE_FORMAT(mst_wajibpajak.tglskp, "%Y-%m") <', $tahun . '-' . $blnpajak);
         $this->db->order_by('mst_wajibpajak.tglskp');
 
         $query = $this->db->get();
         return $query->result();
     }
+	public function getSkpdData($thnpajak, $blnpajak) {
+		$this->db->select("
+			trx_skpdreklame.id as id_skpd, 
+			trx_skpdreklame.idwp,
+			trx_skpdreklame.tanggal,
+			trx_skpdreklame.teks,
+			trx_skpdreklame.blnpajak,
+			trx_skpdreklame.thnpajak,
+			trx_skpdreklame.jumlah,
+			trx_skpdreklame.bunga,
+			trx_skpdreklame.total,
+			trx_skpdreklame.isbayar,
+			trx_skpdreklame.tglbayar,
+			trx_skpdreklame.keterangan,
+			mst_wajibpajak.id,
+			mst_wajibpajak.nama as wajibpajak,
+			mst_wajibpajak.nomor as noskpd,
+			mst_wajibpajak.tgljthtmp,
+			mst_wajibpajak.alamat,
+			mst_wajibpajak.tglskp
+		");
+		$this->db->from('trx_skpdreklame');
+		$this->db->join('mst_wajibpajak', 'mst_wajibpajak.id = trx_skpdreklame.idwp', 'inner');
+		$this->db->where('MONTH(mst_wajibpajak.tglskp)', $blnpajak);
+		$this->db->where('YEAR(mst_wajibpajak.tglskp)', $thnpajak);
+		$this->db->order_by('mst_wajibpajak.tglskp', 'asc');
+	
+		$query = $this->db->get();
+		return $query->result();
+	}
+	
     public function formInsert(){
 		
 		$form[] = '
@@ -193,13 +243,13 @@ class MSkpd extends CI_Model {
 				    <div class="col-md-3">
 						<div class="form-group">
                             <label for="bulan">Bulan:</label>
-                            <input type="number" name="blnpajak" id="blnpajak" class="form-control blnpajak min="1" max="12" value="1">    
+                            <input type="number" name="blnpajak" id="blnpajak" class="form-control blnpajak min="1" max="12" value="1" required>    
 						</div>	
                     </div>
 					<div class="col-md-3">
 						<div class="form-group">
 							<label for="tanggal">Tgl.Cetak:</label>
-							<input type="date" id="tgl_cetak" class="form-control " name="tgl_cetak">
+							<input type="date" id="tgl_cetak" class="form-control " name="tgl_cetak" required>
 						</div>
 				    </div>
 					
@@ -212,7 +262,7 @@ class MSkpd extends CI_Model {
 					<div class="col-md-8">
                         <div class="form-group">
                             <label for="ttd">Tanda Tangan:</label>
-                              <select id="tanda_tangan_2" name="tanda_tangan_2" class="form-control tanda_tangan_2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;">
+                              <select id="tanda_tangan_2" name="tanda_tangan_2" class="form-control tanda_tangan_2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                       '.$opsittd.'
                               </select>
                         </div>
@@ -220,13 +270,13 @@ class MSkpd extends CI_Model {
 				</div>
 				<div class="row">
 					
-					<div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
+					<div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;" >
 							<h5>Kabid Pendaftaran dan Penetapan</h5>
 					</div>
 					<div class="col-md-8">
                         <div class="form-group">
                             <label for="ttd">Tanda Tangan:</label>
-                              <select id="tanda_tangan_1" name="tanda_tangan_1" class="form-control tanda_tangan_1 " data-placeholder="Pilih Tanda Tangan" style="width: 100%;">
+                              <select id="tanda_tangan_1" name="tanda_tangan_1" class="form-control tanda_tangan_1 " data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                       '.$opsittd.'
                               </select>
                         </div>
