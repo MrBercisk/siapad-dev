@@ -1,52 +1,49 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed');
-class Mpend extends CI_Model
-{
-
-    public function get_data_by_idsts_nourut($idstsmaster, $nourut)
-    {
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+class Mbyrskpd extends CI_Model {
+    
+    public function get_data_by_idsts_nourut($idstsmaster, $nourut) {
         $this->db->select([
-            'trx_stsdetail.idstsmaster',
-            'trx_stsdetail.idwp',
-            'trx_rapbd.id as rapbdid',
-            'trx_rapbd.idrekening',
-            'mst_wajibpajak.id',
-            'mst_wajibpajak.nama as wajibpajak',
-            'mst_uptd.id as uptdid',
-            'mst_uptd.singkat as uptd',
-            'mst_rekening.id as idrek',
-            'mst_rekening.nmrekening as namarekening',
-            'trx_stsdetail.nourut',
-            'trx_stsdetail.tglpajak',
-            'trx_stsdetail.idskpd',
-            'trx_stsdetail.nobukti',
-            'trx_stsdetail.blnpajak',
-            'trx_stsdetail.thnpajak',
-            'trx_stsdetail.jumlah',
-            'trx_stsdetail.prs_denda',
-            'trx_stsdetail.nil_denda',
-            'trx_stsdetail.total',
-            'trx_stsdetail.keterangan',
-            'trx_stsdetail.formulir',
-            'trx_stsdetail.kodebayar',
-            'trx_stsdetail.tgl_input',
-            'trx_stsdetail.nopelaporan',
+          'trx_stsdetail.idstsmaster', 
+          'trx_stsdetail.idwp', 
+          'trx_rapbd.id as rapbdid', 
+          'trx_rapbd.idrekening', 
+          'mst_wajibpajak.id', 
+          'mst_wajibpajak.nama as wajibpajak', 
+          'mst_uptd.id as uptdid', 
+          'mst_uptd.singkat as uptd', 
+          'mst_rekening.id as idrek', 
+          'mst_rekening.nmrekening as namarekening', 
+          'trx_stsdetail.nourut', 
+          'trx_stsdetail.tglpajak', 
+          'trx_stsdetail.idskpd', 
+          'trx_stsdetail.nobukti', 
+          'trx_stsdetail.blnpajak', 
+          'trx_stsdetail.thnpajak', 
+          'trx_stsdetail.jumlah', 
+          'trx_stsdetail.prs_denda', 
+          'trx_stsdetail.nil_denda', 
+          'trx_stsdetail.total', 
+          'trx_stsdetail.keterangan',
+          'trx_stsdetail.formulir',
+          'trx_stsdetail.kodebayar',
+          'trx_stsdetail.tgl_input',
+          'trx_stsdetail.nopelaporan',
         ]);
-
+      
         $this->db->from('trx_stsdetail');
-
+        
         $this->db->join('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'left');
         $this->db->join('mst_wajibpajak', 'mst_wajibpajak.id = trx_stsdetail.idwp', 'left');
         $this->db->join('mst_uptd', 'mst_uptd.id = trx_stsdetail.iduptd', 'left');
         $this->db->join('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
         $this->db->join('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
-
+      
         $this->db->where('trx_stsdetail.idstsmaster', $idstsmaster);
         $this->db->where('trx_stsdetail.nourut', $nourut);
-
+      
         $query = $this->db->get();
-
+      
         if ($query->num_rows() > 0) {
-
           return $query->row(); 
         } else {
           return null;
@@ -66,13 +63,12 @@ class Mpend extends CI_Model
         } else {
             return false;
         }
-
     }
     public function delete($idstsmaster, $nourut)
     {
         $idstsmaster = $this->input->post('idstsmaster');
         $nourut = $this->input->post('nourut');
-
+    
         $delete = $this->Crud->delete_data('trx_stsdetail', ['idstsmaster' => $idstsmaster, 'nourut' => $nourut]);
         echo json_encode(['success' => true, 'message' => 'All Data has been deleted successfully']);
        
@@ -92,7 +88,6 @@ class Mpend extends CI_Model
     }
     public function insertdataRecord($data)
     {
-
         return $this->db->insert('trx_stsmaster', $data); 
     }
     public function insertdata($data)
@@ -136,14 +131,12 @@ class Mpend extends CI_Model
         $this->db->where('nourut', $nourut);
         $query = $this->db->get();
 
-
         if ($query->num_rows() > 0) {
             return $query->row_array();
         } else {
             return false;
         }
     }
-
     public function check_duplicate_data($idstsmaster, $kodebayar) {
         $this->db->where('idstsmaster', $idstsmaster);
         $this->db->where('kodebayar', $kodebayar);
@@ -194,5 +187,5 @@ class Mpend extends CI_Model
         return $this->db->update('trx_stsmaster', $data, ['id' => $idrecord]);
     }
 
-  
+   
 }

@@ -117,7 +117,7 @@ $theme['main'][] =
     <div class="main-content">
         <section class="section">
           <div class="section-header">
-            <h1>PENDAPATAN DAERAH</h1>
+            <h1>PEMBAYARAN SKPD</h1>
             <div class="section-header-breadcrumb">
               <div class="breadcrumb-item active"><a href="'.base_url().'"><i class="bx bxs-home"></i>Home</a></div>
               <div class="breadcrumb-item"><a href="#">'.$title.'</a></div>
@@ -132,24 +132,24 @@ $theme['main'][] =
                     <div class="card">
                         <div class="card-body">
                             '.implode('',$theme['alert']).'
-                            <button type="button" class="btn btn mb-2" data-toggle="modal" data-target="#addDataModal" style="background-color: #28a745; border-color: #28a745; color:white;">
+                            <button type="button" class="btn btn mb-2" data-toggle="modal" data-target="#addDataModalSkpd" style="background-color: #28a745; border-color: #28a745; color:white;">
                                 Tambah Record Baru
                             </button>
 
-                            <form id="editForm" action="'.('PendDaerah/update_record_data') .'" method="post">
+                            <form id="editForm" action="'.('PembayaranSkpd/update_record_data') .'" method="post">
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="idrecord">Record</label>
-                                            <select name="id" id="idrecord" class="form-control select2" data-placeholder="Pilih Record" style="width: 100%;">
-                                                '.$opsiRec.'
+                                            <select name="id" id="opsireklame" class="form-control opsireklame select2" style="width: 100%;">
+                                                
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="iddinas">Nama Dinas</label>
-                                            <select name="iddinas" id="iddinas" class="form-control select2" data-placeholder="Pilih Nama Dinas" style="width: 100%;" disabled>
+                                            <select name="iddinas" id="iddinas" class="form-control dinasreklame select2" data-placeholder="Pilih Nama Dinas" style="width: 100%;" disabled>
                                                 '.$opsidin.'
                                             </select>
                                         </div>
@@ -157,19 +157,19 @@ $theme['main'][] =
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="nomor">Nomor:</label>
-                                            <input type="text" id="nomor" class="form-control" name="nomor" disabled>
+                                            <input type="text" id="nomor" class="form-control nomorreklame" name="nomor" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="jenis">Jenis:</label>
-                                            <input type="text" id="jenis" class="form-control" name="isdispenda" disabled>
+                                            <input type="text" id="jenis" class="form-control jenisreklame" name="isdispenda" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="tanggal">Tanggal:</label>
-                                            <input type="date" id="tanggal" class="form-control" name="tanggal" disabled>
+                                            <input type="date" id="tanggal" class="form-control tanggalreklame" name="tanggal" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -193,7 +193,7 @@ $theme['main'][] =
                                     </div>
                                     <div class="col-md-12">
                                         <label for="keterangan">Keterangan:</label>
-                                        <input type="text" id="keterangan" class="form-control" name="keterangan" disabled>
+                                        <input type="text" id="keterangan" class="form-control keteranganreklame" name="keterangan" disabled>
                                     </div>
 
                                     <div class="col-md-12 mt-2 text-right">
@@ -214,7 +214,7 @@ $theme['main'][] =
                       <div class="card-body">                   
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
-                                <div id="table-buttons">
+                                <div id="table-buttons-skpd">
                                     <button type="button" class="btn btn-sm btn-success fa fa-plus add-data" id="add-data" data-toggle="modal" data-target="#addModal" style="display: none;"> Tambah</button>
                                     <button type="button" class="btn btn-sm btn-danger fa fa-times delete-all-data" id="hapus_data" style="display: none;" > Hapus</button>
                                   
@@ -223,28 +223,25 @@ $theme['main'][] =
                                     <button type="button" class="btn btn-sm btn-primary fa fa-binoculars search-data" id="cari_data_table" data-toggle="modal" data-target="#searchTableModal" style="display: none;"> Cari</button>
                                 </div>
                        
-                              <table class="table table-bordered table-stripped display" style="width:100% !important;" id="pendapatan">
+                              <table class="table table-bordered table-stripped display" style="width:100% !important;" id="SKPD">
                               
 
                                 <thead>                                 
                                   <tr>
                                       <th>No. Urut</th>
                                       <th>No. Bukti</th>
+                                      <th>SKPD</th>
                                       <th>Wajib Pajak</th>
                                       <th>Rekening</th>
                                       <th>UPTD</th>
-                                      <th>Tgl</th>
                                       <th>Bln</th>
                                       <th>Thn</th>
                                       <th>Jumlah</th>
-                                      <th>Denda (%)</th>
-                                      <th>Denda (Rp.)</th>
+                                      <th>Bunga (%)</th>
+                                      <th>Bunga (Rp.)</th>
                                       <th>Total (Rp.)</th>
                                       <th>Keterangan</th>
-                                      <th>Kode Formulir/sptpd</th>
-                                      <th>Kode Bayar</th>
-                                      <th>Tanggal Input</th>
-                                      <th>No Pelaporan</th>
+                                    
                                       <th>Aksi</th>
                                   </tr>
                                 </thead>
@@ -267,7 +264,7 @@ $theme['main'][] =
       </div>
       
       <!-- The Modal -->
-      <div class="modal" id="addDataModal">
+      <div class="modal" id="addDataModalSkpd">
         <div class="modal-dialog">
           <div class="modal-content">
           
@@ -279,7 +276,7 @@ $theme['main'][] =
             
             <!-- Modal Body -->
             <div class="modal-body">
-              <form id="forminput" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/add_record_data').'">
+              <form id="forminputskpd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PembayaranSkpd/add_record_data').'">
                      <div class="row">
                               <div class="col-md-6">
                                   <div class="form-group">
@@ -356,7 +353,7 @@ $theme['main'][] =
             <div class="modal-body">
               <form id="formadd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/add_data').'">
                      <div class="row">
-                                 <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
+                                 <input type="text" class="form-control" id="idstsmaster" name="idstsmaster">
                                   <input type="hidden" class="form-control" id="nourut" name="nourut">
                             
                             

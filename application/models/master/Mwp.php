@@ -5,7 +5,7 @@ class Mwp extends CI_Model
 	{
 		$status = '<option>-- Status --</option>
 		<option value="1">Aktif</option>
-		<option value=""2>Tidak Aktif</option>
+		<option value="2">Tidak Aktif</option>
 		';
 		$form[] =
 			'

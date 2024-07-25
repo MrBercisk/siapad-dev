@@ -103,28 +103,44 @@ class Datatables extends CI_Model
         }
         return $this->db->count_all_results();
     }
-    public function tombol($id, $actions = ['edit', 'delete'])
-    {
+
+    public function setOrder($column, $direction = 'asc') {
+        $allowed_columns = ['trx_stsdetail.nourut', 'trx_stsdetail.nobukti', 'trx_stsdetail.blnpajak', 'trx_stsdetail.thnpajak'];
+        
+        if (in_array($column, $allowed_columns)) {
+            $this->db->order_by($column, $direction);
+        } else {
+         
+        }
+    }
+    public function tombol($id, $actions = ['edit', 'delete']) {
+
         $tombol[] = '<div class="btn-group pull-right">';
+       
         if (in_array('edit', $actions)) {
-            $tombol[] = '
-                <a class="btn btn-xs btn-outline-primary modin fa fa-edit" id="edit" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalE" data-placement="bottom" title="Perbarui data">
+
+            $tombol []= '
+                <a class="btn btn-xs btn-primary modin fa fa-edit" id="edit" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalE" data-placement="bottom" title="Perbarui data">
                 </a>';
         }
         if (in_array('delete', $actions)) {
-            $tombol[] = '
-                <a class="btn btn-xs btn-outline-danger modin fa fa-trash" id="delete" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalD" data-placement="bottom" title="Hapus">
+            $tombol []= '
+                <a class="btn btn-xs btn-danger modin fa fa-trash" id="delete" href="#" data-id="' . $id . '" data-toggle="modal" data-target="#myModalD" data-placement="bottom" title="Hapus">
+
                 </a>';
         }
         $tombol[] = '</div>';
         return $tombol;
     }
-    public function tombolPend($idstsmaster, $nourut, $actions = ['edit', 'delete'])
-    {
+
+    public function tombolPend($idstsmaster, $actions = ['edit', 'delete']) {
+
         $tombol[] = '<div class="btn-group pull-right">';
 
         if (in_array('edit', $actions)) {
-            $tombol[] = '<a class="btn btn-xs btn-outline-primary modin fa fa-edit" id="edit" href="' . site_url('transaksi/PendDaerah/myModal/' . $idstsmaster . '/' . $nourut) . '" data-placement="bottom" title="Edit data">Edit</a>';
+
+            $tombol[] = '<button type="button" class="btn btn-xs btn-outline-primary modin fa fa-edit edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$idstsmaster.'">Edit</button>';
+
         }
 
         if (in_array('delete', $actions)) {

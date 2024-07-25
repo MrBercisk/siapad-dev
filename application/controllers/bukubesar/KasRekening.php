@@ -2,10 +2,11 @@
 use Dompdf\Dompdf;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
-class KasDinas extends CI_Controller {
+
+class KasRekening extends CI_Controller {
 	public function __construct() {
         parent::__construct();
-		$this->load->model('bukubesar/MKasDinas');
+		$this->load->model('bukubesar/MKasRekening');
     }
 	public function index()
 	{	
@@ -18,10 +19,10 @@ class KasDinas extends CI_Controller {
 			'sidebar' => $template['sidebar'],
 			'title' => $setpage->title,
 			'link' => $setpage->link,
-			'forminsert' =>  implode($this->MKasDinas->formInsert())
+			'forminsert' =>  implode($this->MKasRekening->formInsert())
 	
 		];
-		$this->load->view('bukubesar/perdinas',$data);
+		$this->load->view('bukubesar/perrekening',$data);
 	}
 	public function cetak() {
     if ($this->input->server('REQUEST_METHOD') !== 'POST') {
@@ -38,15 +39,9 @@ class KasDinas extends CI_Controller {
 
 	$bulan =  $this->input->post('bulan');
 	$tahun = $this->input->post('tahun');
-	$iddinas = $this->input->post('iddinas');
-/* 
-	$tablenya = $this->MKasDinas->get_data_bkdinas($bulan, $tahun);
-	echo '<pre>';
-	var_dump($dinas);
-	echo '</pre>';
-	die(); */
+	$kdrekening = $this->input->post('kdrekening');
 
-	$totals = $this->MKasDinas->get_apbd_apbdp_total($tahun, $iddinas);
+	$totals = $this->MKasRekening->get_apbd_apbdp_total($tahun, $kdrekening);
 
 	$data = [
 		'footer' => $template['footer'],
@@ -57,8 +52,8 @@ class KasDinas extends CI_Controller {
 		'ttd_checkbox' => $ttd_checkbox,
         'format_bulan' => strftime('%B', strtotime("$tahun-$bulan")),
 		'format_tahun' => $tahun,
-		'iddinas' => $iddinas,
-		'tablenya' => $this->MKasDinas->get_data_bkdinas($bulan, $tahun, $iddinas),
+		'kdrekening' => $kdrekening,
+		'tablenya' => $this->MKasRekening->get_data_bkrekening($bulan, $tahun, $kdrekening),
 		'total_apbd' => $totals->total_apbd,
 		'total_apbdp' => $totals->total_apbdp,
         'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
@@ -70,22 +65,24 @@ class KasDinas extends CI_Controller {
 	if ($tanda_tangan_data) {
 		$data['tanda_tangan'] = $tanda_tangan_data;
 	}
-    $dinas_data = $this->Msetup->get_dinas($iddinas);
-	if ($dinas_data) {
-		$data['iddinas'] = $dinas_data;
+    $rek_data = $this->Msetup->get_rekening($kdrekening);
+	if ($rek_data) {
+		$data['kdrekening'] = $rek_data;
 	}
-	$this->load->view('bukubesar/printbkdinas', $data);
+
+	$this->load->view('bukubesar/printbkrekening', $data);
 	/* ob_start();
-	$html = $this->load->view('bukubesar/printbkdinas', $data, true);
-	ob_get_clean();
+	
+	$html = $this->load->view('bukubesar/printbkrekening', $data, true);
+	ob_get_clean(); */
 	
 
-	$dompdf = new Dompdf();
+/* 	$dompdf = new Dompdf();
 	$dompdf->loadHtml($html);
 	$dompdf->setPaper('A4', 'landscape');
 	$dompdf->render();
 	$dompdf->stream("buku_besar_per_dinas.pdf", array("Attachment" => 0)); */
-}
+	}
 
 
 }

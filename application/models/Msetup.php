@@ -98,6 +98,7 @@ class Msetup extends CI_Model
 			</head>
 			<body>
 			
+
 			<div id="app">
 				<div class="main-wrapper main-wrapper-1">
 				<div class="navbar-bg"></div>
@@ -262,7 +263,8 @@ class Msetup extends CI_Model
 				<script src="' . $base['url'] . 'assets/js/scripts.js"></script>
 				<script src="' . $base['url'] . 'assets/js/custom.js"></script>
 				<script src="' . $base['url'] . 'assets/js/select2.js"></script>
-
+        <script src="' . $base['url'] . 'assets/js/skpd.js"></script>
+	      <script src="' . $base['url'] . 'assets/js/datatableaction.js"></script>
 
 				
 				</body>
@@ -343,6 +345,7 @@ class Msetup extends CI_Model
 			return "Title Not Found";
 		}
 	}
+
 	public function get_tanda_tangan($ttd_checkbox, $tanda_tangan)
 	{
 		if ($ttd_checkbox && $tanda_tangan) {
@@ -350,6 +353,34 @@ class Msetup extends CI_Model
 				->select('id, nama, nip, jabatan1, jabatan2')
 				->from('mst_tandatangan')
 				->where('id', $tanda_tangan)
+				->get()
+				->row_array();
+
+			return $ttddetail;
+		}
+		return null;
+	}
+	public function get_tanda_tangan_skpd_1($tanda_tangan_1)
+	{
+		if ($tanda_tangan_1) {
+			$ttddetail = $this->db
+				->select('id, nama, nip, jabatan1, jabatan2')
+				->from('mst_tandatangan')
+				->where('id', $tanda_tangan_1)
+				->get()
+				->row_array();
+
+			return $ttddetail;
+		}
+		return null;
+	}
+	public function get_tanda_tangan_skpd_2($tanda_tangan_2)
+	{
+		if ($tanda_tangan_2) {
+			$ttddetail = $this->db
+				->select('id, nama, nip, jabatan1, jabatan2')
+				->from('mst_tandatangan')
+				->where('id', $tanda_tangan_2)
 				->get()
 				->row_array();
 
@@ -374,7 +405,7 @@ class Msetup extends CI_Model
 
 	public function get_rekening($kdrekening = '')
 	{
-		if ($kdrekening != '' || $kdrekening == null) {
+		if ($kdrekening != '') {
 			$rekdetail = $this->db
 				->select('id,kdrekening, nmrekening')
 				->from('mst_rekening')
@@ -386,19 +417,19 @@ class Msetup extends CI_Model
 			$rekdetail = $this->db
 				->select('id,kdrekening, nmrekening')
 				->from('mst_rekening')
-				// ->where('kdrekening', $kdrekening)
 				->get()
 				->row_array();
 			return $rekdetail;
 		}
-		// return null;
 	}
-	public function get_dinas($dinas)
+
+	public function get_dinas($iddinas)
 	{
-		if ($dinas) {
+		if ($iddinas) {
 			$dinDetail = $this->db
 				->select('id,nama')
 				->from('mst_dinas')
+				->where('id', $iddinas)
 				->get()
 				->row_array();
 			return $dinDetail;

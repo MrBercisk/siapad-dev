@@ -12,6 +12,7 @@ class Form extends CI_Model
 		return $form;
 	}
 
+
 	public function inputRowsText($id = NULL, $label = NULL, $classlabel = NULL, $classinput = NULL, $value = NULL, $attrib = NULL)
 	{
 		$form[] = '
@@ -36,6 +37,25 @@ class Form extends CI_Model
 		return $form;
 	}
 
+
+	public function inputReadonly($id = NULL, $label = NULL, $value = NULL, $attrib = NULL)
+	{
+		$form[] = '
+		<div class="form-group">
+           <label for="' . $id . '">' . $label . '</label>
+           <input type="text"  class="form-control '.$id.'" value="' . $value . '" id="' . $id . '" name="' . $id . '" ' . $attrib . ' readonly>
+        </div>';
+		return $form;
+	}
+	public function inputNumber($id = NULL, $label = NULL, $value = NULL, $attrib = NULL)
+	{
+		$form[] = '
+		<div class="form-group">
+           <label for="' . $id . '">' . $label . '</label>
+           <input type="number"  class="form-control '.$id.'" value="' . $value . '" id="' . $id . '" name="' . $id . '" ' . $attrib . '>
+        </div>';
+		return $form;
+	}
 
 	public function inputCheckbox($id = NULL, $label = NULL, $value = NULL, $attrib = NULL)
 	{
@@ -175,17 +195,38 @@ class Form extends CI_Model
 		return implode('', $form);
 	}
 
+	public function getWP($id_wp = NULL, $label_wp = NULL, $value_wp = NULL, $class = NULL, $attrib_wp = NULL)
+	{
+		$this->load->model('backend/Location');
+		$form = [];
+		$form[] = '<div class="' . $class . '">
+					<div class="form-group">
+					  <label for="' . $id_wp . '">' . $label_wp . '</label>
+					  <select class="form-control" name="' . $id_wp . '" id="' . $id_wp . '" ' . $attrib_wp . '>
+						  <option value="">Pilih WP</option>';
+
+		$wajibpajak = $this->SkpdReklame->get_wp_data();
+		foreach ($wajibpajak as $wp) {
+			$selected = ($value_wp == $wp['id']) ? 'selected' : '';
+			$form[] = '<option value="' . $wp['id'] . '" ' . $selected . '>' . $wp['nama'] . '</option>';
+		}
+		$form[] = '</select></div></div>';
+
+		return implode('', $form);
+	}
+
+
 	public function hiddenText($id = NULL, $value = NULL, $attrib = NULL)
 	{
 		if (!empty($value)) {
 			$value = 'value="' . $value . '"';
 		}
-		$form[] = '<input type="hidden" ' . $value . ' id="' . $id . '" name="' . $id . '" ' . $attrib . '>';
+		$form[] = '<input type="hidden" ' . $value . ' id="' . $id . '" class="'.$id.'" name="' . $id . '" ' . $attrib . '>';
 		return $form;
 	}
 	public function modalKu($abjad, $label, $link, $actions = ['edit', 'delete'])
 	{
-		$modal[] = '<div class="modal fade bd-example-modal-lg" id="myModal' . $abjad . '" tabindex="-1" role="dialog" aria-labelledby="myModalTitle" aria-hidden="true">
+		$modal[] = '<div class="modal" id="myModal' . $abjad . '" aria-hidden="true">
 	  <div class="modal-dialog">
 		<div class="modal-content">
 		  <div class="modal-header">
@@ -203,6 +244,7 @@ class Form extends CI_Model
 		if (in_array('edit', $actions)) {
 			$modal[] = '<button type="submit" name="AKSI" value="Edit" class="btn btn-info">Save changes</button>';
 		}
+	
 		if (in_array('delete', $actions)) {
 			$modal[] = '<button type="submit" name="AKSI" value="Delete" class="btn btn-danger">Confirm Delete</button>';
 		}
