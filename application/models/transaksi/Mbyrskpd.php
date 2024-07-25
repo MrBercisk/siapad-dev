@@ -10,10 +10,11 @@ class Mbyrskpd extends CI_Model {
             'trx_stsdetail.tglpajak',
             'trx_stsdetail.idskpd',
             'trx_stsdetail.iduptd',
-            'trx_stsdetail.blnpajak AS bln',
-            'trx_stsdetail.thnpajak AS thn',
-            'trx_stsdetail.prs_denda AS persen',
-            'trx_stsdetail.nil_denda AS bunga',
+            'trx_stsdetail.idrapbd',
+            'trx_stsdetail.blnpajak',
+            'trx_stsdetail.thnpajak',
+            'trx_stsdetail.prs_denda',
+            'trx_stsdetail.nil_denda',
             'trx_stsdetail.jumlah',
             'trx_stsdetail.total',
             'trx_stsdetail.keterangan',
@@ -50,7 +51,15 @@ class Mbyrskpd extends CI_Model {
           return null;
         }
       }
-      public function get_last_nourut($idstsmaster) {
+      public function get_all_skpd() {
+        $this->db->select('idskpd, trx_stsdetail.idwp, mst_wajibpajak.nama, mst_wajibpajak.nomor');
+        $this->db->from('trx_stsdetail');
+        $this->db->join('trx_skpdreklame','trx_skpdreklame.id = trx_stsdetail.idskpd');
+        $this->db->join('mst_wajibpajak','mst_wajibpajak.id = trx_skpdreklame.idwp');
+        $query = $this->db->get();
+        return $query->result_array(); 
+    }
+      public function ambilnourut($idstsmaster) {
 
         $this->db->select('nourut');
         $this->db->from('trx_stsdetail');
@@ -65,6 +74,15 @@ class Mbyrskpd extends CI_Model {
             return false;
         }
     }
+    public function ambilnomornyaMaster($idstsmaster) {
+        $this->db->select('nomor');
+        $this->db->from('trx_stsmaster');
+        $this->db->where('id', $idstsmaster);
+        $query = $this->db->get();
+    
+        return $query->row();
+    }
+    
     public function delete($idstsmaster, $nourut)
     {
         $idstsmaster = $this->input->post('idstsmaster');

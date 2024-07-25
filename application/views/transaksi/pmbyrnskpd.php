@@ -215,8 +215,8 @@ $theme['main'][] =
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
                                 <div id="table-buttons-skpd">
-                                    <button type="button" class="btn btn-sm btn-success fa fa-plus add-data" id="add-data" data-toggle="modal" data-target="#addModal" style="display: none;"> Tambah</button>
-                                    <button type="button" class="btn btn-sm btn-danger fa fa-times delete-all-data" id="hapus_data" style="display: none;" > Hapus</button>
+                                    <button type="button" class="btn btn-sm btn-success fa fa-plus add-data-skpd" id="add-data-skpd" data-toggle="modal" data-target="#addModalSkpd" style="display: none;"> Tambah</button>
+                                    <button type="button" class="btn btn-sm btn-danger fa fa-times delete-all-data-skpd" id="hapus_data" style="display: none;" > Hapus</button>
                                   
                                     <button type="button" class="btn btn-sm btn-dark fa fa-binoculars search-data" id="cari_data" data-toggle="modal" data-target="#searchModal" style="display: none;"> Cari</button>
                                   
@@ -339,7 +339,7 @@ $theme['main'][] =
           </div>
         </div>
       </div>
-     <div class="modal" id="addModal">
+     <div class="modal add-modal-skpd" id="addModalSkpd">
          <div class="modal-dialog modal-lg">
           <div class="modal-content">
           
@@ -351,110 +351,89 @@ $theme['main'][] =
             
             <!-- Modal Body -->
             <div class="modal-body">
-              <form id="formadd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PembayaranSkpd/add_data').'">
+              <form id="formaddSkpd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PembayaranSkpd/add_data').'">
                      <div class="row">
                                  <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
                                   <input type="hidden" class="form-control" id="nourut" name="nourut">
                             
-                            
-                                <div class="col-md-6">
-                                                  <div class="form-group">
-                                                      <label for="nobukti">Nobukti</label>
-                                                      <input type="text" class="form-control" id="nobukti" name="nobukti" >
-                                                  </div>
-                                </div>
-                             
-                                <div class="col-md-12">
+                               <div class="col-md-4">
                                   <div class="form-group">
-                                    <label for="idwp">Wajib Pajak</label>
-                                     <select id="idwp" name="idwp" class="form-control select2" data-placeholder="Pilih WP" style="width: 100%;" required>
-                                      '.$opsiwp.'
-                                    </select>
+                                      <label for="wp">SKPD:</label>
+                                        <select id="opsiskpdadd" name="idskpd" class="form-control opsiskpdadd select2" data-placeholder="Pilih SKPD" style="width: 100%;">
+                                              
+                                        </select>
                                   </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                                  <div class="form-group">
+                                                      <label for="nobukti">Nobukti</label>
+                                                      <input type="text" class="form-control" id="nobukti" name="nobukti" readonly >
+                                                  </div>
+                                </div>
+                              
+                                <input type="hidden" name="idwp" id="idwpskpdsadd" class="form-control" readonly >
+                                <div class="col-md-4">
+                                  <div class="form-group">
+                                    <label for="idwp">Wajib Pajak</label>
+                                     <input type="text" name="nmwp" id="nmwpsadd" class="form-control" readonly >
+                                  </div>
+                                </div>
+                               <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
-                                     <select id="kdrekening" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
+                                     <select id="idrapbdsadd" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
                                      <option disabled selected></option>
                                     </select>
                                   </div>
                                 </div>
-                               <div class="col-md-6">
+                               <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="iddinas">UPTD</label>
-                                    <select name="iduptd" id="iduptd" class="form-control" data-placeholder="Pilih UPTD" style="width: 100%;">
+                                    <select name="iduptd" id="iduptdsadd" class="form-control" data-placeholder="Pilih UPTD" style="width: 100%;">
                                         '.$opsiUptd.'
                                     </select>
                                   </div>
                                 </div>
-                                 <div class="col-md-4">
-                                 <label for="tanggal">Tanggal:</label>
-                                    <input type="number" name="tglpajak" id="tglpajak" class="form-control min="01" max="31" value="01" placeholder="Pilih Tanggal">                  
-                                </div>
+                               
                                 <div class="col-md-4">
                                  <label for="bulan">Bulan:</label>
-                                  <input type="number" name="blnpajak" id="blnpajak" class="form-control min="01" max="12" value="01" placeholder="Pilih Bulan">    
+                                  <input type="number" name="blnpajak" id="bln" class="form-control min="01" max="12" value="01" readonly>    
                                 </div>
                                 <div class="col-md-4">
                                   <div class="form-group">
                                       <label for="tahun">Tahun:</label>
-                                      <input type="number" class="form-control" id="thnpajak" name="thnpajak" min="1900" max="9999" value="2024" required>
+                                      <input type="number" class="form-control" id="thn" name="thnpajak" min="1900" max="9999" value="2024" readonly>
                                   </div>
                               </div>
-                              <div class="col-md-6">
+                               <div class="col-md-4">
                                   <div class="form-group">
                                      <label for="jumlah">Jumlah(Rp).</label>
-                                       <input type="number" class="form-control jumlah" id="jumlah" name="jumlah" >
+                                       <input type="number" class="form-control jumlahskpd" id="jumlahskpdsadd" name="jumlah">
                                   </div>
                               </div>
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
-                                      <label for="prs_denda">Denda(%).</label>
-                                       <input type="number" class="form-control prs_denda" id="prs_denda" name="prs_denda" >
+                                      <label for="prs_denda">Bunga(%).</label>
+                                       <input type="number" class="form-control persen" id="persensadd" name="prs_denda">
                                  </div>
                               </div>
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
-                                      <label for="nil_denda">Denda(Rp.).</label>
-                                      <input type="number" class="form-control nil_denda" id="nil_denda" name="nil_denda">
+                                      <label for="nil_denda">Bunga(Rp.).</label>
+                                      <input type="number" class="form-control bunga" id="bungasadd" name="nil_denda">
                                   </div>
                               </div>
                              
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="total">Total(Rp.).</label>
-                                      <input type="number" class="form-control total" id="total" name="total" disabled>
+                                      <input type="number" class="form-control totalskpd" id="totalskpdsadd" name="total" disabled>
                                   </div>
                               </div>
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="keterangan">Keterangan</label>
                                       <input type="text" class="form-control" id="keterangan" name="keterangan">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="formulir">Kode Formulir</label>
-                                      <input type="text" class="form-control" id="formulir" name="formulir">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="kodebayar">Kode Bayar</label>
-                                      <input type="text" class="form-control" id="kodebayar" name="kodebayar">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="tgl_input">Tanggal Input</label>
-                                      <input type="date" class="form-control" id="tgl_input" name="tgl_input">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="nopelaporan">Nomor Pelaporan</label>
-                                      <input type="text" class="form-control" id="nopelaporan" name="nopelaporan">
                                   </div>
                               </div>
 
@@ -495,13 +474,7 @@ $theme['main'][] =
                         <input type="hidden" name="iddinas" id="id="iddinas">
                         <input type="hidden" name="nourut" id="id="nourut">
                         <div class="row">
-                                <div class="col-md-6">
-                                                  <div class="form-group">
-                                                      <label for="nobukti">Nobukti</label>
-                                                      <input type="text" class="form-control" id="nobukti" name="nobukti" >
-                                                  </div>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                   <div class="form-group">
                                       <label for="wp">SKPD:</label>
                                         <select id="opsiskpd2" name="idskpd" class="form-control select2" data-placeholder="Pilih SKPD" style="width: 100%;">
@@ -509,25 +482,32 @@ $theme['main'][] =
                                         </select>
                                   </div>
                                 </div>
-                                <input type="hidden" name="idwp" id="idwp" class="form-control" readonly >
-                                <div class="col-md-12">
+                                <div class="col-md-4">
+                                                  <div class="form-group">
+                                                      <label for="nobukti">Nobukti</label>
+                                                      <input type="text" class="form-control" id="nobukti" name="nobukti" >
+                                                  </div>
+                                </div>
+                                
+                                <input type="hidden" name="idwp" id="idwpskpds" class="form-control" readonly >
+                                <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="idwp">Wajib Pajak</label>
                                      <input type="text" name="nmwp" id="nmwp" class="form-control" readonly >
                                   </div>
                                 </div>
-                               <div class="col-md-6">
+                               <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
-                                     <select id="kdrekening2" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
+                                     <select id="idrapbds" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
                                      <option disabled selected></option>
                                     </select>
                                   </div>
                                 </div>
-                               <div class="col-md-6">
+                               <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="iddinas">UPTD</label>
-                                    <select name="iduptd" id="iduptd" class="form-control" data-placeholder="Pilih UPTD" style="width: 100%;">
+                                    <select name="iduptd" id="iduptds" class="form-control" data-placeholder="Pilih UPTD" style="width: 100%;">
                                         '.$opsiUptd.'
                                     </select>
                                   </div>
@@ -540,35 +520,35 @@ $theme['main'][] =
                                 <div class="col-md-4">
                                   <div class="form-group">
                                       <label for="tahun">Tahun:</label>
-                                      <input type="number" class="form-control" id="thnpajak" name="thn" min="1900" max="9999" value="2024" readonly>
+                                      <input type="number" class="form-control" id="thn" name="thnpajak" min="1900" max="9999" value="2024" readonly>
                                   </div>
                               </div>
-                               <div class="col-md-6">
+                               <div class="col-md-4">
                                   <div class="form-group">
                                      <label for="jumlah">Jumlah(Rp).</label>
                                        <input type="number" class="form-control jumlahskpd" id="jumlahskpd" name="jumlah">
                                   </div>
                               </div>
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
                                       <label for="prs_denda">Bunga(%).</label>
                                        <input type="number" class="form-control persen" id="persen" name="prs_denda">
                                  </div>
                               </div>
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
                                       <label for="nil_denda">Bunga(Rp.).</label>
                                       <input type="number" class="form-control bunga" id="bunga" name="nil_denda">
                                   </div>
                               </div>
                              
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="total">Total(Rp.).</label>
                                       <input type="number" class="form-control totalskpd" id="totalskpd" name="total" disabled>
                                   </div>
                               </div>
-                              <div class="col-md-6">
+                              <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="keterangan">Keterangan</label>
                                       <input type="text" class="form-control" id="keterangan" name="keterangan">
@@ -602,7 +582,7 @@ $theme['main'][] =
           
             <!-- Modal Header -->
             <div class="modal-header">
-              <h4 class="modal-title">Cari SPTPD</h4>
+              <h4 class="modal-title">Cari SKPD</h4>
               <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             
@@ -615,7 +595,7 @@ $theme['main'][] =
                                   <input type="hidden" class="form-control" id="nopelaporan" name="nopelaporan">
                               <div class="col-md-12">
                                   <div class="form-group">
-                                    <label for="nosptpd">No. SPTPD/No Formulir</label>
+                                    <label for="nosptpd">No. SKPD</label>
                                      <input type="text" id="nosptpd" class="form-control" name="nosptpd"  placeholder="Ketik No SPTPD / No Formulir lalu tekan Enter..." required>                       
                                   </div>
                                 </div>

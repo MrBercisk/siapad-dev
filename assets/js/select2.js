@@ -1107,27 +1107,25 @@ $(document).ready(function() {
     function hitungdenda(modal) {
         var jumlah = parseFloat(modal.find('.jumlah').val()) || 0;
         var prs_denda = parseFloat(modal.find('.prs_denda').val()) || 0;
-    
-        var nil_denda = (jumlah * prs_denda) / 100;
+
+        var nil_denda = Math.round((jumlah * prs_denda) / 100);
         modal.find('.nil_denda').val(nil_denda);
     
-        var total = jumlah + nil_denda;
+        var total = Math.round(jumlah + nil_denda); 
         modal.find('.total').val(total);
     }
     
     function hitungprsdenda(modal) {
         var jumlah = parseFloat(modal.find('.jumlah').val()) || 0;
         var nil_denda = parseFloat(modal.find('.nil_denda').val()) || 0;
-        var prs_denda = (nil_denda / jumlah) * 100;
-        var total = jumlah + nil_denda;
+        
+        var prs_denda = Math.round((nil_denda / jumlah) * 100); 
+        var total = Math.round(jumlah + nil_denda); 
     
         modal.find('.prs_denda').val(prs_denda);
         modal.find('.total').val(total);
     }
-    $('#idwp2').on('change', function() {
-        var idwpSelected = $(this).val();
-        console.log('Selected idwp:', idwpSelected); 
-    });
+    
    
    
 });

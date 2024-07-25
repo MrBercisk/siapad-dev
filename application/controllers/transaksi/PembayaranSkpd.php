@@ -97,6 +97,10 @@ class PembayaranSkpd extends CI_Controller
             echo json_encode(['success' => false, 'message' => 'Data not found']);
         }
     }
+    public function get_all_skpd() {
+        $data = $this->Mbyrskpd->get_all_skpd();
+        echo json_encode(array('data' => $data));
+    }
     public function getSkpd() {
         $datatables = $this->Datatables;
         $datatables->setTable("trx_skpdreklame");
@@ -192,9 +196,10 @@ class PembayaranSkpd extends CI_Controller
         $offset = $this->input->get('offset') ?: 0;
         $search = $this->input->get('search') ?: '';
     
-        $this->db->select('a.id, b.nomor AS nomor, b.nama AS nama, a.teks, a.blnpajak, a.thnpajak, a.jumlah, c.nil_denda as bunga, a.total, c.prs_denda as persen');
-        $this->db->join('mst_wajibpajak b', 'b.id=a.idwp');
-        $this->db->join('trx_stsdetail c', 'c.idskpd=a.id');
+        $this->db->select('a.id, a.idwp, b.idrekening, c.iduptd, c.idrapbd, d.nmrekening, b.nomor AS nomor, b.nama AS nama, a.teks, a.blnpajak, a.thnpajak, a.jumlah, c.nil_denda as bunga, a.total, c.prs_denda as persen');
+        $this->db->join('mst_wajibpajak b', 'b.id = a.idwp');
+        $this->db->join('trx_stsdetail c', 'c.idskpd = a.id');
+        $this->db->join('mst_rekening d', 'd.id = b.idrekening');
         $this->db->from('trx_skpdreklame a');
         
         if (!empty($search)) {
@@ -636,6 +641,141 @@ class PembayaranSkpd extends CI_Controller
     
         echo $options;
     }
+    public function get_nomor_data() {
+        $idstsmaster = $this->input->post('idstsmaster');
+    
+        if (!$idstsmaster) {
+            echo json_encode(['success' => false, 'message' => 'ID tidak ditemukan.']);
+            return;
+        }
+    
+        $this->load->model('Mbyrskpd');
+        $nomor_data = $this->Mbyrskpd->ambilnomornyaMaster($idstsmaster);
+    
+        if ($nomor_data) {
+            $last_nourut = $this->Mbyrskpd->ambilnourut($idstsmaster);
+            if (!$last_nourut) {
+                $last_nourut = '0000';
+            }
+    
+            $response = [
+                'success' => true,
+                'data' => [
+                    'nomor' => $nomor_data->nomor,
+                    'last_nourut' => $last_nourut
+                ]
+            ];
+        } else {
+            $response = ['success' => false, 'message' => 'Nomor tidak ditemukan.'];
+        }
+    
+        echo json_encode($response);
+    }
+    
+    public function add_data() {
+        $idstsmaster = $this->input->post('idstsmaster');
+        $jumlah = (float) $this->input->post('jumlah');
+        $prs_denda = (float) $this->input->post('prs_denda');
+
+         
+        if (!is_numeric($jumlah) || !is_numeric($prs_denda)) {
+            $respon = ['success' => false, 'message' => 'harus angka.'];
+            echo json_encode($respon);
+            return;
+        }
+        
+        /* Hitung denda rp */
+        $nil_denda = ($jumlah * $prs_denda) / 100;
+        
+        /* Hitung total */
+        $total = $jumlah + $nil_denda;
+        
+        $nomor_data = $this->Mbyrskpd->ambilnomornyaMaster($idstsmaster);
+        if ($nomor_data) {
+            $nomor = $nomor_data->nomor;
+        } else {
+            $nomor = NULL; 
+        }
+       /* Ambil nourut terakhir */
+       $last_nourut = $this->Mbyrskpd->ambilnourut($idstsmaster);
+       if (!$last_nourut) {
+           $last_nourut = '0000';
+       }
+   
+       $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
+
+       $nobukti = $next_nourut . '/' . $nomor;
+        $data = [
+            'idstsmaster' => $idstsmaster,
+            'idwp' => $this->input->post('idwp'),
+            'iduptd' => $this->input->post('iduptd'),
+            'idrapbd' => $this->input->post('idrapbd'),
+            'nobukti' => $nobukti,
+            'nourut' => $next_nourut,
+            'blnpajak' => $this->input->post('blnpajak'),
+            'thnpajak' => $this->input->post('thnpajak'),
+            'jumlah' => $jumlah,
+            'prs_denda' => $prs_denda,
+            'nil_denda' => $nil_denda,
+            'total' => $total,
+            'keterangan' => $this->input->post('keterangan'),
+        ];
+    
+        $insert = $this->Mbyrskpd->insertdata($data);
+    
+        if ($insert) {
+            $response = ['success' => true, 'message' => 'Berhasil Tambah Data.'];
+        } else {
+            $response = ['success' => false, 'message' => 'Gagal Tambah Data'];
+        }
+    
+        echo json_encode($response);
+    }
+    public function update_data() 
+    {
+        $this->load->model('Mbyrskpd'); 
+        $idstsmaster = $this->input->post('idstsmaster');
+        $nourut = $this->input->post('nourut');
+        
+        $jumlah = (float) $this->input->post('jumlah');
+        $prs_denda = (float) $this->input->post('prs_denda');
+        
+        if (!is_numeric($jumlah) || !is_numeric($prs_denda)) {
+            $respon = ['success' => false, 'message' => 'harus angka.'];
+            echo json_encode($respon);
+            return;
+        }
+
+        $nil_denda = ($jumlah * $prs_denda) / 100;
+        $total = $jumlah + $nil_denda;
+        
+        $data = [
+            'idwp' => $this->input->post('idwp'),
+            'iduptd' => $this->input->post('iduptd'),
+            'idrapbd' => $this->input->post('idrapbd'),
+            'idskpd' => $this->input->post('idskpd'),
+            'nobukti' => $this->input->post('nobukti'),
+            'nourut' => $nourut,
+            'blnpajak' =>  $this->input->post('blnpajak'),
+            'thnpajak' => $this->input->post('thnpajak'),
+            'jumlah' => $jumlah,
+            'prs_denda' => $prs_denda,
+            'nil_denda' => $nil_denda,
+            'total' => $total,
+            'keterangan' => $this->input->post('keterangan'),
+        ];
+        
+        $update = $this->Mbyrskpd->updatedata($idstsmaster, $nourut, $data);
+        
+        if ($update) {
+            $response = ['success' => true, 'message' => 'Berhasil update Data.'];
+        } else {
+            $response = ['success' => false, 'message' => 'Gagal update Data'];
+        }
+        
+        echo json_encode($response);
+    }
+    
      public function delete() {
             $this->load->model('Mbyrskpd'); 
      
@@ -659,5 +799,53 @@ class PembayaranSkpd extends CI_Controller
           
             echo json_encode($response);
           }
+          public function delete_all_data() {
+            $this->load->model('Mbyrskpd'); 
+     
+            $idstsmaster = $this->input->post('idstsmaster');
 
+            header('Content-Type: application/json'); 
+          
+            $delete_all_results = $this->Mbyrskpd->deleteAll($idstsmaster);
+
+            if ($delete_all_results) {
+              $response = ['success' => true, 'message' => 'Berhasil Hapus Semua Data.'];
+            } else {
+              $response = ['success' => false, 'message' => 'Gagal Delete Record'];
+            }
+          
+            echo json_encode($response);
+          }
+          
+          public function getapisimpada()
+          {
+              $nosptpd = empty($this->input->get('nosptpd')) ? 0 : $this->input->get('nosptpd');
+              
+              $urlApi = ENDPOINT_API_SIMPATDA_SKPD_REKLAME . "?noskpd=$nosptpd";
+              $data = [
+                  'nosptpd' => $nosptpd
+              ];
+              $payload = json_encode($data);
+             
+              $curl = curl_init($urlApi);
+          
+              curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+              curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+              curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+              curl_setopt($curl, CURLOPT_HTTPGET, true);
+          
+              $response = curl_exec($curl);
+          
+              if (curl_errno($curl)) {
+                  echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
+              } else {
+                  $responseData = json_decode($response, true);
+                  $prettyResponse = json_encode($responseData, JSON_PRETTY_PRINT); 
+                  echo $prettyResponse;
+              }
+          
+              curl_close($curl);
+          }
+          
+          
 }

@@ -365,7 +365,51 @@ class PendDaerah extends CI_Controller {
         }
 
         /* End record function */
+ public function update_data() 
+    {
+        $this->load->model('Mbyrskpd'); 
+        $idstsmaster = $this->input->post('idstsmaster');
+        $nourut = $this->input->post('nourut');
+        
+        $jumlah = (float) $this->input->post('jumlah');
+        $prs_denda = (float) $this->input->post('prs_denda');
+        
+        if (!is_numeric($jumlah) || !is_numeric($prs_denda)) {
+            $respon = ['success' => false, 'message' => 'harus angka.'];
+            echo json_encode($respon);
+            return;
+        }
 
+        $nil_denda = ($jumlah * $prs_denda) / 100;
+        $total = $jumlah + $nil_denda;
+        
+        $data = [
+            'idwp' => $this->input->post('idwp'),
+            'iduptd' => $this->input->post('iduptd'),
+            'idrapbd' => $this->input->post('idrapbd'),
+            'idskpd' => $this->input->post('idskpd'),
+            'nobukti' => $this->input->post('nobukti'),
+            'nourut' => $nourut,
+            'blnpajak' =>  $this->input->post('blnpajak'),
+            'thnpajak' => $this->input->post('thnpajak'),
+            'jumlah' => $jumlah,
+            'prs_denda' => $prs_denda,
+            'nil_denda' => $nil_denda,
+            'total' => $total,
+            'keterangan' => $this->input->post('keterangan'),
+        ];
+        
+        $update = $this->Mbyrskpd->updatedata($idstsmaster, $nourut, $data);
+        
+        if ($update) {
+            $response = ['success' => true, 'message' => 'Berhasil update Data.'];
+        } else {
+            $response = ['success' => false, 'message' => 'Gagal update Data'];
+        }
+        
+        echo json_encode($response);
+    }
+    
         
         /* Action datatable Record fynction */
         public function add_data() {
