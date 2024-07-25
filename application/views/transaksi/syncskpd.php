@@ -53,7 +53,8 @@ $theme['main'][] =
                           <table class="table table-bordered" style="width:100% !important;" id="syncTable">
                               <thead>                                 
                                 <tr>
-                                    <th><input type="checkbox" id="select-all"></th>
+                                    <th></th>
+                                    <th>NOP</th>
                                     <th>NO.PELAPORAN</th>
                                     <th>WAJIB PAJAK</th>
                                     <th>ALAMAT</th>

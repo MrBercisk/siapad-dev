@@ -220,57 +220,61 @@ class SyncSkpd extends CI_Controller
     }
 
     public function getapisimpadareklame()
-    {
-        $tanggal = empty($this->input->get('tanggal')) ? 0 : $this->input->get('tanggal');
-        $urlApi = ENDPOINT_API_SIMPATDA_REKLAME . "?tanggal=$tanggal";
-        $data = [
-            'tanggal' => $tanggal
-        ];
+{
+    $tanggal = empty($this->input->get('tanggal')) ? 0 : $this->input->get('tanggal');
+    $urlApi = ENDPOINT_API_SIMPATDA_REKLAME . "?tanggal=$tanggal";
+    $data = [
+        'tanggal' => $tanggal
+    ];
+
+    $payload = json_encode($data);
+    $curl = curl_init($urlApi);
     
-        $payload = json_encode($data);
-        $curl = curl_init($urlApi);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+    curl_setopt($curl, CURLOPT_HTTPGET, true);
+
+    $response = curl_exec($curl);
+
+    if (curl_errno($curl)) {
+        echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
+    } else {
+        $respondatanya = json_decode($response, true);
         
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-        curl_setopt($curl, CURLOPT_HTTPGET, true);
-    
-        $response = curl_exec($curl);
-    
-        if (curl_errno($curl)) {
-            echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
-        } else {
-            $respondatanya = json_decode($response, true);
+        if (isset($respondatanya['data']) && is_array($respondatanya['data'])) {
+            $this->load->database();
             
-            if (isset($respondatanya['data']) && is_array($respondatanya['data'])) {
-                $this->load->database();
+            $keyunik = array_column($respondatanya['data'], 'NOSKPDN');
+            
+            if (!empty($keyunik)) {
+                $this->db->select('nopelaporan AS NOSKPDN, nomor, nop');
+                $this->db->from('mst_wajibpajak');
+                $this->db->where_in('nopelaporan', $keyunik);
+                $query = $this->db->get();
+                $kohir = $query->result_array();
                 
-                $keyunik = array_column($respondatanya['data'], 'NOSKPDN');
+                $nomorMap = array_column($kohir, 'nomor', 'NOSKPDN');
+                $nopMap = array_column($kohir, 'nop', 'NOSKPDN');
                 
-                if (!empty($keyunik)) {
-                    $this->db->select('nopelaporan AS NOSKPDN, nomor');
-                    $this->db->from('mst_wajibpajak');
-                    $this->db->where_in('nopelaporan', $keyunik);
-                    $query = $this->db->get();
-                    $kohir = $query->result_array();
+                foreach ($respondatanya['data'] as &$item) {
+                    $noskpd = $item['NOSKPDN'];
+                    $nokohir = isset($nomorMap[$noskpd]) ? $nomorMap[$noskpd] : '';
+                    $nop = isset($nopMap[$noskpd]) ? $nopMap[$noskpd] : '';
                     
-                    $nomorMap = array_column($kohir, 'nomor', 'NOSKPDN');
-                    
-                    foreach ($respondatanya['data'] as &$item) {
-                        $noskpd = $item['NOSKPDN'];
-                        $nokohir = isset($nomorMap[$noskpd]) ? $nomorMap[$noskpd] : '';
-    
-                        $item['nomor'] = substr($nokohir, 0, 4);
-                    }
+                    $item['nomor'] = substr($nokohir, 0, 4);
+                    $item['nop'] = $nop; 
                 }
             }
-    
-            $prettyResponse = json_encode($respondatanya, JSON_PRETTY_PRINT);
-            echo $prettyResponse;
         }
-    
-        curl_close($curl);
+
+        $prettyResponse = json_encode($respondatanya, JSON_PRETTY_PRINT);
+        echo $prettyResponse;
     }
+
+    curl_close($curl);
+}
+
     
     public function cekData($data){
         $cek = $this->db->select('id AS idrwp','nomor')

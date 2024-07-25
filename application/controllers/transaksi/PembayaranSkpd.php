@@ -83,7 +83,20 @@ class PembayaranSkpd extends CI_Controller
     }
     
    
+    
+    public function get_edit_data() {
+        $this->load->model('Mbyrskpd'); 
 
+        $idstsmaster = $this->input->post('idstsmaster');
+        $nourut = $this->input->post('nourut');
+
+        $data = $this->Mbyrskpd->get_data_by_idsts_nourut($idstsmaster, $nourut);
+        if ($data) {
+            echo json_encode(['success' => true, 'data' => $data]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Data not found']);
+        }
+    }
     public function getSkpd() {
         $datatables = $this->Datatables;
         $datatables->setTable("trx_skpdreklame");
@@ -174,6 +187,27 @@ class PembayaranSkpd extends CI_Controller
         echo json_encode($wpdata);
     }
 
+    public function get_skpd_data(){
+        $limit = $this->input->get('limit') ?: 10;
+        $offset = $this->input->get('offset') ?: 0;
+        $search = $this->input->get('search') ?: '';
+    
+        $this->db->select('a.id, b.nomor AS nomor, b.nama AS nama, a.teks, a.blnpajak, a.thnpajak, a.jumlah, c.nil_denda as bunga, a.total, c.prs_denda as persen');
+        $this->db->join('mst_wajibpajak b', 'b.id=a.idwp');
+        $this->db->join('trx_stsdetail c', 'c.idskpd=a.id');
+        $this->db->from('trx_skpdreklame a');
+        
+        if (!empty($search)) {
+            $this->db->like('b.nomor', $search);
+            $this->db->or_like('b.nama', $search);
+        }
+        
+        $this->db->limit($limit, $offset);
+        $wpdata = $this->db->get()->result_array(); 
+    
+        echo json_encode($wpdata);
+    }
+    
     
     public function myModal()
     {
@@ -460,7 +494,7 @@ class PembayaranSkpd extends CI_Controller
     public function get_record_data() {
         $opsireklame = $this->input->post('id');
         if ($opsireklame) {
-            $this->db->select('trx_stsmaster.iddinas,trx_stsmaster.nomor, trx_stsmaster.tanggal, trx_stsmaster.keterangan,trx_stsmaster.isnonkas,trx_stsmaster.tmpbayar, mst_dinas.isdispenda');
+            $this->db->select('trx_stsmaster.id, trx_stsmaster.iddinas,trx_stsmaster.nomor, trx_stsmaster.tanggal, trx_stsmaster.keterangan,trx_stsmaster.isnonkas,trx_stsmaster.tmpbayar, mst_dinas.isdispenda');
             $this->db->from('trx_stsmaster');
             $this->db->join('mst_dinas', 'trx_stsmaster.iddinas = mst_dinas.id', 'left');
             $this->db->where('trx_stsmaster.id', $opsireklame);
@@ -468,6 +502,7 @@ class PembayaranSkpd extends CI_Controller
 
             if ($record) {
                 $data = [
+                    'id' => $record->id,
                     'iddinas' => $record->iddinas,
                     'nomor' => $record->nomor,
                     'tanggal' => $record->tanggal,
@@ -485,8 +520,8 @@ class PembayaranSkpd extends CI_Controller
         }
     }   
     public function get_datatable_data() {
-        $opsireklame = $this->input->get('id');
-
+        $opsireklame = $this->input->post('id'); 
+    
         $datatables = $this->Datatables;
         $datatables->setTable("trx_stsdetail");
         $datatables->setSelectColumn([
@@ -513,7 +548,9 @@ class PembayaranSkpd extends CI_Controller
             'mst_uptd.singkat as nmuptd',
             'mst_rekening.id as idrek',
             'mst_rekening.nmrekening as nmrek',
-            'trx_stsmaster.iddinas'
+            'trx_stsmaster.id as idmaster',
+            'trx_stsmaster.iddinas',
+            'trx_stsmaster.nomor'
         ]);
         $datatables->addJoin('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'left');
         $datatables->addJoin('mst_wajibpajak', 'mst_wajibpajak.id = trx_stsdetail.idwp', 'left');
@@ -522,10 +559,11 @@ class PembayaranSkpd extends CI_Controller
         $datatables->addJoin('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
         $datatables->addJoin('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
         $datatables->addWhere('trx_stsdetail.idstsmaster', $opsireklame);
-       /*  $datatables->addWhere('mst_rekening.jenis', 'REK'); */
+       /*  $datatables->addWhere('trx_stsmaster.nomor', '20240226/rek.trf'); */
+    
         $datatables->setOrder('trx_stsdetail.nourut', 'asc');
         $fetch_data = $datatables->make_datatables();
-        
+    
         $data = array();
         foreach ($fetch_data as $row) {
             $sub_array = array(
@@ -542,44 +580,84 @@ class PembayaranSkpd extends CI_Controller
                 $row->bunga,
                 $row->total,
                 $row->keterangan,
-            
                 '<div class="action-buttons">' . 
-                '<button type="button" class="btn btn-sm btn-primary modin fa fa-edit edit-data" id="edit-data" data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'" data-nobukti="'.$row->nobukti.'"> Edit</button>' .
-                '<button type="button" class="btn btn-sm btn-danger modin fa fa-times delete-data" data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>' .
+                '<button type="button" class="btn btn-sm btn-primary modin fa fa-edit edit-data-skpd" id="edit-data-skpd" data-toggle="modal" data-target="#editModalSkpd" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'" data-nobukti="'.$row->nobukti.'"> Edit</button>' .
+                '<button type="button" class="btn btn-sm btn-danger modin fa fa-times delete-data-skpd" data-placement="bottom" title="Hapus data" data-idstsmaster="'.$row->idstsmaster.'" data-nourut="'.$row->nourut.'"> Hapus</button>' .
                 '</div>'
             );
             $data[] = $sub_array;
         }
-        
+    
         $hidden_inputs = '<input type="hidden" name="idstsmaster" id="idstsmaster" value="'.$opsireklame.'">';
         if (!empty($fetch_data)) {
             $hidden_inputs .= '<input type="hidden" name="iddinas" id="iddinas" value="'.$fetch_data[0]->iddinas.'">';
         }
-        
+    
         $output = array(
             "draw" => intval($this->input->post("draw")),
             "data" => $data,
             "extra_data" => $hidden_inputs
         );
-
+    
         echo json_encode($output);
     }
-    public function get_namarekening_by_iddinas() {
-        $iddinas = $this->input->post('iddinas');
+    public function get_nmwp_by_idwp() {
+        $idwp = $this->input->post('idwp');
+        $this->load->model('Mbyrskpd');
+        $nmwp = $this->Mbyrskpd->get_namapajak_by_id($idwp);
+        
+        if ($nmwp) {
+            echo json_encode(['success' => true, 'data' => ['nmwp' => $nmwp]]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Nama WP tidak ditemukan']);
+        }
+    }
     
+    public function get_namarekening_skpd() {
         $apbdData = $this->db
             ->select('trx_rapbd.id, trx_rapbd.idrekening, trx_rapbd.iddinas, mst_rekening.idheader, mst_rekening.kdrekview, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
             ->from('trx_rapbd')
             ->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left')
-            ->where('trx_rapbd.iddinas', $iddinas)
+            ->where('mst_rekening.kdrekview', '4.1.01.09.01.01')
             ->get()
             ->result();
-        
-        $options = '<option disabled selected></option>';
-        foreach ($apbdData as $apbd) {
-            $options .= '<option value="'.$apbd->id.'">'.$apbd->nmrekening.'('.$apbd->kdrekview.')</option>'; 
+    
+        $dataunik = [];
+        foreach ($apbdData as $item) {
+            if (!isset($dataunik[$item->kdrekview])) {
+                $dataunik[$item->kdrekview] = $item;
+            }
         }
-        
+    
+        $options = '<option disabled selected></option>';
+        foreach ($dataunik as $item) {
+            $options .= '<option value="'.$item->id.'">'.$item->nmrekening.' ('.$item->kdrekview.')</option>'; 
+        }
+    
         echo $options;
     }
+     public function delete() {
+            $this->load->model('Mbyrskpd'); 
+     
+            $idstsmaster = $this->input->post('idstsmaster');
+            $nourut = $this->input->post('nourut');
+
+            header('Content-Type: application/json'); 
+            if (empty($idstsmaster) || empty($nourut)) {
+              $response = ['success' => false, 'message' => 'id dan nourut salah.'];
+              echo json_encode($response);
+              return;
+            }
+          
+            $delete_result = $this->Mbyrskpd->delete_record($idstsmaster, $nourut);
+
+            if ($delete_result) {
+              $response = ['success' => true, 'message' => 'Data Berhasil Dihapus.'];
+            } else {
+              $response = ['success' => false, 'message' => 'Gagal Delete Record'];
+            }
+          
+            echo json_encode($response);
+          }
+
 }

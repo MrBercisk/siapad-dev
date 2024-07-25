@@ -3,37 +3,38 @@ class Mbyrskpd extends CI_Model {
     
     public function get_data_by_idsts_nourut($idstsmaster, $nourut) {
         $this->db->select([
-          'trx_stsdetail.idstsmaster', 
-          'trx_stsdetail.idwp', 
-          'trx_rapbd.id as rapbdid', 
-          'trx_rapbd.idrekening', 
-          'mst_wajibpajak.id', 
-          'mst_wajibpajak.nama as wajibpajak', 
-          'mst_uptd.id as uptdid', 
-          'mst_uptd.singkat as uptd', 
-          'mst_rekening.id as idrek', 
-          'mst_rekening.nmrekening as namarekening', 
-          'trx_stsdetail.nourut', 
-          'trx_stsdetail.tglpajak', 
-          'trx_stsdetail.idskpd', 
-          'trx_stsdetail.nobukti', 
-          'trx_stsdetail.blnpajak', 
-          'trx_stsdetail.thnpajak', 
-          'trx_stsdetail.jumlah', 
-          'trx_stsdetail.prs_denda', 
-          'trx_stsdetail.nil_denda', 
-          'trx_stsdetail.total', 
-          'trx_stsdetail.keterangan',
-          'trx_stsdetail.formulir',
-          'trx_stsdetail.kodebayar',
-          'trx_stsdetail.tgl_input',
-          'trx_stsdetail.nopelaporan',
+            'trx_stsdetail.idstsmaster',
+            'trx_stsdetail.idwp',
+            'trx_stsdetail.nourut',
+            'trx_stsdetail.nobukti',
+            'trx_stsdetail.tglpajak',
+            'trx_stsdetail.idskpd',
+            'trx_stsdetail.iduptd',
+            'trx_stsdetail.blnpajak AS bln',
+            'trx_stsdetail.thnpajak AS thn',
+            'trx_stsdetail.prs_denda AS persen',
+            'trx_stsdetail.nil_denda AS bunga',
+            'trx_stsdetail.jumlah',
+            'trx_stsdetail.total',
+            'trx_stsdetail.keterangan',
+            'trx_rapbd.id as rapbdid',
+            'trx_rapbd.idrekening',
+            'mst_wajibpajak.id',
+            'mst_wajibpajak.nomor as noskpd',
+            "CONCAT(mst_wajibpajak.nama, ' - ', mst_wajibpajak.nomor) AS nmwp",
+            'mst_uptd.id as uptdid',
+            'mst_uptd.singkat as nmuptd',
+            'mst_rekening.id as idrek',
+            'mst_rekening.nmrekening as nmrek',
+            'trx_stsmaster.id as idmaster',
+            'trx_stsmaster.iddinas',
+            'trx_stsmaster.nomor'
         ]);
       
         $this->db->from('trx_stsdetail');
-        
         $this->db->join('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'left');
         $this->db->join('mst_wajibpajak', 'mst_wajibpajak.id = trx_stsdetail.idwp', 'left');
+        $this->db->join('trx_skpdreklame', 'trx_skpdreklame.id = trx_stsdetail.idskpd', 'left');
         $this->db->join('mst_uptd', 'mst_uptd.id = trx_stsdetail.iduptd', 'left');
         $this->db->join('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
         $this->db->join('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
@@ -76,10 +77,24 @@ class Mbyrskpd extends CI_Model {
 
 
     public function delete_record($idstsmaster, $nourut) {
+        $this->db->select('idskpd');
+        $this->db->where('idstsmaster', $idstsmaster);
+        $this->db->where('nourut', $nourut);
+        $query = $this->db->get('trx_stsdetail');
+        $hasil = $query->row();
+    
+        if ($hasil) {
+            $idskpd = $hasil->idskpd;
+            $this->db->set('isbayar', 0);
+            $this->db->where('id', $idskpd);
+            $this->db->update('trx_skpdreklame');
+        }
+    
         $this->db->where('idstsmaster', $idstsmaster);
         $this->db->where('nourut', $nourut);
         return $this->db->delete('trx_stsdetail'); 
-      }
+    }
+    
       
     public function deleteAll($idstsmaster)
     {
@@ -153,21 +168,16 @@ class Mbyrskpd extends CI_Model {
     }
 
     public function get_idwp_by_namaop($namaop) {
-        // Query untuk mencari idwp berdasarkan namaop
-        $this->db->select('id'); // Ganti 'id' sesuai dengan kolom yang menyimpan idwp
-        $this->db->from('mst_wajibpajak'); // Ganti 'mst_wajibpajak' sesuai dengan nama tabel yang benar
-        $this->db->where('nama', $namaop); // Ganti 'namawp' sesuai dengan kolom yang menyimpan nama WP
+        $this->db->select('id'); 
+        $this->db->from('mst_wajibpajak');
+        $this->db->where('nama', $namaop); 
 
-        // Lakukan query dan ambil hasilnya
         $query = $this->db->get();
-        
-        // Periksa apakah hasil query mengembalikan baris data
         if ($query->num_rows() > 0) {
-            // Ambil idwp dari hasil query
             $row = $query->row();
-            return $row->id; // Mengembalikan nilai idwp
+            return $row->id; 
         } else {
-            return NULL; // Mengembalikan NULL jika tidak ditemukan idwp
+            return NULL; 
         }
     }
     public function databyid($id)
@@ -187,5 +197,16 @@ class Mbyrskpd extends CI_Model {
         return $this->db->update('trx_stsmaster', $data, ['id' => $idrecord]);
     }
 
-   
+    public function get_namapajak_by_id($idwp) {
+        $this->db->select('nama');
+        $this->db->from('mst_wajibpajak');
+        $this->db->where('id', $idwp);
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            return $query->row();
+        } else {
+            return false;
+        }
+    }
+  
 }

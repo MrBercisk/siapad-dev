@@ -112,7 +112,7 @@ class Datatables extends CI_Model
 
         if (in_array('edit', $actions)) {
 
-            $tombol[] = '<button type="button" class="btn btn-xs btn-outline-primary modin fa fa-edit edit-data"  data-toggle="modal" data-target="#editModal" data-idstsmaster="'.$idstsmaster.'">Edit</button>';
+            $tombol[] = '<button type="button" class="btn btn-xs btn-outline-primary modin fa fa-edit editModalSkpd"  data-toggle="modal" data-target="#editModalSkpd" data-idstsmaster="'.$idstsmaster.'">Edit</button>';
 
         }
 
@@ -122,8 +122,7 @@ class Datatables extends CI_Model
         }
 
         $tombol[] = '</div>';
-
-        return implode(' ', $tombol);
+        return $tombol;
     }
 
     public function get_filtered_datas($nomor = NULL, $npwpd = NULL, $rekening = NULL, $wajibpajak = NULL, $tahun = NULL)

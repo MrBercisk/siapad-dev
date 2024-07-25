@@ -1,6 +1,20 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class MDisSkpd extends CI_Model {
-    
+    function selectById($id=0){
+        $result = $this->db
+            ->select("a.id, b.nomor AS noskpd, b.tglskp AS tglskpd, b.tgljthtmp, a.idwp, b.nama AS nmwp, a.teks, a.blnpajak, a.thnpajak, 
+                a.jumlah, a.bunga, a.total, a.tglbayar, a.isbayar, a.isdispen, b.idrekening, c.nmrekening, 
+                e.iduptd, f.nama AS nmuptd, f.singkat AS nmuptdsingkat, a.keterangan", false)
+            ->join('mst_wajibpajak b', 'b.id=a.idwp')
+            ->join('mst_rekening c', 'c.id=b.idrekening')
+            ->join('mst_kelurahan d', 'd.id=b.idkelurahan', 'left')
+            ->join('mst_kecamatan e', 'e.id=d.idkecamatan', 'left')
+            ->join('mst_uptd f', 'f.id=e.iduptd', 'left')
+            ->where('a.id', $id)
+            ->get('trx_skpdreklame a');
+
+        return $result;
+    }
     public function formInsert(){
 		
 		$form[] = '

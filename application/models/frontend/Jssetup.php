@@ -146,6 +146,26 @@ class Jssetup extends CI_Model
         ';
         return $modal;
     }
+    public function jsModalSts($idstsmaster = NULL, $mode = NULL, $link = NULL, $panggil = NULL)
+    {
+        $modal = '
+        $(document).on("click", "' . $idstsmaster . '", function() {
+            var idnya = $(this).data("idstsmaster");
+            var wadi = "' . $mode . '";
+            $.ajax({
+                url: "' . site_url($link) . '",
+                type: "POST",
+                data: { WADI: wadi, idnya: idnya },
+                cache: false, 
+                success: function(data) {
+                    $("' . $panggil . '").empty();
+                    $("' . $panggil . '").html(data);
+                }
+            });
+        });
+        ';
+        return $modal;
+    }
 
     public function jsKecamatan($link)
     {

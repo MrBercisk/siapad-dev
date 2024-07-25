@@ -351,9 +351,9 @@ $theme['main'][] =
             
             <!-- Modal Body -->
             <div class="modal-body">
-              <form id="formadd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/add_data').'">
+              <form id="formadd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PembayaranSkpd/add_data').'">
                      <div class="row">
-                                 <input type="text" class="form-control" id="idstsmaster" name="idstsmaster">
+                                 <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
                                   <input type="hidden" class="form-control" id="nourut" name="nourut">
                             
                             
@@ -479,8 +479,8 @@ $theme['main'][] =
         </div>
       </div>
    
-    <!-- Modal for Editing -->
-    <div class="modal" id="editModal">
+    <!-- Modal buat ngedit -->
+    <div class="modal modal-skpd" id="editModalSkpd">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -490,7 +490,7 @@ $theme['main'][] =
                     </button>
                 </div>
                 <div class="modal-body">
-                      <form id="editTableForm" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PendDaerah/update_data').'">
+                      <form id="editTableFormSkpd" method="post" enctype="multipart/form-data" action="'.site_url('transaksi/PembayaranSkpd/update_data').'">
                         <input type="hidden" name="idstsmaster" id="id="idstsmaster">
                         <input type="hidden" name="iddinas" id="id="iddinas">
                         <input type="hidden" name="nourut" id="id="nourut">
@@ -501,13 +501,19 @@ $theme['main'][] =
                                                       <input type="text" class="form-control" id="nobukti" name="nobukti" >
                                                   </div>
                                 </div>
-                             
+                                <div class="col-md-6">
+                                  <div class="form-group">
+                                      <label for="wp">SKPD:</label>
+                                        <select id="opsiskpd2" name="idskpd" class="form-control select2" data-placeholder="Pilih SKPD" style="width: 100%;">
+                                              
+                                        </select>
+                                  </div>
+                                </div>
+                                <input type="hidden" name="idwp" id="idwp" class="form-control" readonly >
                                 <div class="col-md-12">
                                   <div class="form-group">
                                     <label for="idwp">Wajib Pajak</label>
-                                     <select id="idwp2" name="idwp" class="form-control select2" data-placeholder="Pilih WP" style="width: 100%;" >
-                                      '.$opsiwp.'
-                                    </select>
+                                     <input type="text" name="nmwp" id="nmwp" class="form-control" readonly >
                                   </div>
                                 </div>
                                <div class="col-md-6">
@@ -526,43 +532,40 @@ $theme['main'][] =
                                     </select>
                                   </div>
                                 </div>
-                                <div class="col-md-4">
-                                 <label for="tanggal">Tanggal:</label>
-                                    <input type="number" name="tglpajak" id="tglpajak" class="form-control min="01" max="31" value="01">                  
-                                </div>
+                               
                                 <div class="col-md-4">
                                  <label for="bulan">Bulan:</label>
-                                  <input type="number" name="blnpajak" id="blnpajak" class="form-control min="01" max="12" value="01">    
+                                  <input type="number" name="blnpajak" id="bln" class="form-control min="01" max="12" value="01" readonly>    
                                 </div>
                                 <div class="col-md-4">
                                   <div class="form-group">
                                       <label for="tahun">Tahun:</label>
-                                      <input type="number" class="form-control" id="thnpajak" name="thnpajak" min="1900" max="9999" value="2024" >
+                                      <input type="number" class="form-control" id="thnpajak" name="thn" min="1900" max="9999" value="2024" readonly>
                                   </div>
                               </div>
                                <div class="col-md-6">
                                   <div class="form-group">
                                      <label for="jumlah">Jumlah(Rp).</label>
-                                       <input type="number" class="form-control jumlah" id="jumlah" name="jumlah">
+                                       <input type="number" class="form-control jumlahskpd" id="jumlahskpd" name="jumlah">
                                   </div>
                               </div>
                               <div class="col-md-6">
                                   <div class="form-group">
-                                      <label for="prs_denda">Denda(%).</label>
-                                       <input type="number" class="form-control prs_denda" id="prs_denda" name="prs_denda">
+                                      <label for="prs_denda">Bunga(%).</label>
+                                       <input type="number" class="form-control persen" id="persen" name="prs_denda">
                                  </div>
                               </div>
                               <div class="col-md-6">
                                   <div class="form-group">
-                                      <label for="nil_denda">Denda(Rp.).</label>
-                                      <input type="number" class="form-control nil_denda" id="nil_denda" name="nil_denda">
+                                      <label for="nil_denda">Bunga(Rp.).</label>
+                                      <input type="number" class="form-control bunga" id="bunga" name="nil_denda">
                                   </div>
                               </div>
                              
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="total">Total(Rp.).</label>
-                                      <input type="number" class="form-control total" id="total" name="total" disabled>
+                                      <input type="number" class="form-control totalskpd" id="totalskpd" name="total" disabled>
                                   </div>
                               </div>
                               <div class="col-md-6">
@@ -571,31 +574,7 @@ $theme['main'][] =
                                       <input type="text" class="form-control" id="keterangan" name="keterangan">
                                   </div>
                               </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="formulir">Kode Formulir</label>
-                                      <input type="text" class="form-control" id="formulir" name="formulir">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="kodebayar">Kode Bayar</label>
-                                      <input type="text" class="form-control" id="kodebayar" name="kodebayar">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="tgl_input">Tanggal Input</label>
-                                      <input type="date" class="form-control" id="tgl_input" name="tgl_input">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="nopelaporan">Nomor Pelaporan</label>
-                                      <input type="text" class="form-control" id="nopelaporan" name="nopelaporan">
-                                  </div>
-                              </div>
-
+                          
 
                             </div>
                          

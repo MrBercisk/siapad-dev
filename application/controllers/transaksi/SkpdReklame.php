@@ -71,7 +71,7 @@ class SkpdReklame extends CI_Controller
         
         foreach ($fetch_data as $row) {
             $sub_array = array();
-            if ($row->isbayar != 0 || $row->tglbayar !== null && $row->tglbayar !== '0000-00-00') {
+            if ($row->isbayar != 0) {
                 foreach ($row as $key => $value) {
                     if ($key == 'isbayar') continue; 
                     $sub_array[$key] = $value;
@@ -383,38 +383,4 @@ class SkpdReklame extends CI_Controller
         }
     }
 
-    function selectBySKPD($key='',$skpd='', $start=0, $limit=0, $sort, $dir='ASC', &$total=0){
-        $key = $this->db->escape_like_str($key);
-        // $where = "(a.nama LIKE '%$key%' OR a.nomor LIKE '%$key%' OR a.pemilik LIKE '%$key%')";
-        $where = "(a.nama LIKE '%$key%' OR a.nomor LIKE '%$key%' OR a.pemilik LIKE '%$key%' 
-        OR a.nama LIKE '%$skpd%' OR a.nomor LIKE '%$skpd%' OR a.pemilik LIKE '%$skpd%')";
-        $total = $this->db
-            ->where($where)
-            ->where('notype', 'No. SKP')
-            ->count_all_results('mst_wajibpajak a');
-
-        $result = $this->db
-            ->select("a.id, a.nama, CONCAT(a.nama, ' - ', a.nomor) AS nmwp, a.alamat, a.idkelurahan, b.nama AS kelurahan, 
-                b.idkecamatan, c.nama AS kecamatan, a.nomor, a.notype, a.tglskp, a.tgljthtmp, 
-                a.idrekening, d.nmrekening, d.jenis,
-                c.iduptd, e.nama AS nmuptd, e.singkat AS nmuptdsingkat,
-                a.awalpajakbln, a.awalpajakthn, a.akhirpajakbln, a.akhirpajakthn, a.isclosed,f.keterangan", false)
-            ->join('mst_rekening d', 'd.id=a.idrekening')
-            ->join('mst_kelurahan b', 'b.id=a.idkelurahan', 'left')
-            ->join('mst_kecamatan c', 'c.id=b.idkecamatan', 'left')
-            ->join('mst_uptd e', 'e.id=c.iduptd', 'left')
-            ->join('trx_skpdreklame f', 'f.idwp=a.id', 'left')
-            ->where($where)
-            ->where('a.notype', 'No. SKP')
-            ->order_by($sort, $dir)
-            ->get('mst_wajibpajak a', $limit, $start);
-
-        return $result;
-    }
-
-    public function selectBySKPD1($query) {
-        $sql = "SELECT * FROM ($query) AS union_result";
-        $result = $this->db->query($sql);
-        return $result->result_array();
-    }
 }
