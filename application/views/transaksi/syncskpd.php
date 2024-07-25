@@ -6,6 +6,7 @@ if ($this->session->flashdata('message')) :
     $this->session->flashdata('message') . '
 					</div>';
 endif;
+$escaped_link = 'transaksi/Apbd/getDinas';
 $theme['main'][] = implode($sidebar);
 $datatables = '<script type="text/javascript">
 $(document).ready(function(){  
@@ -53,15 +54,12 @@ $theme['main'][] =
                           <table class="table table-bordered" style="width:100% !important;" id="syncTable">
                               <thead>                                 
                                 <tr>
-                                    <th><input type="checkbox" id="select-all"></th>
-                                    <th>NO.PELAPORAN</th>
+                                    <th>NPWPD</th>
                                     <th>WAJIB PAJAK</th>
                                     <th>ALAMAT</th>
-                                    <th>NO.KOHIR</th>
                                     <th>KELURAHAN</th>
                                     <th>KECAMATAN</th>
                                     <th>NO.SKPD</th>
-                                    <th>NPWPD</th>
                                     <th>MASA PAJAK</th>
                                     <th>TGL.JTH.TMP</th>
                                     <th>THN</th>
@@ -70,7 +68,6 @@ $theme['main'][] =
                                     <th>TOTAL</th>
                                     <th>TGL.TERBIT</th>
                                     <th>KETERANGAN</th>
-           
                                 </tr>
                               </thead>
                               <tbody>     
@@ -85,38 +82,5 @@ $theme['main'][] =
               </div>
             </div> 
 		</section>
-      </div>
-      <!-- Modal untuk Edit Data -->
-        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit Data</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editForm">
-                           
-                            <div class="form-group">
-                                <label for="editNokohir">Nokohir</label>
-                                <input type="text" class="form-control" id="editNokohir">
-                            </div>
-                            <div class="form-group">
-                                <label for="editPaymentCode">Payment Code</label>
-                                <input type="text" class="form-control" id="editPaymentCode" disabled>
-                            </div>
-                            <input type="hidden" id="editRowId">
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="saveChanges">Save changes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-      ' . implode('', $modalEdit) . implode('', $modalDelete);
+      </div>' . implode('', $modalEdit) . implode('', $modalDelete);
 echo preg_replace('/\r|\n|\t/', '', implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));

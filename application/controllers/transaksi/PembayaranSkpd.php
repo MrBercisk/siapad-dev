@@ -23,7 +23,7 @@ class PembayaranSkpd extends CI_Controller
                 'modalEdit'   => $this->Form->modalKu('E', 'Edit', 'transaksi/PembayaranSkpd/aksi', ['edit']),
                 'modalDelete' => $this->Form->modalKu('D', 'Delete', 'transaksi/PembayaranSkpd/aksi', ['delete']),
                 'sidebar'     => $template['sidebar'],
-                'jstable'     => $Jssetup->jsDatatable('#SKPD', 'transaksi/PembayaranSkpd/get_datatable_data'),
+                'jstable'     => $Jssetup->jsDatatable('#skpdTable', 'transaksi/PembayaranSkpd/getSkpd'),
                 'jsedit'      => $Jssetup->jsModal('#edit', 'Edit', 'transaksi/PembayaranSkpd/myModal', '#modalkuE'),
                 'jsdelete'    => $Jssetup->jsModal('#delete', 'Delete', 'transaksi/PembayaranSkpd/myModal', '#modalkuD'),
                 // 'formTambah'  => implode('', $this->MApbd->formModal())
@@ -458,12 +458,12 @@ class PembayaranSkpd extends CI_Controller
 
     	
     public function get_record_data() {
-        $opsireklame = $this->input->post('id');
-        if ($opsireklame) {
+        $idrecord = $this->input->post('id');
+        if ($idrecord) {
             $this->db->select('trx_stsmaster.iddinas,trx_stsmaster.nomor, trx_stsmaster.tanggal, trx_stsmaster.keterangan,trx_stsmaster.isnonkas,trx_stsmaster.tmpbayar, mst_dinas.isdispenda');
             $this->db->from('trx_stsmaster');
             $this->db->join('mst_dinas', 'trx_stsmaster.iddinas = mst_dinas.id', 'left');
-            $this->db->where('trx_stsmaster.id', $opsireklame);
+            $this->db->where('trx_stsmaster.id', $idrecord);
             $record = $this->db->get()->row();
 
             if ($record) {
@@ -485,45 +485,41 @@ class PembayaranSkpd extends CI_Controller
         }
     }   
     public function get_datatable_data() {
-        $opsireklame = $this->input->get('id');
+        $idrecord = $this->input->get('id');
 
         $datatables = $this->Datatables;
-        $datatables->setTable("trx_stsdetail");
+        $datatables->setTable("trx_stsdetail a");
         $datatables->setSelectColumn([
-            'trx_stsdetail.idstsmaster',
-            'trx_stsdetail.idwp',
-            'trx_stsdetail.nourut',
-            'trx_stsdetail.nobukti',
-            'trx_stsdetail.tglpajak',
-            'trx_stsdetail.idskpd',
-            'trx_stsdetail.iduptd',
-            'trx_stsdetail.blnpajak AS bln',
-            'trx_stsdetail.thnpajak AS thn',
-            'trx_stsdetail.prs_denda AS persen',
-            'trx_stsdetail.nil_denda AS bunga',
-            'trx_stsdetail.jumlah',
-            'trx_stsdetail.total',
-            'trx_stsdetail.keterangan',
-            'trx_rapbd.id as rapbdid',
-            'trx_rapbd.idrekening',
-            'mst_wajibpajak.id',
-            'mst_wajibpajak.nomor as noskpd',
-            "CONCAT(mst_wajibpajak.nama, ' - ', mst_wajibpajak.nomor) AS nmwp",
-            'mst_uptd.id as uptdid',
-            'mst_uptd.singkat as nmuptd',
-            'mst_rekening.id as idrek',
-            'mst_rekening.nmrekening as nmrek',
-            'trx_stsmaster.iddinas'
+            'a.idstsmaster',
+            'a.nourut',
+            'a.nobukti',
+            'a.idskpd',
+            'a.idwp',
+            'a.iduptd',
+            'a.blnpajak AS bln',
+            'a.thnpajak AS thn',
+            'a.prs_denda AS persen',
+            'a.jumlah',
+            'a.total',
+            'a.keterangan',
+            'e.nomor AS noskpd',
+            "CONCAT(e.nama, ' - ', e.nomor) AS nmwp",
+            'c.id',
+            'c.nmrekening AS nmrek',
+            'f.singkat AS nmuptd',
+            '(a.nil_denda) AS bunga',  
+            'g.iddinas',  
         ]);
-        $datatables->addJoin('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'left');
-        $datatables->addJoin('mst_wajibpajak', 'mst_wajibpajak.id = trx_stsdetail.idwp', 'left');
-        $datatables->addJoin('trx_skpdreklame', 'trx_skpdreklame.id = trx_stsdetail.idskpd', 'left');
-        $datatables->addJoin('mst_uptd', 'mst_uptd.id = trx_stsdetail.iduptd', 'left');
-        $datatables->addJoin('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
-        $datatables->addJoin('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
-        $datatables->addWhere('trx_stsdetail.idstsmaster', $opsireklame);
-       /*  $datatables->addWhere('mst_rekening.jenis', 'REK'); */
-        $datatables->setOrder('trx_stsdetail.nourut', 'asc');
+      
+        $datatables->addJoin('trx_rapbd b', 'b.id=a.idrapbd', 'left');
+        $datatables->addJoin('mst_rekening c', 'c.id=b.idrekening', 'left');
+        $datatables->addJoin('trx_skpdreklame d', 'd.id=a.idskpd', 'left');
+        $datatables->addJoin('mst_wajibpajak e', 'e.id=d.idwp', 'left');
+        $datatables->addJoin('mst_uptd f', 'f.id=a.iduptd', 'left');
+        $datatables->addJoin('trx_stsmaster g', 'g.id=a.idstsmaster', 'left');
+        $datatables->addWhere('a.idstsmaster', $idrecord);
+        $datatables->addWhere('c.jenis', 'REK');
+        $datatables->setOrder('a.nourut', 'asc');
         $fetch_data = $datatables->make_datatables();
         
         $data = array();
@@ -551,7 +547,7 @@ class PembayaranSkpd extends CI_Controller
             $data[] = $sub_array;
         }
         
-        $hidden_inputs = '<input type="hidden" name="idstsmaster" id="idstsmaster" value="'.$opsireklame.'">';
+        $hidden_inputs = '<input type="hidden" name="idstsmaster" id="idstsmaster" value="'.$idrecord.'">';
         if (!empty($fetch_data)) {
             $hidden_inputs .= '<input type="hidden" name="iddinas" id="iddinas" value="'.$fetch_data[0]->iddinas.'">';
         }
@@ -563,23 +559,5 @@ class PembayaranSkpd extends CI_Controller
         );
 
         echo json_encode($output);
-    }
-    public function get_namarekening_by_iddinas() {
-        $iddinas = $this->input->post('iddinas');
-    
-        $apbdData = $this->db
-            ->select('trx_rapbd.id, trx_rapbd.idrekening, trx_rapbd.iddinas, mst_rekening.idheader, mst_rekening.kdrekview, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
-            ->from('trx_rapbd')
-            ->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left')
-            ->where('trx_rapbd.iddinas', $iddinas)
-            ->get()
-            ->result();
-        
-        $options = '<option disabled selected></option>';
-        foreach ($apbdData as $apbd) {
-            $options .= '<option value="'.$apbd->id.'">'.$apbd->nmrekening.'('.$apbd->kdrekview.')</option>'; 
-        }
-        
-        echo $options;
     }
 }

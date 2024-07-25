@@ -127,11 +127,6 @@ class SkpdReklame extends CI_Controller
         $blnpajak =  $this->input->post('blnpajak');
         $thnpajak = $this->input->post('thnpajak');
     
-       /*  $cek = $this->MSkpd->getSkpdData($thnpajak, $blnpajak);
-        echo "<pre>";
-        var_dump($cek);
-        echo "</pre>";
-        die(); */
         $data = [
             'footer' => $template['footer'],
             'title' => $setpage->title,
@@ -155,7 +150,7 @@ class SkpdReklame extends CI_Controller
             $data['tanda_tangan_2'] = $tanda_tangan_data_2;
         }
  
-        /* $this->load->view('transaksi/printskpd', $data); */
+       /*  $this->load->view('transaksi/printskpd', $data); */
         ob_start();
         $html = $this->load->view('transaksi/printskpd', $data, true);
         ob_get_clean();

@@ -26,7 +26,7 @@ class PendDaerah extends CI_Controller {
 	 	$data['jsadd']	    = $Jssetup->jsModal('#add','Add','transaksi/PendDaerah/myModal','#modalkuA');
 		$this->load->view('transaksi/pnddaerah',$data);
 	}
-   /*  function selectByIdSKPD($id = 0)
+    function selectByIdSKPD($id = 0)
     {
         $result = $this->db
             ->where('id', $id)
@@ -77,7 +77,7 @@ class PendDaerah extends CI_Controller {
 
 
         return $data;
-    } */
+    }
 	
     public function get_datatable_data() {
         $idrecord = $this->input->get('id');
