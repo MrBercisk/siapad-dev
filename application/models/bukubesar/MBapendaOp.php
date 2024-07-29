@@ -89,19 +89,7 @@ class MBapendaOp extends CI_Model {
         foreach ($ttddata as $ttd) {
             $opsittd .= '<option value="'.$ttd->id.'">'.$ttd->nama.'</option>';
         }
-        $rekData = $this->db
-        ->select('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening')
-        ->from('mst_rekening')
-        ->join('mst_wajibpajak', 'mst_wajibpajak.idrekening = mst_rekening.id')
-        ->join('trx_rapbd_wp', 'trx_rapbd_wp.idwp = mst_wajibpajak.id')
-        ->group_by('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening')
-        ->get()
-        ->result();
-
-    $opsiRek = '<option></option>';
-    foreach ($rekData as $rek) {
-        $opsiRek .= '<option value="'.$rek->kdrekening.'">'.$rek->kdrekening.' - '.$rek->nmrekening.'</option>';
-    }
+        $opsiRek = $this->iniopsirekening();
         $form[] = '
         
         <div class="card">
@@ -172,5 +160,29 @@ class MBapendaOp extends CI_Model {
         </div>';
         return $form;
     }
+    public function iniopsirekening() {
+        $rekeningCumaIni = array(
+            '4.1.1.01' => 'Pajak Hotel',
+            '4.1.1.02' => 'Pajak Restoran',
+            '4.1.1.03' => 'Pajak Hiburan',
+            '4.1.1.07' => 'Pajak Parkir',
+            '4.1.1.08' => 'Pajak Air Tanah',
+            '4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam'
+        );
 
+        $rekData = $this->db
+            ->select('mst_rekening.id, mst_rekening.kdrekening')
+            ->from('mst_rekening')
+            ->where_in('kdrekening', array_keys($rekeningCumaIni))
+            ->get()
+            ->result();
+    
+        $opsiRek = '<option></option>';
+        foreach ($rekData as $rek) {
+            $namaRek = isset($rekeningCumaIni[$rek->kdrekening]) ? $rekeningCumaIni[$rek->kdrekening] : $rek->kdrekening;
+            $opsiRek .= '<option value="'.$rek->kdrekening.'">'.$rek->kdrekening.' - '.$namaRek.'</option>';
+        }
+    
+        return $opsiRek;
+    }
 }

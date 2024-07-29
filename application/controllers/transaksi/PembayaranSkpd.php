@@ -97,6 +97,18 @@ class PembayaranSkpd extends CI_Controller
             echo json_encode(['success' => false, 'message' => 'Data not found']);
         }
     }
+    /* public function get_options_skpd() {
+        $skpdini = $this->Mbyrskpd->get_all_skpd();
+
+        $pilihan = '<option value="">Pilih SKPD</option>'; 
+
+        foreach ($skpdini as $skpd) {
+            $pilihan .= '<option value="' . $skpd->id . '">' . htmlspecialchars($skpd->nama) . '</option>'; 
+        }
+
+        echo json_encode(['html' => $pilihan]);
+    } */
+
     public function get_all_skpd() {
         $data = $this->Mbyrskpd->get_all_skpd();
         echo json_encode(array('data' => $data));
@@ -553,6 +565,7 @@ class PembayaranSkpd extends CI_Controller
             'mst_uptd.singkat as nmuptd',
             'mst_rekening.id as idrek',
             'mst_rekening.nmrekening as nmrek',
+            'mst_rekening.kdrekview',
             'trx_stsmaster.id as idmaster',
             'trx_stsmaster.iddinas',
             'trx_stsmaster.nomor'
@@ -564,6 +577,7 @@ class PembayaranSkpd extends CI_Controller
         $datatables->addJoin('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
         $datatables->addJoin('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
         $datatables->addWhere('trx_stsdetail.idstsmaster', $opsireklame);
+        $datatables->addWhere('mst_rekening.kdrekview','4.1.01.09.01.01');
        /*  $datatables->addWhere('trx_stsmaster.nomor', '20240226/rek.trf'); */
     
         $datatables->setOrder('trx_stsdetail.nourut', 'asc');
@@ -710,6 +724,7 @@ class PembayaranSkpd extends CI_Controller
             'idwp' => $this->input->post('idwp'),
             'iduptd' => $this->input->post('iduptd'),
             'idrapbd' => $this->input->post('idrapbd'),
+            'idskpd' => $this->input->post('idskpd'),
             'nobukti' => $nobukti,
             'nourut' => $next_nourut,
             'blnpajak' => $this->input->post('blnpajak'),

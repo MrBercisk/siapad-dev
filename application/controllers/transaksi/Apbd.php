@@ -29,7 +29,7 @@ class Apbd extends CI_Controller
                 'jsdelete'    => $Jssetup->jsModal('#delete', 'Delete', 'transaksi/Apbd/myModal', '#modalkuD'),
                 'forminsert'  => implode('', $this->MApbd->formInsert()),
                 'formCari'  => implode('', $this->MApbd->formCari()),
-                'filters'  => implode('', $this->MApbd->filterCari()),
+               /*  'filters'  => implode('', $this->MApbd->filterCari()), */
                 // 'formTambah'  => implode('', $this->MApbd->formModal())
             ];
 

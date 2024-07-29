@@ -1,11 +1,63 @@
 
 $(document).ready(function() {
-    
     $('#idrecord').select2({
+        ajax: {
+            url: 'PembayaranSkpd/get_record_option',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term,
+                    limit: 10,
+                    offset: params.page ? (params.page - 1) * 10 : 0
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            id: item.id,
+                            iddinas: item.iddinas,
+                            text: item.nomor + ' (' + item.tanggal +')',
+                            nomor: item.nomor,
+                            tanggal: item.tanggal,
+                            keterangan: item.keterangan,
+                            isnonkas: item.isnonkas,
+                            isdispenda: item.isdispenda,
+                            nama: item.nama
+                        };
+                    }),
+                    pagination: {
+                        more: data.length === 10
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Pilih Record',
+        templateResult: formatRecord,
+        templateSelection: formatRecordSelection
+    });
+    
+    function formatRecord(record) {
+        if (record.loading) {
+            return record.text; 
+        }
+        var $container = $('<div>' + record.nomor + ' ('+ record.tanggal + ')'+ '</div>');
+        return $container;
+    }
+    
+    function formatRecordSelection(record) {
+        return record.text || record.nomor + ' ('+ record.tanggal + ')' ;
+    }
+  
+ 
+   /*  $('#idrecord').select2({
         placeholder: $('#idrecord').data('placeholder'),
         minimumInputLength: 3,
     });
-    
+     */
     $('#idwp').select2({
             placeholder: $('#idwp').data('placeholder'),
             minimumInputLength: 5, 
@@ -165,6 +217,99 @@ $(document).ready(function() {
             });
         }
     });
+   /*  $('#nosptpd2').off('keypress').on('keypress', function(event) {
+        if (event.which === 13) {
+            event.preventDefault();
+            var kodebayar = $('#nosptpd2').val();
+            var nobukti = $('#NoSSPD2').val();
+            var tgl_input = $('#TGLKirim2').val();
+            var jumlah = $('#jumlahbayar2').val();
+            var nil_denda = $('#denda2').val();
+            var total = $('#totalbayar2').val();
+            var blnpajak = $('#blnpajak2').val();
+            var thnpajak = $('#thnpajak2').val();
+            var idwp = $('#idwp').val();
+            var nama = $('#namaop2').val();
+            var alamat = $('#alamatop2').val();
+            var npwpd = $('#npwpd2').val();
+            var nopelaporan = $('#nopelaporan2').val();
+            var nmrekening = $('#jenisop2').val();
+    
+            $.ajax({
+                url: 'PendDaerah/get_data_from_stsdetail',
+                type: 'GET',
+                data: {
+                    kodebayar: kodebayar,
+                    nopelaporan: nopelaporan,
+                    blnpajak: blnpajak,
+                    thnpajak: thnpajak,
+                    nobukti: nobukti,
+                    jumlah: jumlah,
+                    tgl_input: tgl_input,
+                    nil_denda: nil_denda,
+                    total: total,
+                    idwp: idwp,
+                    nama: nama,
+                    alamat: alamat,
+                    npwpd: npwpd,
+                    nmrekening: nmrekening,
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        var record = response[0];
+    
+                        $('#nosptpd2').val(record.kodebayar);
+                        $('#NoSSPD2').val(record.nobukti);
+                        $('#TGLKirim2').val(record.tgl_input);
+                        $('#jumlahbayar2').val(record.jumlah);
+                        $('#denda2').val(record.nil_denda);
+                        $('#totalbayar2').val(record.total);
+                        $('#blnpajak2').val(record.blnpajak);
+                        $('#thnpajak2').val(record.thnpajak);
+                        $('#namaop2').val(record.nama); 
+                        $('#alamatop2').val(record.alamat); 
+                        $('#jenisop2').val(record.nmrekening); 
+                        $('#npwpd2').val(record.npwpd); 
+                        $('#nopelaporan2').val(record.nopelaporan);
+    
+                        $('#idwp').val(record.idwp);
+                        $('#idrapbd').val(record.idrapbd);
+                        $('#iduptd').val(record.iduptd);
+
+                        $('#statusbayar2').val(1);
+                        
+                        Swal.fire({
+                            title: 'Success',
+                            text: 'Koneksi Berhasil, Data Wajib Pajak Pada Server SIAPAD Ditemukan',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+    
+                        $('#submitDataButton').removeClass('d-none');
+                    } else {
+                        clearFormFields2();
+                        Swal.fire({
+                            title: 'Warning',
+                            text: 'Data SIMPADA tidak ditemukan',
+                            icon: 'warning',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Terjadi kesalahan saat menghubungi server.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+    }); */
+    
     function clearFormFields() {
         $('#nosptpd').val('');
         $('#NoSSPD').val('');
@@ -329,9 +474,6 @@ $(document).ready(function() {
                 console.log('idstsmasternya dan iddinas yang diambil:', json.extra_data);
                 return json.data;
             },
-            "data": function() {
-                return {};
-            }
         },
         "searching": false,
         "ordering": false,
@@ -413,8 +555,8 @@ $(document).ready(function() {
     
                         $('#add-data').show();
                         $('#hapus_data').show();
-                       /*  $('#cari_data').show(); */
-                        $('#cari_data_table').show();
+                        $('#cari_data').show();
+                       /*  $('#cari_data_table').show(); */
     
                         table.ajax.url('PendDaerah/get_datatable_data?id=' + recordId + '&iddinas=' + iddinasId).load();
                         
@@ -824,99 +966,7 @@ $(document).ready(function() {
     });
 
  
-    $('#nosptpd2').off('keypress').on('keypress', function(event) {
-        if (event.which === 13) {
-            event.preventDefault();
-            var kodebayar = $('#nosptpd2').val();
-            var nobukti = $('#NoSSPD2').val();
-            var tgl_input = $('#TGLKirim2').val();
-            var jumlah = $('#jumlahbayar2').val();
-            var nil_denda = $('#denda2').val();
-            var total = $('#totalbayar2').val();
-            var blnpajak = $('#blnpajak2').val();
-            var thnpajak = $('#thnpajak2').val();
-            var idwp = $('#idwp').val();
-            var nama = $('#namaop2').val();
-            var alamat = $('#alamatop2').val();
-            var npwpd = $('#npwpd2').val();
-            var nopelaporan = $('#nopelaporan2').val();
-            var nmrekening = $('#jenisop2').val();
-    
-            $.ajax({
-                url: 'PendDaerah/get_data_from_stsdetail',
-                type: 'GET',
-                data: {
-                    kodebayar: kodebayar,
-                    nopelaporan: nopelaporan,
-                    blnpajak: blnpajak,
-                    thnpajak: thnpajak,
-                    nobukti: nobukti,
-                    jumlah: jumlah,
-                    tgl_input: tgl_input,
-                    nil_denda: nil_denda,
-                    total: total,
-                    idwp: idwp,
-                    nama: nama,
-                    alamat: alamat,
-                    npwpd: npwpd,
-                    nmrekening: nmrekening,
-                },
-                dataType: 'json',
-                success: function(response) {
-                    if (response && response.length > 0) {
-                        var record = response[0];
-    
-                        $('#nosptpd2').val(record.kodebayar);
-                        $('#NoSSPD2').val(record.nobukti);
-                        $('#TGLKirim2').val(record.tgl_input);
-                        $('#jumlahbayar2').val(record.jumlah);
-                        $('#denda2').val(record.nil_denda);
-                        $('#totalbayar2').val(record.total);
-                        $('#blnpajak2').val(record.blnpajak);
-                        $('#thnpajak2').val(record.thnpajak);
-                        $('#namaop2').val(record.nama); 
-                        $('#alamatop2').val(record.alamat); 
-                        $('#jenisop2').val(record.nmrekening); 
-                        $('#npwpd2').val(record.npwpd); 
-                        $('#nopelaporan2').val(record.nopelaporan);
-    
-                        $('#idwp').val(record.idwp);
-                        $('#idrapbd').val(record.idrapbd);
-                        $('#iduptd').val(record.iduptd);
-
-                        $('#statusbayar2').val(1);
-                        
-                        Swal.fire({
-                            title: 'Success',
-                            text: 'Koneksi Berhasil, Data Wajib Pajak Pada Server SIAPAD Ditemukan',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-    
-                        $('#submitDataButton').removeClass('d-none');
-                    } else {
-                        clearFormFields2();
-                        Swal.fire({
-                            title: 'Warning',
-                            text: 'Data SIMPADA tidak ditemukan',
-                            icon: 'warning',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Terjadi kesalahan saat menghubungi server.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-    });
-    
+   
 
     function clearFormFields2() {
         $('#nosptpd2').val();
@@ -935,13 +985,15 @@ $(document).ready(function() {
 
     $('#table-buttons').on('click', '#add-data', function() {
         var idstsmaster = $('#idstsmaster').val();
-        var iddinas = $('#iddinas').val(); 
+        var iddinas = $('#iddinas').val();
+        var nomornya = $('#nomor').val();
     
-        if (idstsmaster && iddinas) {
-            console.log('Tambah data dengan idstsmaster:', idstsmaster, 'dan iddinas:', iddinas);
+        if (idstsmaster && iddinas  && nomornya) {
+            console.log('Tambah data dengan idstsmaster:', idstsmaster, 'dan iddinas:', iddinas,'dan nomornya:', nomornya);
             
             $('#addModal #idstsmaster').val(idstsmaster);
             $('#addModal #iddinas').val(iddinas); 
+            $('#addModal #nobukti').val(nomornya); 
     
             $.ajax({
                 url: 'PendDaerah/get_namarekening_by_iddinas',

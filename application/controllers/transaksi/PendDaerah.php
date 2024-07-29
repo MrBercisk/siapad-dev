@@ -256,6 +256,32 @@ class PendDaerah extends CI_Controller {
             }
             echo implode($form);
         }
+        public function get_record_option()
+            {
+                $limit = $this->input->get('limit') ?: 10;
+                $offset = $this->input->get('offset') ?: 0;
+                $search = $this->input->get('search') ?: '';
+                
+                $this->db->select('trx_stsmaster.id, trx_stsmaster.iddinas, trx_stsmaster.nomor, trx_stsmaster.tanggal, trx_stsmaster.keterangan, trx_stsmaster.isnonkas, trx_stsmaster.tmpbayar, mst_dinas.isdispenda, mst_dinas.nama');
+                $this->db->from('trx_stsmaster');
+                $this->db->join('mst_dinas', 'trx_stsmaster.iddinas = mst_dinas.id', 'inner');
+                $this->db->where('mst_dinas.isdispenda', 1);
+                $this->db->order_by('trx_stsmaster.nomor', 'ASC');
+                
+                if (!empty($search)) {
+                    $this->db->group_start();
+                    $this->db->like('mst_dinas.nama', $search);
+                    $this->db->or_like('trx_stsmaster.nomor', $search);
+                    $this->db->group_end();
+                }
+                
+                $this->db->limit($limit, $offset);
+                $wpdata = $this->db->get()->result();
+                
+                echo json_encode($wpdata);
+            }
+            
+   
     
         public function getRecordData()
         {
@@ -365,81 +391,50 @@ class PendDaerah extends CI_Controller {
         }
 
         /* End record function */
- public function update_data() 
-    {
-        $this->load->model('Mbyrskpd'); 
-        $idstsmaster = $this->input->post('idstsmaster');
-        $nourut = $this->input->post('nourut');
-        
-        $jumlah = (float) $this->input->post('jumlah');
-        $prs_denda = (float) $this->input->post('prs_denda');
-        
-        if (!is_numeric($jumlah) || !is_numeric($prs_denda)) {
-            $respon = ['success' => false, 'message' => 'harus angka.'];
-            echo json_encode($respon);
-            return;
-        }
-
-        $nil_denda = ($jumlah * $prs_denda) / 100;
-        $total = $jumlah + $nil_denda;
-        
-        $data = [
-            'idwp' => $this->input->post('idwp'),
-            'iduptd' => $this->input->post('iduptd'),
-            'idrapbd' => $this->input->post('idrapbd'),
-            'idskpd' => $this->input->post('idskpd'),
-            'nobukti' => $this->input->post('nobukti'),
-            'nourut' => $nourut,
-            'blnpajak' =>  $this->input->post('blnpajak'),
-            'thnpajak' => $this->input->post('thnpajak'),
-            'jumlah' => $jumlah,
-            'prs_denda' => $prs_denda,
-            'nil_denda' => $nil_denda,
-            'total' => $total,
-            'keterangan' => $this->input->post('keterangan'),
-        ];
-        
-        $update = $this->Mbyrskpd->updatedata($idstsmaster, $nourut, $data);
-        
-        if ($update) {
-            $response = ['success' => true, 'message' => 'Berhasil update Data.'];
-        } else {
-            $response = ['success' => false, 'message' => 'Gagal update Data'];
-        }
-        
-        echo json_encode($response);
-    }
-    
+ 
         
         /* Action datatable Record fynction */
         public function add_data() {
             $idstsmaster = $this->input->post('idstsmaster');
             $jumlah = $this->input->post('jumlah');
             $prs_denda = $this->input->post('prs_denda');
-            
+               
+            if (!is_numeric($jumlah) || !is_numeric($prs_denda)) {
+                $respon = ['success' => false, 'message' => 'harus angka.'];
+                echo json_encode($respon);
+                return;
+            }
+        
             /* Hitung denda rp */
             $nil_denda = ($jumlah * $prs_denda) / 100;
             
             /* Hitung total */
             $total = $jumlah + $nil_denda;
-            
+
+            $nomor_data = $this->Mpend->ambilnomornyaMaster($idstsmaster);
+            if ($nomor_data) {
+                $nomor = $nomor_data->nomor;
+            } else {
+                $nomor = NULL; 
+            }
             
            /* Ambil nourut terakhir */
-           $last_nourut = $this->Mpend->get_last_nourut($idstsmaster);
+           $last_nourut = $this->Mpend->ambilnourut($idstsmaster);
            if (!$last_nourut) {
                $last_nourut = '0000';
            }
        
            // Tambahkan 1 ke nourut terakhir
            $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
-            
+           $nobukti = $next_nourut . '/' . $nomor;
+
             $data = [
                 'idstsmaster' => $idstsmaster,
                 'idwp' => $this->input->post('idwp'),
                 'iduptd' => $this->input->post('iduptd'),
                 'idrapbd' => $this->input->post('idrapbd'),
                 'tglpajak' => $this->input->post('tglpajak'),
-                'nobukti' => $this->input->post('nobukti'),
+                'nobukti' => $nobukti,
                 'nourut' => $next_nourut,
                 'blnpajak' => $this->input->post('blnpajak'),
                 'thnpajak' => $this->input->post('thnpajak'),
@@ -477,7 +472,7 @@ class PendDaerah extends CI_Controller {
                 return;
             }
         
-            $last_nourut = $this->Mpend->get_last_nourut($idstsmaster);
+            $last_nourut = $this->Mpend->ambilnourut($idstsmaster);
             if (!$last_nourut) {
                 $last_nourut = '0000';
             }

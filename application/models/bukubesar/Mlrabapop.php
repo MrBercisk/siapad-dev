@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class MKasRekening extends CI_Model {
+class Mlrabapop extends CI_Model {
     /* public function getRptBBPPKDinas($iddinas, $tahun, $bulan) {
         $query = $this->db->query("CALL spRptBBPPKDinas(?, ?, ?)", array($iddinas, $tahun, $bulan));
         return $query->result_array();
@@ -128,8 +128,8 @@ class MKasRekening extends CI_Model {
 
         $opsiRek = $this->iniopsirekening();
 
+       /*  $opsiwp = '<option value="">Pilih Wajib Pajak</option>'; */
         $form[] = '
-        
         <div class="card">
             <div class="card-body">
                 <form action="' . site_url('bukubesar/KasRekening/cetak') . '" class="form-row" method="post">
@@ -144,27 +144,7 @@ class MKasRekening extends CI_Model {
                             <input type="number" class="form-control" id="tahun" name="tahun" min="1900" max="9999" value="2024" required>
                         </div>
                     </div>
-                   <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="bulan">Bulan:</label>
-                            <select class="form-control select2" id="bulan" name="bulan" required>
-                                <option value="" disabled selected>Pilih Bulan</option>
-                                <option value="">Semua</option>
-                                <option value="01">Januari</option>
-                                <option value="02">Februari</option>
-                                <option value="03">Maret</option>
-                                <option value="04">April</option>
-                                <option value="05">Mei</option>
-                                <option value="06">Juni</option>
-                                <option value="07">Juli</option>
-                                <option value="08">Agustus</option>
-                                <option value="09">September</option>
-                                <option value="10">Oktober</option>
-                                <option value="11">November</option>
-                                <option value="12">Desember</option>
-                            </select>
-                        </div>
-                    </div>
+                  
 
                     <script>
                         document.getElementById("tahun").value = new Date().getFullYear();
@@ -188,12 +168,20 @@ class MKasRekening extends CI_Model {
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="dinas">Rekening:</label>
-                              <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
+                              <select id="rekbuku" name="idrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
                                       '.$opsiRek.'
                               </select>
                         </div>
                     </div>
-    
+                     <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="wajib_pajak">Wajib Pajak:</label>
+                            <select id="wajib_pajak" name="idwp" class="form-control select2" data-placeholder="Pilih Wajib Pajak" style="width: 100%;">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+
                     </div>
                 </div>
 
@@ -215,7 +203,9 @@ class MKasRekening extends CI_Model {
                     </div>
                 </form>
             </div>
-        </div>';
+        </div>
+        
+        ';
         return $form;
     }
     public function iniopsirekening() {
@@ -238,10 +228,17 @@ class MKasRekening extends CI_Model {
         $opsiRek = '<option></option>';
         foreach ($rekData as $rek) {
             $namaRek = isset($rekeningCumaIni[$rek->kdrekening]) ? $rekeningCumaIni[$rek->kdrekening] : $rek->kdrekening;
-            $opsiRek .= '<option value="'.$rek->kdrekening.'">'.$rek->kdrekening.' - '.$namaRek.'</option>';
+            $opsiRek .= '<option value="'.$rek->id.'">'.$rek->kdrekening.' - '.$namaRek.'</option>';
         }
     
         return $opsiRek;
     }
     
+    public function get_wajib_pajak($idrekening) {
+        $this->db->select('id, npwpd, nomor');
+        $this->db->from('mst_wajibpajak');
+        $this->db->where('idrekening', $idrekening);
+        $query = $this->db->get();
+        return $query->result();
+    }
 }

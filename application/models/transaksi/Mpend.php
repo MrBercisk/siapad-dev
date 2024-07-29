@@ -52,7 +52,7 @@ class Mpend extends CI_Model
           return null;
         }
       }
-      public function get_last_nourut($idstsmaster) {
+      public function ambilnourut($idstsmaster) {
 
         $this->db->select('nourut');
         $this->db->from('trx_stsdetail');
@@ -77,7 +77,14 @@ class Mpend extends CI_Model
         echo json_encode(['success' => true, 'message' => 'All Data has been deleted successfully']);
        
     }
-
+    public function ambilnomornyaMaster($idstsmaster) {
+        $this->db->select('nomor');
+        $this->db->from('trx_stsmaster');
+        $this->db->where('id', $idstsmaster);
+        $query = $this->db->get();
+    
+        return $query->row();
+    }
 
     public function delete_record($idstsmaster, $nourut) {
         $this->db->where('idstsmaster', $idstsmaster);

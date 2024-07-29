@@ -120,7 +120,7 @@ class MSkpd extends CI_Model {
 					<div class="col-md-3">
 						<div class="form-group">
 							<label for="nomor">Nomor:</label>
-							<input type="text" id="nomor" class="form-control nomor" name="nomor" readonly>
+							<input type="text" id="nomor" class="form-control nomor" name="nomor">
 						</div>
 				   </div>
 				    <div class="col-md-3">

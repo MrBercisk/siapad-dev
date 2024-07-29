@@ -55,9 +55,10 @@ class SkpdReklame extends CI_Controller
             "trx_skpdreklame.isbayar",
             "trx_skpdreklame.tglbayar",
             "trx_skpdreklame.keterangan",
+            "trx_skpdreklame.nomor as noskpd",
             "mst_wajibpajak.id",
             "mst_wajibpajak.nama as wajibpajak",
-            "mst_wajibpajak.nomor as noskpd",
+       /*      "mst_wajibpajak.nomor as noskpd", */
             "mst_wajibpajak.tgljthtmp",
             "mst_wajibpajak.tglskp",
         ]);
@@ -174,7 +175,7 @@ class SkpdReklame extends CI_Controller
         $offset = $this->input->get('offset') ?: 0;
         $search = $this->input->get('search') ?: '';
 
-        $this->db->select('id, nama, nomor, tgljthtmp, tglskp');
+        $this->db->select('id, nama,  tgljthtmp, tglskp');
         $this->db->from('mst_wajibpajak');
         if (!empty($search)) {
             $this->db->like('nama', $search);
@@ -289,6 +290,7 @@ class SkpdReklame extends CI_Controller
                         </div>
                     </div>
                     <div class="col-md-12">' . implode($this->Form->inputText('teks', 'Teks', $idreklame->teks)) . '</div>
+                    <div class="col-md-4">' . implode($this->Form->inputText('nomor', 'Nomor', $idreklame->nomor)) . '</div>
                     <div class="col-md-4">' . implode($this->Form->inputNumber('blnpajak', 'Bulan Pajak', $idreklame->blnpajak)) . '</div>
                     <div class="col-md-4">' . implode($this->Form->inputNumber('thnpajak', 'Tahun Pajak', $idreklame->thnpajak)) . '</div>
                     <div class="col-md-4">' . implode($this->Form->inputNumber('jumlah', 'Jumlah', $idreklame->jumlah)) . '</div>
@@ -327,6 +329,7 @@ class SkpdReklame extends CI_Controller
                     'idwp'        => $this->input->post('idwp'),
                     'teks' => $this->input->post('teks'),
                     'tglbayar' => $tglbayar,
+                    'nomor' => $this->input->post('nomor'),
                     'blnpajak' => $this->input->post('blnpajak'),
                     'thnpajak' => $this->input->post('thnpajak'),
                     'jumlah' => $this->input->post('jumlah'),
@@ -350,6 +353,7 @@ class SkpdReklame extends CI_Controller
                 $data = [
                     'idwp'        => $this->input->post('idwp'),
                     'teks' => $this->input->post('teks'),
+                    'nomor' => $this->input->post('nomor'),
                     'blnpajak' => $this->input->post('blnpajak'),
                     'thnpajak' => $this->input->post('thnpajak'),
                     'jumlah' => $this->input->post('jumlah'),

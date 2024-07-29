@@ -500,7 +500,7 @@ $theme['main'][] =
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
                                      <select id="idrapbds" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
-                                     <option disabled selected></option>
+                                       <option disabled selected></option>
                                     </select>
                                   </div>
                                 </div>
@@ -698,7 +698,7 @@ $theme['main'][] =
           
             <!-- Modal Header -->
             <div class="modal-header">
-              <h4 class="modal-title">Cari SPTPD</h4>
+              <h4 class="modal-title">Cari SKPD</h4>
               <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             
@@ -710,7 +710,6 @@ $theme['main'][] =
                                   <input type="hidden" class="form-control" id="nourut" name="nourut">
                                   <input type="hidden" class="form-control" id="idrapbd" name="idrapbd">
                                   <input type="hidden" class="form-control" id="iduptd" name="iduptd">
-                                  <input type="hidden" class="form-control" id="idwp" name="idwp">
                                   <input type="hidden" class="form-control" id="nopelaporan2" name="nopelaporan">
 
                               <div class="col-md-12">

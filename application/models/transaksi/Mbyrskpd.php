@@ -51,6 +51,7 @@ class Mbyrskpd extends CI_Model {
           return null;
         }
       }
+ 
       public function get_all_skpd() {
         $this->db->select('idskpd, trx_stsdetail.idwp, mst_wajibpajak.nama, mst_wajibpajak.nomor');
         $this->db->from('trx_stsdetail');

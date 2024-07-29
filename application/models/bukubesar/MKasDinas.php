@@ -193,7 +193,7 @@ class MKasDinas extends CI_Model {
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="dinas">Dinas:</label>
-                              <select id="dinas" name="iddinas" class="form-control select2" data-placeholder="Pilih Dinas" style="width: 100%;">
+                              <select id="dinas" name="iddinas" class="form-control select2" data-placeholder="Pilih Dinas" style="width: 100%;" required>
                                       '.$opsiDinas.'
                               </select>
                         </div>

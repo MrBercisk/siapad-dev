@@ -142,7 +142,7 @@ $theme['main'][] =
                                         <div class="form-group">
                                             <label for="idrecord">Record</label>
                                             <select name="id" id="idrecord" class="form-control select2" data-placeholder="Pilih Record" style="width: 100%;">
-                                                '.$opsiRec.'
+                                            
                                             </select>
                                         </div>
                                     </div>

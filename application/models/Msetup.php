@@ -360,6 +360,20 @@ class Msetup extends CI_Model
         }
         return null;
     }
+	public function get_tanda_tangan_tanpa_checbox($tanda_tangan) {
+        if ($tanda_tangan) {
+            $ttddetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $tanda_tangan)
+                ->get()
+                ->row_array();
+            
+            return $ttddetail;
+        }
+        return null;
+    }
+
 	public function get_tanda_tangan_skpd_1($tanda_tangan_1) {
         if ($tanda_tangan_1) {
             $ttddetail = $this->db

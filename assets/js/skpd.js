@@ -648,6 +648,7 @@ $(document).ready(function() {
                     npwpd: npwpd,
                     kodebayar: kodebayar,
                     nopelaporan: nosptpd,
+                    nop:nop
                     /* idwp : namaop */
                 },
                 dataType: 'json',
@@ -909,13 +910,10 @@ $(document).ready(function() {
         columns: [
             { data: null, defaultContent: '', orderable: false, className: 'select-checkbox', width: '5%' },
             { 
-                data: 'nop', 
-                render: function(data, type, row) {
-                    return data ? data : ''; 
-                }
+                data: 'nop',
             },
             { data: 'NOSKPDN' },
-            { data: 'NamaObjekPajak' },
+            { data: 'Nama' },
             { data: 'ALamatObjek' },
             { 
                 data: 'nomor', 
@@ -998,12 +996,13 @@ $(document).ready(function() {
                     npwpd: inidataygdipilih.NPWPD,
                     kelurahan: inidataygdipilih.kelurahan,
                     paymentcode: paymentCode,
+                    nop:inidataygdipilih.nop,
                     nokohir: '' 
                 },
                 success: function(response) {
                     if (response.exists) {
                         Swal.fire({
-                            title: 'Data Pada Database Sudah Ada',
+                            title: 'Data Dengan NOP Tersebut Sudah Ada',
                             text: response.message,
                             icon: 'warning'
                         });
@@ -1042,6 +1041,7 @@ $(document).ready(function() {
                                         tgljatuhtempo: inidataygdipilih.TglJatuhTempo,
                                         npwpd: inidataygdipilih.NPWPD,
                                         kelurahan: inidataygdipilih.kelurahan,
+                                        nop: inidataygdipilih.nop,
                                         paymentcode: paymentCode,
                                         nokohir: nokohirnya 
                                     },
