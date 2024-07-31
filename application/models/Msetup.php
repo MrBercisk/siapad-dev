@@ -426,6 +426,18 @@ class Msetup extends CI_Model
 			return $rekdetail;
 		}
 	}
+	public function get_wp($idwp) {
+		if($idwp){
+
+			$rekdetail = $this->db
+				->select('id, nama')
+				->from('mst_wajibpajak')
+				->where('id', $idwp)
+				->get()
+				->row_array();
+			return $rekdetail;
+		}
+	}
 
 	public function get_dinas($iddinas) {
 		if($iddinas){

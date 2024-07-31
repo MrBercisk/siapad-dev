@@ -2,10 +2,10 @@
 use Dompdf\Dompdf;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
-class LraBapendaOp extends CI_Controller {
+class LraBapendaRek extends CI_Controller {
 	public function __construct() {
         parent::__construct();
-		$this->load->model('bukubesar/Mlrabapop');
+		$this->load->model('bukubesar/Mlrabaprek');
     }
 	public function index()
 	{	
@@ -18,10 +18,10 @@ class LraBapendaOp extends CI_Controller {
 			'sidebar' => $template['sidebar'],
 			'title' => $setpage->title,
 			'link' => $setpage->link,
-			'forminsert' =>  implode($this->Mlrabapop->formInsert())
+			'forminsert' =>  implode($this->Mlrabaprek->formInsert())
 	
 		];
-		$this->load->view('bukubesar/lrabapendaop',$data);
+		$this->load->view('bukubesar/lrabapendarek',$data);
 	}
 
 	public function cetak() {
@@ -38,17 +38,16 @@ class LraBapendaOp extends CI_Controller {
 	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
 
 	$tahun = $this->input->post('tahun');
-	$kdrekening = $this->input->post('kdrekening');	
-	$idwp = $this->input->post('idwp');	
+	$kdrekening = $this->input->post('kdrekening');
 
-	/* $tablenya = $this->Mlrabapop->ambildata($kdrekening, $tahun); */
+	$tablenya =  $this->Mlrabaprek->ambildata($kdrekening, $tahun);
 	/* echo '<pre>';
-	var_dump($kdrekening);
+	var_dump($tablenya);
 	echo '</pre>';
-	die();
- */
-	$totals = $this->Mlrabapop->get_apbd_apbdp_total($tahun, $idwp);
+	die(); */
 
+	/* $totals = $this->Mlrabapop->get_apbd_apbdp_total($tahun);
+ */
 	$data = [
 		'footer' => $template['footer'],
 		'title' => $setpage->title,
@@ -57,9 +56,7 @@ class LraBapendaOp extends CI_Controller {
 		'sidebar' => $template['sidebar'],
 		'ttd_checkbox' => $ttd_checkbox,
 		'format_tahun' => $tahun,
-		'tablenya' => $this->Mlrabapop->ambildatanya($tahun,$kdrekening,$idwp),
-		'total_apbd' => $totals->total_apbd,
-		'total_apbdp' => $totals->total_apbdp,
+		'tablenya' => $tablenya,
         'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
 
 	];
@@ -69,64 +66,45 @@ class LraBapendaOp extends CI_Controller {
 	if ($tanda_tangan_data) {
 		$data['tanda_tangan'] = $tanda_tangan_data;
 	}
-	$rek_data = $this->Msetup->get_rekening($kdrekening);
+    $rek_data = $this->Msetup->get_rekening($kdrekening);
 	if ($rek_data) {
 		$data['kdrekening'] = $rek_data;
 	}
-	$wp_data = $this->Msetup->get_wp($idwp);
-	if ($wp_data) {
-		$data['idwp'] = $wp_data;
-	}
-	$this->load->view('bukubesar/printlrabapop', $data );
+	$html = $this->load->view('bukubesar/printlrabaprek', $data, true);
+
+    $this->output
+        ->set_content_type('application/pdf')
+        ->set_output($html)
+        ->set_header('Content-Disposition: inline; filename="lra_bapenda_rekening.pdf"');
 	
-	/* ob_start();
-	$html = $this->load->view('bukubesar/printbapop', $data, true);
+/* 	ob_start();
+	$html = $this->load->view('bukubesar/printlrabaprek', $data, true);
 	ob_get_clean();
 	
 
 	$dompdf = new Dompdf();
 	$dompdf->loadHtml($html);
-	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->setPaper('legal', 'landscape');
 	$dompdf->render();
-	$dompdf->stream("buku_besar_bapenda_op.pdf", array("Attachment" => 0)); */
-}
-public function get_wajib_pajak_by_rekening() {
-    $kdrekening = $this->input->get('kdrekening');
-    
-	$limit = $this->input->get('limit') ?: 10;
-    $offset = $this->input->get('offset') ?: 0;
-
-    $this->db->select('mst_wajibpajak.id, nama');
-    $this->db->from('mst_wajibpajak');
-	$this->db->join('mst_rekening','mst_rekening.id = mst_wajibpajak.idrekening');
-    $this->db->where('kdrekening', $kdrekening);
-	$this->db->limit($limit, $offset);
-	$result = $this->db->get()->result();
-
-    $options = '<option value="">Pilih Wajib Pajak</option>';
-    foreach ($result as $row) {
-        $options .= '<option value="'.$row->id.'">'.$row->nama.'</option>';
-    }
-  
-    echo $options;
+	$dompdf->stream("lra_bap_rek.pdf", array("Attachment" => 0)); */
 }
 
 public function getWajibPajakByRekening()
 {
-    $idrekening= $this->input->get('idrekening');
+    $id= $this->input->get('id');
     
-    if (!$idrekening) {
+    if (!$id) {
         echo json_encode(['tidak ada datanya']);
         return;
     }
 
     $this->load->model('master/Mwp');
-    $data = $this->Mwp->getWajibPajakByRekening($idrekening);
+    $data = $this->Mwp->getWajibPajakByRekening($id);
 
     echo json_encode($data);
 }
 
-public function getWajibPajakByRekening2() {
+/* public function getWajibPajakByRekening() {
     $idrekening = $this->input->post('id');
 
     if ($idrekening) {
@@ -141,7 +119,7 @@ public function getWajibPajakByRekening2() {
     } else {
         echo json_encode([]);
     }
-}
+} */
 
 }
 

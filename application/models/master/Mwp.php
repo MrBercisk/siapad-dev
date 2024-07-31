@@ -1,7 +1,31 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class Mwp extends CI_Model {
+	public function getWajibPajakByRekening($idrekening)
+    {
+        $this->db->select('mst_wajibpajak.id, nama, idrekening, nomor');
+        $this->db->from('mst_wajibpajak');
+        $this->db->join('mst_rekening','mst_rekening.id = mst_wajibpajak.idrekening');
+        $this->db->where('mst_wajibpajak.idrekening', $idrekening);
+        $query = $this->db->get();
+        
+        return $query->result_array();
+    }
 	
     public function selectBySKPD($key='',$skpd='', $start=0, $limit=0, $sort, $dir='ASC', &$total=0){
+       
+        /* ->select("a.id, a.nama, CONCAT(a.nama, ' - ', a.nomor) AS nmwp, a.alamat, a.idkelurahan, b.nama AS kelurahan, 
+                b.idkecamatan, c.nama AS kecamatan, a.nomor, a.notype, a.tglskp, a.tgljthtmp, 
+                a.idrekening, d.nmrekening, d.jenis, a.pemilik,
+                c.iduptd, e.nama AS nmuptd, e.singkat AS nmuptdsingkat,
+                a.awalpajakbln, a.awalpajakthn, a.akhirpajakbln, a.akhirpajakthn, a.isclosed", false)
+            ->join('mst_rekening d', 'd.id=a.idrekening')
+            ->join('mst_kelurahan b', 'b.id=a.idkelurahan', 'left')
+            ->join('mst_kecamatan c', 'c.id=b.idkecamatan', 'left')
+            ->join('mst_uptd e', 'e.id=c.iduptd', 'left')
+            ->where($where)
+            ->like('d.kdrekening', $kdrekening, 'after')
+            ->order_by($sort, $dir)
+            ->get('mst_wajibpajak a', $limit, $start); */
         $key = $this->db->escape_like_str($key);
         $where = "(a.nama LIKE '%$key%' OR a.nomor LIKE '%$key%' OR a.pemilik LIKE '%$key%' 
         OR a.nama LIKE '%$skpd%' OR a.nomor LIKE '%$skpd%' OR a.pemilik LIKE '%$skpd%')";

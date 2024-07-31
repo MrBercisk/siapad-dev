@@ -1358,6 +1358,50 @@ $('#delete').on('click', function() {
     }
 });
 
+$('.select2').select2();
 
+$("#opsirekwp").change(function() {
+    var idrekening = $(this).val();
+    $.ajax({
+        url: "LraBapendaOp/get_wajib_pajak_by_rekening",
+        type: "GET",
+        data: { kdrekening: idrekening },
+        dataType: 'html', 
+        success: function(data) {
+            $("#wajib_pajak").html(data).trigger("change");
+        }
+    });
+});
+/* $('#opsirekwp').on('change', function() {
+    var idRekening = $(this).val();
+    
+    if (idRekening) {
+        $.ajax({
+            url: 'LraBapendaOp/get_wajib_pajak_by_rekening', 
+            type: 'GET',
+            data: { idrekening: idRekening },
+            dataType: 'json', 
+            success: function(respon) {
+                console.log('respon nya::',respon);
+                var $idwp = $('#wajib_pajak');
+                $idwp.empty();
+                if (Array.isArray(respon) && respon.length > 0) {
+                    $.each(respon, function(item) {
+                        $idwp.append($('<option></option>').val(item.data.id).text(item.data.nama));
+                    });
+                } else {
+                    $idwp.append($('<option></option>').val('').text('Tidak ada data'));
+                }
+    
+                $idwp.select2();
+            },
+            error: function() {
+                alert('error tes.');
+            }
+        });
+    } else {
+        $('#wajib_pajak').empty();
+    }
+});  */
 
 });

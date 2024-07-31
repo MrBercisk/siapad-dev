@@ -1,117 +1,86 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Mlrabapop extends CI_Model {
-    /* public function getRptBBPPKDinas($iddinas, $tahun, $bulan) {
-        $query = $this->db->query("CALL spRptBBPPKDinas(?, ?, ?)", array($iddinas, $tahun, $bulan));
-        return $query->result_array();
-    } */
+    public function ambildata($kdrekening, $tahun) {
+        $mysqli = $this->db->conn_id; 
+ 
+        $statment = $mysqli->prepare("CALL spRptBBPPDBPPRDPerWP(?, ?)");
+        $statment->bind_param('ss', $kdrekening, $tahun);  
+    
+        $statment->execute();
+        $result = $statment->get_result();  
+    
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
 
-    public function get_apbd_apbdp_total($tahun, $kdrekening) {
+        while ($mysqli->more_results()) {
+            $mysqli->next_result(); 
+        }
+    
+        return $data;
+    }
+    
+
+    public function get_apbd_apbdp_total($tahun, $idwp) {
         $this->db->select('SUM(a.apbd) as total_apbd, SUM(a.apbdp) as total_apbdp');
-        $this->db->from('trx_rapbd a');
-        $this->db->join('mst_rekening b', 'b.id = a.idrekening', 'inner');
+        $this->db->from('trx_rapbd_wp a');
+        $this->db->join('mst_wajibpajak b', 'b.id = a.idwp', 'inner');
         $this->db->where('a.tahun', $tahun);
-        $this->db->where('LEFT(b.kdrekening, LENGTH(' . $this->db->escape($kdrekening) . ')) =', $kdrekening);
+        $this->db->where('a.idwp', $idwp);
         $query = $this->db->get();
         return $query->row();
     }
     
-
-    public function get_data_bkrekening($bulan, $tahun, $kdrekening)
+    public function ambildatanya($tahun, $kdrekening, $idwp)
     {
-        if ($bulan == '') {
-            $query1 = "
-                SELECT
-                    NULL AS tanggal,
-                    'Saldo Awal' AS nobukti,
-                    NULL AS nmdinas,
-                    IFNULL(SUM(b.total), 0) AS jumlah,
-                    c.apbd AS apbd, 
-                    c.apbdp AS apbdp, 
-                    1 AS issaldoawal,
-                    '' AS keterangan
-                FROM trx_stsmaster a
-                INNER JOIN trx_stsdetail b ON b.idstsmaster = a.id
-                INNER JOIN trx_rapbd c ON c.id = b.idrapbd
-                INNER JOIN mst_rekening d ON d.id = c.idrekening
-                WHERE LEFT(d.kdrekening, LENGTH('{$kdrekening}')) = '{$kdrekening}'
-                    AND a.tahun = '{$tahun}'
-            ";
+        $this->db->select("
+            $tahun AS tahun,
+            MONTH(b.tanggal) AS bulan,
+            b.tanggal,
+            CASE 
+                WHEN a.tglpajak IS NOT NULL AND a.tglpajak <> '' THEN CONCAT(a.tglpajak, '-', a.blnpajak, '-', a.thnpajak)
+                WHEN a.blnpajak IS NOT NULL THEN CONCAT(
+                    CASE a.blnpajak
+                        WHEN 1 THEN 'Januari'
+                        WHEN 2 THEN 'Februari'
+                        WHEN 3 THEN 'Maret'
+                        WHEN 4 THEN 'April'
+                        WHEN 5 THEN 'Mei'
+                        WHEN 6 THEN 'Juni'
+                        WHEN 7 THEN 'Juli'
+                        WHEN 8 THEN 'Agustus'
+                        WHEN 9 THEN 'September'
+                        WHEN 10 THEN 'Oktober'
+                        WHEN 11 THEN 'November'
+                        WHEN 12 THEN 'Desember'
+                        ELSE ' '
+                    END, ' ', a.thnpajak
+                )
+                ELSE '-' 
+            END AS masapajak,
+            a.total,
+            a.keterangan, 
+            a.nobukti, 
+            e.nomor AS nomor_wp, 
+            e.nama AS nama_wp
+        ");
         
-            $query2 = "
-                SELECT
-                    a.tanggal,
-                    a.nomor AS nobukti,
-                    e.singkat AS nmdinas,
-                    SUM(b.total) AS jumlah,
-                    c.apbd AS apbd, 
-                    c.apbdp AS apbdp, 
-                    0 AS issaldoawal,
-                    a.keterangan
-                FROM trx_stsmaster a
-                INNER JOIN trx_stsdetail b ON b.idstsmaster = a.id
-                INNER JOIN trx_rapbd c ON c.id = b.idrapbd
-                INNER JOIN mst_rekening d ON d.id = c.idrekening
-                INNER JOIN mst_dinas e ON e.id = a.iddinas
-                WHERE LEFT(d.kdrekening, LENGTH('{$kdrekening}')) = '{$kdrekening}'
-                    AND a.tahun = '{$tahun}'
-                GROUP BY a.tanggal, a.nomor, e.singkat, c.apbd, c.apbdp, a.keterangan
-                ORDER BY a.tanggal, a.nomor
-            ";
-        
-            // Combine the two queries with UNION ALL
-            $query = $this->db->query("($query1) UNION ALL ($query2) ORDER BY issaldoawal DESC, tanggal, nobukti");
-        }
-        
-         else {
-            $query3 = "
-                SELECT 
-                CONCAT('$tahun', '-', LPAD('$bulan', 2, '0'), '-01') AS tanggal, 
-                'Saldo Awal' AS nobukti, 
-                NULL AS nmdinas,
-                IFNULL(SUM(b.total), 0) AS jumlah, 
-                c.apbd AS apbd, 
-                c.apbdp AS apbdp, 
-                1 AS issaldoawal, 
-                '' AS keterangan
-                FROM trx_stsmaster a
-                    INNER JOIN trx_stsdetail b ON b.idstsmaster = a.id
-                    INNER JOIN trx_rapbd c ON c.id = b.idrapbd
-                    INNER JOIN mst_rekening d ON d.id = c.idrekening
-                WHERE LEFT(d.kdrekening, LENGTH('{$kdrekening}')) = '{$kdrekening}'
-                    AND a.tahun = '$tahun'
-                    AND MONTH(a.tanggal) < $bulan
-            ";
-            
-            
-            $query4 = "
-                SELECT 
-                a.tanggal,
-                a.nomor AS nobukti,
-                e.singkat AS nmdinas,
-                SUM(b.total) AS jumlah,
-                c.apbd AS apbd, 
-                c.apbdp AS apbdp, 
-                0 AS issaldoawal,
-                a.keterangan
-                FROM trx_stsmaster a
-                    INNER JOIN trx_stsdetail b ON b.idstsmaster = a.id
-                    INNER JOIN trx_rapbd c ON c.id = b.idrapbd
-                    INNER JOIN mst_rekening d ON d.id = c.idrekening
-                    INNER JOIN mst_dinas e ON e.id = a.iddinas
-                WHERE LEFT(d.kdrekening, LENGTH('{$kdrekening}')) = '{$kdrekening}'
-                    AND a.tahun = '$tahun'
-                    AND MONTH(a.tanggal) = $bulan
-                GROUP BY a.id
-                ORDER BY a.tanggal, a.nomor
-            ";
-        
-            $query = $this->db->query("($query3) UNION ALL ($query4) ORDER BY issaldoawal DESC, tanggal, nobukti");
-        }
-        
-            $results = $query->result_array();
-            return $results;
+        $this->db->from('trx_stsdetail a');
+        $this->db->join('trx_stsmaster b', 'b.id = a.idstsmaster', 'inner');
+        $this->db->join('trx_rapbd c', 'c.id = a.idrapbd', 'inner');
+        $this->db->join('mst_rekening d', 'd.id = c.idrekening', 'inner');
+        $this->db->join('mst_wajibpajak e', 'e.id = a.idwp', 'inner');
+        $this->db->where('YEAR(b.tanggal)', $tahun);
+        $this->db->where('d.kdrekening', $kdrekening);
+        $this->db->where('a.idwp', $idwp);
+        $this->db->order_by('b.tanggal', 'asc');
+    
+        $query = $this->db->get();
+        return $query->result_array();
     }
+    
     
     
 
@@ -132,7 +101,7 @@ class Mlrabapop extends CI_Model {
         $form[] = '
         <div class="card">
             <div class="card-body">
-                <form action="' . site_url('bukubesar/KasRekening/cetak') . '" class="form-row" method="post">
+                <form action="' . site_url('bukubesar/lrabapendaop/cetak') . '" class="form-row" method="post">
                 <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                 </div>
@@ -167,8 +136,8 @@ class Mlrabapop extends CI_Model {
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="dinas">Rekening:</label>
-                              <select id="rekbuku" name="idrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
+                            <label for="rekening">Rekening:</label>
+                              <select id="opsirekwp" name="kdrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
                                       '.$opsiRek.'
                               </select>
                         </div>
@@ -177,7 +146,7 @@ class Mlrabapop extends CI_Model {
                         <div class="form-group">
                             <label for="wajib_pajak">Wajib Pajak:</label>
                             <select id="wajib_pajak" name="idwp" class="form-control select2" data-placeholder="Pilih Wajib Pajak" style="width: 100%;">
-                                <option></option>
+                              
                             </select>
                         </div>
                     </div>
@@ -210,12 +179,13 @@ class Mlrabapop extends CI_Model {
     }
     public function iniopsirekening() {
         $rekeningCumaIni = array(
-            '4.1.1.01' => 'Pajak Hotel',
-            '4.1.1.02' => 'Pajak Restoran',
-            '4.1.1.03' => 'Pajak Hiburan',
-            '4.1.1.07' => 'Pajak Parkir',
-            '4.1.1.08' => 'Pajak Air Tanah',
-            '4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam'
+            '4.1.1.01.01' => 'Pajak Hotel',
+            '4.1.1.02.01' => 'Pajak Restoran',
+            '4.1.1.03.01' => 'Pajak Hiburan',
+            '4.1.1.04.01' => 'Pajak Reklame',
+            '4.1.1.07.01' => 'Pajak Parkir',
+            '4.1.1.08.01' => 'Pajak Air Tanah',
+            '4.1.1.11.37' => 'Pajak Mineral Batuan Bukan Logam'
         );
 
         $rekData = $this->db
@@ -228,17 +198,10 @@ class Mlrabapop extends CI_Model {
         $opsiRek = '<option></option>';
         foreach ($rekData as $rek) {
             $namaRek = isset($rekeningCumaIni[$rek->kdrekening]) ? $rekeningCumaIni[$rek->kdrekening] : $rek->kdrekening;
-            $opsiRek .= '<option value="'.$rek->id.'">'.$rek->kdrekening.' - '.$namaRek.'</option>';
+            $opsiRek .= '<option value="'.$rek->kdrekening.'">'.$namaRek.'</option>';
         }
     
         return $opsiRek;
     }
     
-    public function get_wajib_pajak($idrekening) {
-        $this->db->select('id, npwpd, nomor');
-        $this->db->from('mst_wajibpajak');
-        $this->db->where('idrekening', $idrekening);
-        $query = $this->db->get();
-        return $query->result();
-    }
 }
