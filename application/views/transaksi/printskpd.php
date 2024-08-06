@@ -187,7 +187,7 @@
 </tbody>
     </table>
 
-    <div class="footer-section">
+<div class="footer-section">
     <div class="tgl_cetak">
         <p>Bandar Lampung, <?= $tgl_cetak_format ?></p>
     </div>

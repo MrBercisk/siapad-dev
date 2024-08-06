@@ -400,6 +400,59 @@ class Msetup extends CI_Model
         }
         return null;
     }
+	public function get_tanda_tangan_skpd_3($tanda_tangan_3) {
+        if ($tanda_tangan_3) {
+            $ttddetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $tanda_tangan_3)
+                ->get()
+                ->row_array();
+            
+            return $ttddetail;
+        }
+        return null;
+    }
+	public function get_tanda_tangan_skpd_4($tanda_tangan_4) {
+        if ($tanda_tangan_4) {
+            $ttddetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $tanda_tangan_4)
+                ->get()
+                ->row_array();
+            
+            return $ttddetail;
+        }
+        return null;
+    }
+	public function get_tanda_tangan_skpd_5($tanda_tangan_5) {
+        if ($tanda_tangan_5) {
+            $ttddetail = $this->db
+                ->select('id, nama, nip, jabatan1, jabatan2')
+                ->from('mst_tandatangan')
+                ->where('id', $tanda_tangan_5)
+                ->get()
+                ->row_array();
+            
+            return $ttddetail;
+        }
+        return null;
+    }
+	public function get_tanda_tangan_skpd($tanda_tangan_id) {
+		if ($tanda_tangan_id) {
+			$ttddetail = $this->db
+				->select('id, nama, nip, jabatan1, jabatan2')
+				->from('mst_tandatangan')
+				->where('id', $tanda_tangan_id)
+				->get()
+				->row_array();
+			
+			return $ttddetail;
+		}
+		return null;
+	}
+	
 	public function get_pembuat($pembuat_checkbox, $pembuat) {
         if ($pembuat_checkbox && $pembuat) {
             $pembuatdetail = $this->db
@@ -439,6 +492,18 @@ class Msetup extends CI_Model
 		}
 	}
 
+	public function get_uptd($iduptd) {
+		if($iduptd){
+			$uptddetail = $this->db
+			->select('id,nama,singkat')
+			->from('mst_uptd')
+			->where('id', $iduptd)
+			->get()
+			->row_array();
+			return $uptddetail;
+		}
+		return null;
+	}
 	public function get_dinas($iddinas) {
 		if($iddinas){
 			$dinDetail = $this->db

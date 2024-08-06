@@ -1,5 +1,53 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class MRekAnggaran extends CI_Model {
+class MRelAnggaran extends CI_Model {
+    public function ambildata($bulan,$tahun) {
+        $mysqli = $this->db->conn_id; 
+ 
+        $statment = $mysqli->prepare("CALL spRptRekapRealisasiBln(?, ?)");
+        $statment->bind_param('ss', $bulan,$tahun);  
+    
+        $statment->execute();
+        $result = $statment->get_result();  
+    
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        while ($mysqli->more_results()) {
+            $mysqli->next_result(); 
+        }
+    
+        return $data;
+   
+    }
+
+    public function gettotallalu($bulan, $tahun)
+    {
+        $query="DROP TEMPORARY TABLE IF EXISTS `tmp_bulanlalu`;
+                    CREATE TEMPORARY TABLE `tmp_bulanlalu`(
+                        `id` INT(10) NOT NULL AUTO_INCREMENT,
+                        `kdrek` VARCHAR(15) NOT NULL,
+                        `jmlrp` DECIMAL(20,2) DEFAULT 0,
+                        PRIMARY KEY  (`id`)
+                    )ENGINE=INNODB DEFAULT CHARSET=utf8;
+                    
+        INSERT INTO tmp_bulanlalu(kdrek, jmlrp)
+                    SELECT LEFT(d.kdrekening, 8) AS kdrek, SUM(a.total) AS jmlrp
+                    FROM trx_stsdetail a
+                    INNER JOIN trx_stsmaster b ON b.id = a.idstsmaster
+                    INNER JOIN trx_rapbd c ON c.id = a.idrapbd
+                    INNER JOIN mst_rekening d ON d.id = c.idrekening
+                    WHERE YEAR(b.tanggal) = $tahun AND MONTH(b.tanggal) < $bulan
+                        AND (d.kdrekening LIKE '4.1.1.01%' OR d.kdrekening LIKE '4.1.1.02%' OR d.kdrekening LIKE '4.1.1.03%' OR d.kdrekening LIKE '4.1.1.04%'
+                        OR d.kdrekening LIKE '4.1.1.05%' OR d.kdrekening LIKE '4.1.1.07%' OR d.kdrekening LIKE '4.1.1.12%' OR d.kdrekening LIKE '4.1.1.13%')
+                    GROUP BY kdrek";
+
+                    $query = $this->db->query($sql, array($bulan, $tahun));
+                    $results = $query->result_array();
+                    return $results;
+        }
+
     public function formInsert() {
         $ttddata = $this->db
         ->select('mst_tandatangan.id, mst_tandatangan.nip, mst_tandatangan.nama, mst_tandatangan.jabatan1, mst_tandatangan.jabatan2')
@@ -10,21 +58,12 @@ class MRekAnggaran extends CI_Model {
         foreach ($ttddata as $ttd) {
             $opsittd .= '<option value="'.$ttd->id.'">'.$ttd->nama.'</option>';
         }
-        $rekdata = $this->db
-        ->select('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
-        ->from('mst_rekening')
-        ->where('mst_rekening.idheader', 3)
-        ->get()
-        ->result();
-        $opsirek = '<option></option>';
-        foreach ($rekdata as $ttd) {
-            $opsirek .= '<option value="'.$ttd->id.'">'.$ttd->nmrekening.'</option>';
-        }
+    
         $form[] = '
         
         <div class="card">
             <div class="card-body">
-                <form action="' . site_url('rekapitulasi/RekAnggaran/cetak') . '" class="form-row" method="post">
+                <form action="' . site_url('rekapitulasi/RelAnggaran/cetak') . '" class="form-row" method="post">
                 <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                 </div>
@@ -60,7 +99,7 @@ class MRekAnggaran extends CI_Model {
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="tgl_cetak">Tgl. Cetak:</label>
-                            <input type="date" class="form-control" id="tgl_cetak" name="tgl_cetak" required>
+                            <input type="date" class="form-control" id="tglcetak" name="tglcetak" required>
                         </div>
                     </div>
 
@@ -72,40 +111,11 @@ class MRekAnggaran extends CI_Model {
                               </select>
                         </div>
                     </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="rekening">Rekening:</label>
-                              <select id="rekening" name="rekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
-                                      '.$opsirek.'
-                              </select>
-                        </div>
-                    </div>
+                  
     
                     </div>
                 </div>
-                 <div class="col-md-1">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="denda_checkbox" name="denda_checkbox">
-                            <label class="form-check-label" for="denda_checkbox">Denda</label>
-                        </div>
-                        
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="pokok_checkbox" name="pokok_checkbox">
-                            <label class="form-check-label" for="pokok_checkbox">Pokok</label>
-                        </div>
-                        
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="jumlah_checkbox" name="jumlah_checkbox">
-                            <label class="form-check-label" for="jumlah_checkbox">Jumlah</label>
-                        </div>
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-check-label" for="ttd">Penandatangan</label>  
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="ttd_checkbox" name="ttd_checkbox" checked>
-                            <label class="form-check-label" for="ttd_checkbox">Ttd</label>
-                        </div>
-                     
+                    <div class="col-md-1 mt-3">
                         
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary">Cetak Laporan</button>
