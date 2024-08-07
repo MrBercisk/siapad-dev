@@ -148,34 +148,73 @@ class FormSptpd extends CI_Controller
 		$wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:' . site_url('404'));
 		switch ($wadi) {
 			case 'Edit':
-				$joinTables  		= [];
-				$selectFields 		= 'id, nama, singkat, urut, isdispenda';
-				$kode 				= $this->Crud->gandengan('mst_dinas', $joinTables, $selectFields, 'id="' . $this->input->post('idnya') . '"')[0];
-				if ($kode->isdispenda == 0 || empty($kode->isdispenda)) {
-					$kode->isdispenda = 0;
+
+				$joinTables  		= [
+					'mst_wajibpajak b' => ['condition' => 'b.id = a.idwp', 'type' => 'inner'],
+					'mst_rekening c' => ['condition' => 'c.id = a.idrekening', 'type' => 'inner']
+				];
+				// $selectFields 		= 'id, nama, singkat, urut, isdispenda';
+				$selectFields 		= 'a.id,a.nomor,a.tanggal,a.tgl_input AS tanggal_terbit,b.npwpd AS npwpd,a.idwp,b.nama AS nmwp,b.nop,a.blnpajak,a.thnpajak,a.jumlah,a.keterangan,a.idrekening,c.nmrekening,a.isskpdn,a.noskpdn,a.tglskpdn,a.jmlskpdn,a.denda,a.pokok';
+				$kode 				= $this->Crud->gandengan('trx_sptpd a', $joinTables, $selectFields, 'a.id="' . $this->input->post('idnya') . '"')[0];
+				if ($kode->idwp == 0 || empty($kode->idwp)) {
+					$kode->idwp = 0;
 				}
+				$milehTahun = $this->Jstambah->milehTahun((int)date($kode->thnpajak));
+				$milehSasi = $this->Jstambah->milehBulan((int)date($kode->blnpajak));
 				$form[] 	= '
+				<script>
+				var selectedWp = ' . json_encode($kode) . ';
+    
+				if (selectedWp) {
+					var option = new Option(selectedWp.nmwp + " (" + selectedWp.npwpd + ")", selectedWp.idwp, true, true);
+					$("#wajibpajake").append(option).trigger("change");
+				}
+				$("#wajibpajake").select2({
+					ajax: {
+						url: "http://localhost/siapad-dev/transaksi/formsptpd/get_data",
+						type: "POST",
+						dataType: "json",
+						delay: 250,
+						data: function(params) {
+							return {
+								search: params.term,
+								page: params.page || 1
+							};
+						},
+						processResults: function(data) {
+							return {
+								results: data.items,
+								pagination: {
+									more: data.pagination.more
+								}
+							};
+						},
+						cache: true
+					},
+					minimumInputLength: 5,
+					width: "resolve",
+					placeholder:"Masukan Nama Wajib Pajak"
+				})
+				</script>
+
 				<div class="row">
 				<div class="col-12">'
-					. implode($this->Form->inputRowsText('nomore', 'Nomor', 'col-sm-3', 'form-control-sm')) .
+					. implode($this->Form->inputRowsText('nomore', 'Nomor Biling', 'col-sm-3', 'form-control-sm', $kode->nomor)) .
 					'</div>
 				<div class="col-12">'
-					. implode($this->Form->inputRowsText('rekeninge', 'Rekening', 'col-sm-3', 'form-control-sm', '', 'readonly')) .
+					. implode($this->Form->inputRowsText('rekeninge', 'Rekening', 'col-sm-3', 'form-control-sm', $kode->nmrekening, 'readonly')) .
 					'</div>
-			<div class="col-12">'
-					. implode($this->Form->inputRowsText('npwpde', 'NPWPD', 'col-sm-3', 'form-control-sm', '', 'readonly')) .
+				<div class="col-12">'
+					. implode($this->Form->inputRowsText('npwpde', 'NPWPD', 'col-sm-3', 'form-control-sm', $kode->npwpd, 'readonly')) .
 					'</div>
-		<div class="col-12">'
-					. implode($this->Form->inputRowsText('nope', 'NOP', 'col-sm-3', 'form-control-sm', '', 'readonly')) .
+				<div class="col-12">'
+					. implode($this->Form->inputRowsText('nope', 'NOP', 'col-sm-3', 'form-control-sm', $kode->nop, 'readonly')) .
 					'</div>
-			<div class="col-12">'
-					. implode($this->Form->inputRowsSelect('wajibpajake', 'Wajib Pajak', 'col-sm-3', 'form-control-sm select2')) .
+				<div class="col-12">'
+					. implode($this->Form->inputRowsSelect('wajibpajake', 'Wajib Pajak', 'col-sm-3', 'form-control-sm select2', $kode->idwp)) .
 					'</div>
-			<div class="col-12">'
-					. implode($this->Form->inputRowsText('tanggale', 'Tanggal', 'col-sm-3', 'form-control-sm datepicker')) .
-					'</div>
-			<div class="col-12">'
-					. implode($this->Form->inputRowsText('tglterbite', 'Tgl. Terbit', 'col-sm-3', 'form-control-sm datepicker')) .
+				<div class="col-12">'
+					. implode($this->Form->inputRowsText('tglterbite', 'Tgl. Terbit', 'col-sm-3', 'form-control-sm datepicker', $kode->tanggal_terbit, 'readonly')) .
 					'</div>
 			<div class="col-12">'
 					. implode($this->Form->inputRowsSelect('bulane', 'Bulan', 'col-sm-3', 'form-control-sm', $milehSasi)) .
@@ -184,16 +223,16 @@ class FormSptpd extends CI_Controller
 					. implode($this->Form->inputRowsSelect('tahune', 'Tahun', 'col-sm-3', 'form-control-sm', $milehTahun)) .
 					'</div>
 			<div class="col-12">'
-					. implode($this->Form->inputRowsText('pokoke', 'Pokok', 'col-sm-3', 'form-control-sm')) .
+					. implode($this->Form->inputRowsText('pokoke', 'Pokok', 'col-sm-3', 'form-control-sm', $kode->pokok)) .
 					'</div>
 			<div class="col-12">'
-					. implode($this->Form->inputRowsText('dendae', 'Denda', 'col-sm-3', 'form-control-sm')) .
+					. implode($this->Form->inputRowsText('dendae', 'Denda', 'col-sm-3', 'form-control-sm', $kode->denda)) .
 					'</div>
 			<div class="col-12">'
-					. implode($this->Form->inputRowsText('jumlahe', 'Jumlah', 'col-sm-3', 'form-control-sm')) .
+					. implode($this->Form->inputRowsText('jumlahe', 'Jumlah', 'col-sm-3', 'form-control-sm', $kode->jumlah)) .
 					'</div>
 			<div class="col-12">'
-					. implode($this->Form->inputRowsTextArea('keterangane', 'Keterangan', 'col-sm-3', 'form-control-sm')) .
+					. implode($this->Form->inputRowsTextArea('keterangane', 'Keterangan', 'col-sm-3', 'form-control-sm', $kode->keterangan)) .
 					'</div>
 				</div>
 				';
@@ -232,7 +271,7 @@ class FormSptpd extends CI_Controller
 				}
 				$data = [
 					'nomor' => $this->input->post('nomors'),
-					'tanggal' => $this->input->post('tanggals'),
+					// 'tanggal' => $this->input->post('tanggals'),
 					'idwp' => $this->input->post('idwps'),
 					'idrekening' => $this->input->post('idreks'),
 					'blnpajak' => $this->input->post('bulans'),
@@ -257,7 +296,7 @@ class FormSptpd extends CI_Controller
 				$kode = $this->input->post('kode');
 				$data = [
 					'nomor' => $this->input->post('nomors'),
-					'tanggal' => $this->input->post('tanggals'),
+					// 'tanggal' => $this->input->post('tanggals'),
 					'idwp' => $this->input->post('idwps'),
 					'idrekening' => $this->input->post('idreks'),
 					'blnpajak' => $this->input->post('bulans'),
@@ -269,7 +308,7 @@ class FormSptpd extends CI_Controller
 					'tgl_input' => $this->input->post('tglterbits'),
 					'keterangan' => $this->input->post('keterangans'),
 				];
-				$update = $this->Crud->update_data('mst_dinas', $data, ['id' => $kode]);
+				$update = $this->Crud->update_data('trx_sptpd', $data, ['id' => $kode]);
 				if ($update) {
 					$this->session->set_flashdata('message', 'Data has been updated successfully');
 					redirect('transaksi/FormSptpd');
@@ -280,7 +319,7 @@ class FormSptpd extends CI_Controller
 				break;
 			case 'Delete':
 				$kode = $this->input->post('kode');
-				$delete = $this->Crud->delete_data('mst_dinas', ['id' => $kode]);
+				$delete = $this->Crud->delete_data('trx_sptpd', ['id' => $kode]);
 				if ($delete) {
 					$this->session->set_flashdata('message', 'Data has been deleted successfully');
 					redirect('transaksi/FormSptpd');
@@ -307,6 +346,7 @@ class FormSptpd extends CI_Controller
 		$this->db->from('mst_wajibpajak w');
 		$this->db->join('mst_rekening a', 'a.id = w.idrekening', 'left');
 		$this->db->like('w.nama', $search);
+		$this->db->or_like('w.npwpd', $search);
 		$this->db->limit($limit, $offset);
 		$query = $this->db->get();
 
@@ -318,6 +358,7 @@ class FormSptpd extends CI_Controller
 		$this->db->from('mst_wajibpajak w');
 		$this->db->join('mst_rekening a', 'a.id = w.idrekening', 'left');
 		$this->db->like('w.nama', $search);
+		$this->db->or_like('w.npwpd', $search);
 		$total_count = $this->db->count_all_results();
 
 		$more = ($offset + $limit) < $total_count;

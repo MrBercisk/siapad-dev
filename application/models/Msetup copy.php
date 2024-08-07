@@ -1,28 +1,30 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
-class Msetup extends CI_Model {
-	public function loadTemplate($title = NULL,$link= NULL) {
-	$base 	  			= $this->setup();
-	$getpola			= $this->get_menu_tree();
-	$side				= $this->menuSide($getpola);
-	$theme['topbar'][] 	= '<!DOCTYPE html>
+<?php defined('BASEPATH') or exit('No direct script access allowed');
+class Msetup extends CI_Model
+{
+	public function loadTemplate($title = NULL, $link = NULL)
+	{
+		$base 	  			= $this->setup();
+		$getpola			= $this->get_menu_tree();
+		$side				= $this->menuSide($getpola);
+		$theme['topbar'][] 	= '<!DOCTYPE html>
 			<html lang="en">
 			<head>
 			  <meta charset="UTF-8">
 			  <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-			  <link rel="stylesheet" href="'.$base['url'].'assets/modules/bootstrap/css/bootstrap.min.css">
-			  <title>'.$title.'</title>
-			  <link rel="icon" href="'.$base['url'].'assets/img/default/ico.png" type="image/x-icon">
-			  <link rel="stylesheet" href="'.$base['url'].'assets/modules/fontawesome/css/all.min.css">
-			  <link rel="stylesheet" href="'.$base['url'].'assets/css/style.css">
-			  <link rel="stylesheet" href="'.$base['url'].'assets/css/boxicons.min.css">
-			  <link rel="stylesheet" href="'.$base['url'].'assets/css/components.css">
-  			  <link rel="stylesheet" href="'.$base['url'].'assets/modules/datatables/Select-1.2.4/css/select.bootstrap4.min.css">
-			  <script src="'.$base['url'].'assets/modules/jquery.min.js"></script>
-			  <script src="'.$base['url'].'assets/modules/datatables/datatables.min.js"></script>
-			  <script src="'.$base['url'].'assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
-			  <script src="'.$base['url'].'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/bootstrap/css/bootstrap.min.css">
+			  <title>' . $title . '</title>
+			  <link rel="icon" href="' . $base['url'] . 'assets/img/default/ico.png" type="image/x-icon">
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/fontawesome/css/all.min.css">
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/css/style.css">
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/css/boxicons.min.css">
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/css/components.css">
+  			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/css/select.bootstrap4.min.css">
+			  <script src="' . $base['url'] . 'assets/modules/jquery.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/datatables.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
+			  <script src="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>
 			  
-			  <link rel="stylesheet" href="'.$base['url'].'assets/modules/datatables/datatables.min.css">
+			  <link rel="stylesheet" href="' . $base['url'] . 'assets/modules/datatables/datatables.min.css">
 			  <style>
 					/* Custom CSS to ensure menu alignment */
 					.sidebar-menu .nav-link {
@@ -73,7 +75,7 @@ class Msetup extends CI_Model {
               <div class="dropdown-list-content dropdown-list-message">
                 <a href="#" class="dropdown-item dropdown-item-unread">
                   <div class="dropdown-item-avatar">
-                    <img alt="image" src="'.$base['url'].'assets/img/avatar/avatar-1.png" class="rounded-circle">
+                    <img alt="image" src="' . $base['url'] . 'assets/img/avatar/avatar-1.png" class="rounded-circle">
                     <div class="is-online"></div>
                   </div>
                   <div class="dropdown-item-desc">
@@ -112,7 +114,7 @@ class Msetup extends CI_Model {
             </div>
           </li>
           <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-            <img alt="image" src="'.$base['url'].'assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
+            <img alt="image" src="' . $base['url'] . 'assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
             <div class="d-sm-none d-lg-inline-block">Hi, Ujang Maman</div></a>
             <div class="dropdown-menu dropdown-menu-right">
               <div class="dropdown-title">Logged in 5 min ago</div>
@@ -126,31 +128,31 @@ class Msetup extends CI_Model {
                 <i class="fas fa-cog"></i> Settings
               </a>
               <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item has-icon text-danger">
+              <a href="login.php" class="dropdown-item has-icon text-danger">
                 <i class="fas fa-sign-out-alt"></i> Logout
               </a>
             </div>
           </li>
         </ul>
       </nav>';
-	$theme['sidebar'][]= '
+		$theme['sidebar'][] = '
 			<div class="main-sidebar sidebar-style-2" >
 				<aside id="sidebar-wrapper">
 				  <div class="sidebar-brand" style="height: 40px;">
-					<a href="'.$base['url'].'">SIAPAD
+					<a href="' . $base['url'] . '">SIAPAD
 					</a>
 				  </div>
 				  <center><label class="hide-sidebar-mini" for="">Sistem Informasi dan Akuntansi Pendapatan Daerah</label>
 				  </center>
 				  <div class="sidebar-brand sidebar-brand-sm">
-					<a href="'.base_url().'">SIAPAD</a>
+					<a href="' . base_url() . '">SIAPAD</a>
 				  </div>
 				  <ul class="sidebar-menu">
-				  '.$side.'
+				  ' . $side . '
 				  </ul>
 				 </aside>
 			</div>';
-	$theme['myModalEdit'][] = '
+		$theme['myModalEdit'][] = '
 	<div class="modal fade bd-example-modal-lg" id="myModalE" tabindex="-1" role="dialog" aria-labelledby="myModalTitle" aria-hidden="true">
 	  <div class="modal-dialog">
 		<div class="modal-content">
@@ -160,7 +162,7 @@ class Msetup extends CI_Model {
 			  <span aria-hidden="true">&times;</span>
 			</button>
 		  </div>
-		  <form action="'.site_url($link).'" class="row">
+		  <form action="' . site_url($link) . '" class="row">
 				<div class="row">
 		  <div class="modal-body" id="modalkuE">
 		  </div>
@@ -172,7 +174,7 @@ class Msetup extends CI_Model {
 		</div>
 	  </div>
 	</div>';
-	$theme['myModalDelete'][] = '
+		$theme['myModalDelete'][] = '
 	<div class="modal fade bd-example-modal-lg" id="myModalD" tabindex="-1" role="dialog" aria-labelledby="myModalTitle" aria-hidden="true">
 		  <div class="modal-dialog">
 			<div class="modal-content">
@@ -192,7 +194,7 @@ class Msetup extends CI_Model {
 		  </div>
 	</div>
 	';
-	$theme['footer'][] = '
+		$theme['footer'][] = '
 		  <footer class="main-footer">
 			<div class="footer-right">
 				Copyright &copy; 2024 <div class="bullet"></div> Design By <a href="https://ftfservices.biz/">FTF GLOBALINDO</a>
@@ -200,99 +202,105 @@ class Msetup extends CI_Model {
 		  </footer>
 		</div>
 	  </div>
-	  <script src="'.$base['url'].'assets/modules/popper.js"></script>
-	  <script src="'.$base['url'].'assets/modules/tooltip.js"></script>
-	  <script src="'.$base['url'].'assets/modules/bootstrap/js/bootstrap.min.js"></script>
-	  <script src="'.$base['url'].'assets/modules/nicescroll/jquery.nicescroll.min.js"></script>
-	  <script src="'.$base['url'].'assets/modules/moment.min.js"></script>
-	  <script src="'.$base['url'].'assets/js/stisla.js"></script>
-	  <script src="'.$base['url'].'assets/js/scripts.js"></script>
-	  <script src="'.$base['url'].'assets/js/custom.js"></script>
+	  <script src="' . $base['url'] . 'assets/modules/popper.js"></script>
+	  <script src="' . $base['url'] . 'assets/modules/tooltip.js"></script>
+	  <script src="' . $base['url'] . 'assets/modules/bootstrap/js/bootstrap.min.js"></script>
+	  <script src="' . $base['url'] . 'assets/modules/nicescroll/jquery.nicescroll.min.js"></script>
+	  <script src="' . $base['url'] . 'assets/modules/moment.min.js"></script>
+	  <script src="' . $base['url'] . 'assets/js/stisla.js"></script>
+	  <script src="' . $base['url'] . 'assets/js/scripts.js"></script>
+	  <script src="' . $base['url'] . 'assets/js/custom.js"></script>
 	</body>
 	</html>';
-	return $theme;
+		return $theme;
 	}
-	public function setup(){
-	$base			= [];
-	$uri			= explode('/',$_SERVER['REQUEST_URI']);
-	$base			= [ 'url' 		=> 'http://localhost/siapad/',
-						'halaman'	=> isset($uri[2]) ? $uri[2] : NULL,
-					   	'fungsi'	=> isset($uri[3]) ? $uri[3] : NULL];
+	public function setup()
+	{
+		$base			= [];
+		$uri			= explode('/', $_SERVER['REQUEST_URI']);
+		$base			= [
+			'url' 		=> 'http://localhost/siapad/',
+			'halaman'	=> isset($uri[2]) ? $uri[2] : NULL,
+			'fungsi'	=> isset($uri[3]) ? $uri[3] : NULL
+		];
 		return $base;
 	}
-	public function get_menu() {
-        $query = $this->db->get('menu');
-        return $query->result_array();
-    }
-    public function get_menu_tree($parent_id = 0) {
-        $this->db->where('parent_id', $parent_id);
-        $this->db->order_by('id', 'ASC');
-        $query 	= $this->db->get('menu');
-        $menu 	= $query->result_array();
-        $tree 	= array();
-        foreach ($menu as $menu) {
-            $children = $this->get_menu_tree($menu['id']);
-            if ($children) {
-                $menu['children'] = $children;
-            }
-            $tree[] = $menu;
-        }
-        return $tree;
-    }
-	public function menuSide($menus){
-    $base = $this->setup();
-    $html = [];
-    
-    foreach ($menus as $menu) {
-        $icon = !empty($menu['icon']) ? '<i class="' . $menu['icon'] . '" style="font-size:25px;"></i> ' : '';
-        $link = !empty($menu['link']) ? $base['url'].$menu['link'] : '#';
-        
-        if (isset($menu['children'])) {
-            $html[] = '<li class="dropdown">';
-            $html[] = '<a href="'.$link.'" class="nav-link has-dropdown">' . $icon . '<span> ' . $menu['name'] . '</span></a>';
-            $html[] = '<ul class="dropdown-menu">';
-            $html[] = $this->menuSide($menu['children']);
-            $html[] = '</ul>';
-        } else {
-            $html[] = '<li class="dropdown">';
-            $html[] = '<a href="'.$link.'" class="nav-link ">' . $icon . '<span>' . $menu['name'] . '</span></a>';
-        }
-        $html[] = '</li>';
-    }
-    
-    return implode('',$html);
-}
+	public function get_menu()
+	{
+		$query = $this->db->get('menu');
+		return $query->result_array();
+	}
+	public function get_menu_tree($parent_id = 0)
+	{
+		$this->db->where('parent_id', $parent_id);
+		$this->db->order_by('id', 'ASC');
+		$query 	= $this->db->get('menu');
+		$menu 	= $query->result_array();
+		$tree 	= array();
+		foreach ($menu as $menu) {
+			$children = $this->get_menu_tree($menu['id']);
+			if ($children) {
+				$menu['children'] = $children;
+			}
+			$tree[] = $menu;
+		}
+		return $tree;
+	}
+	public function menuSide($menus)
+	{
+		$base = $this->setup();
+		$html = [];
 
-//	public function menuSide($menus){
-//		$base	= $this->setup();
-//		$html 	= ''; 
-//		foreach ($menus as $menu) {
-//			$icon = !empty($menu['icon']) ? '<i class="' . $menu['icon'] . '" style="font-size:28px;"></i>' : NULL;
-//			$link = !empty($menu['link']) ? $base['url'].$menu['link'] : '#';
-//			if (isset($menu['children'])) {
-//				$html .= '<li class="dropdown">';
-//				$html .= '<a href="'.$link.'" class="nav-link has-dropdown">' . $icon . '<span>' . $menu['name'] . '</span></a>';
-//				$html .= '<ul class="dropdown-menu">';
-//				$html .= $this->menuSide($menu['children']);
-//				$html .= '</ul>';
-//			} else {
-//				$html .= '<li class="dropdown">';
-//				$html .= '<a href="'.$link.'" class="nav-link ">' . $icon . '<span>' . $menu['name'] . '</span></a>';
-//			}
-//			$html .= '</li>';
-//		}
-//		return $html;
-//	}
-	public function get_title($uri_segment) {
-        $this->db->select('*');
-        $this->db->from('menu');
-        $this->db->where('link', $uri_segment);
-        $query = $this->db->get();
-        if ($query->num_rows() > 0) {
-            return $query->row();
-        } else {
-            return "Title Not Found";
-        }
-    }
+		foreach ($menus as $menu) {
+			$icon = !empty($menu['icon']) ? '<i class="' . $menu['icon'] . '" style="font-size:25px;"></i> ' : '';
+			$link = !empty($menu['link']) ? $base['url'] . $menu['link'] : '#';
+
+			if (isset($menu['children'])) {
+				$html[] = '<li class="dropdown">';
+				$html[] = '<a href="' . $link . '" class="nav-link has-dropdown">' . $icon . '<span> ' . $menu['name'] . '</span></a>';
+				$html[] = '<ul class="dropdown-menu">';
+				$html[] = $this->menuSide($menu['children']);
+				$html[] = '</ul>';
+			} else {
+				$html[] = '<li class="dropdown">';
+				$html[] = '<a href="' . $link . '" class="nav-link ">' . $icon . '<span>' . $menu['name'] . '</span></a>';
+			}
+			$html[] = '</li>';
+		}
+
+		return implode('', $html);
+	}
+
+	//	public function menuSide($menus){
+	//		$base	= $this->setup();
+	//		$html 	= ''; 
+	//		foreach ($menus as $menu) {
+	//			$icon = !empty($menu['icon']) ? '<i class="' . $menu['icon'] . '" style="font-size:28px;"></i>' : NULL;
+	//			$link = !empty($menu['link']) ? $base['url'].$menu['link'] : '#';
+	//			if (isset($menu['children'])) {
+	//				$html .= '<li class="dropdown">';
+	//				$html .= '<a href="'.$link.'" class="nav-link has-dropdown">' . $icon . '<span>' . $menu['name'] . '</span></a>';
+	//				$html .= '<ul class="dropdown-menu">';
+	//				$html .= $this->menuSide($menu['children']);
+	//				$html .= '</ul>';
+	//			} else {
+	//				$html .= '<li class="dropdown">';
+	//				$html .= '<a href="'.$link.'" class="nav-link ">' . $icon . '<span>' . $menu['name'] . '</span></a>';
+	//			}
+	//			$html .= '</li>';
+	//		}
+	//		return $html;
+	//	}
+	public function get_title($uri_segment)
+	{
+		$this->db->select('*');
+		$this->db->from('menu');
+		$this->db->where('link', $uri_segment);
+		$query = $this->db->get();
+		if ($query->num_rows() > 0) {
+			return $query->row();
+		} else {
+			return "Title Not Found";
+		}
+	}
 }
-?>

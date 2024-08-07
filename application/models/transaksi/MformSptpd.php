@@ -18,7 +18,7 @@ class MformSptpd extends CI_Model
 			
 			<div class="row mt-3">
 					<div class="col-6">'
-			. implode($this->Form->inputRowsText('nomors', 'Nomor', 'col-sm-3', 'form-control-sm')) .
+			. implode($this->Form->inputRowsText('nomors', 'Nomor Biling', 'col-sm-3', 'form-control-sm')) .
 			'</div>
 					<div class="col-6">'
 			. implode($this->Form->inputRowsText('rekenings', 'Rekening', 'col-sm-3', 'form-control-sm', '', 'readonly')) .
@@ -31,9 +31,6 @@ class MformSptpd extends CI_Model
 			'</div>
 				<div class="col-6">'
 			. implode($this->Form->inputRowsSelect('wajibpajaks', 'Wajib Pajak', 'col-sm-3', 'form-control-sm ')) .
-			'</div>
-				<div class="col-6">'
-			. implode($this->Form->inputRowsText('tanggals', 'Tanggal', 'col-sm-3', 'form-control-sm datepicker')) .
 			'</div>
 				<div class="col-6">'
 			. implode($this->Form->inputRowsText('tglterbits', 'Tgl. Terbit', 'col-sm-3', 'form-control-sm datepicker')) .
@@ -208,7 +205,7 @@ class MformSptpd extends CI_Model
 			<form action="' . site_url('transaksi/FormSptpd/Cetak') . '" id="forminput" class="form-row" method="post" enctype="multipart/form-data" target="_blank">
 				<div class="row mt-3">
 					<div class="col-6">'
-			. implode($this->Form->inputRowsText('nomor', 'Nomor', 'col-sm-3', 'form-control-sm')) .
+			. implode($this->Form->inputRowsText('nomor', 'Nomor Biling', 'col-sm-3', 'form-control-sm')) .
 			'</div>	
 				<div class="col-6">'
 			. implode($this->Form->inputRowsText('npwpd', 'NPWPD', 'col-sm-3', 'form-control-sm', '')) .

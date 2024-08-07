@@ -33,9 +33,7 @@ class Msetup extends CI_Model
 			  <script src="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>	  
 			 <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script> 
 			  <script src="https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>
-
-			 
+			  <script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>			 
 			  <style>
 					/* Custom CSS to ensure menu alignment */
 					.sidebar-menu .nav-link {
@@ -173,7 +171,7 @@ class Msetup extends CI_Model
 							<i class="fas fa-cog"></i> Settings
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="#" class="dropdown-item has-icon text-danger">
+						<a href="' . base_url("/Login") . '" class="dropdown-item has-icon text-danger">
 							<i class="fas fa-sign-out-alt"></i> Logout
 						</a>
 						</div>
@@ -281,6 +279,7 @@ class Msetup extends CI_Model
 			'halaman'	=> isset($uri[2]) ? $uri[2] : NULL,
 			'fungsi'	=> isset($uri[3]) ? $uri[3] : NULL
 		];
+
 		return $base;
 	}
 	public function get_menu()
@@ -403,13 +402,21 @@ class Msetup extends CI_Model
 		return null;
 	}
 
-	public function get_rekening($kdrekening = '')
+	public function get_rekening($kdrekening = '', $namarek = null)
 	{
 		if ($kdrekening != '') {
 			$rekdetail = $this->db
 				->select('id,kdrekening, nmrekening')
 				->from('mst_rekening')
 				->where('kdrekening', $kdrekening)
+				->get()
+				->row_array();
+			return $rekdetail;
+		} else if ($namarek != null) {
+			$rekdetail = $this->db
+				->select('id,kdrekening, nmrekening')
+				->from('mst_rekening')
+				->where('id', $namarek)
 				->get()
 				->row_array();
 			return $rekdetail;
@@ -509,11 +516,22 @@ class Msetup extends CI_Model
 		return $triwulan;
 	}
 
-	public function mstWajibPajak($nama = '')
+	public function mstWajibPajak($nama = '', $npwpd = null, $nop = null, $rek = null)
 	{
-
+		if ($npwpd != null && $npwpd != '') {
+			$this->db->where("npwpd", $npwpd);
+		}
+		if ($nop != null && $nop != '') {
+			$this->db->where("nop", $nop);
+		}
+		if ($nama != '' && $nama != null) {
+			$this->db->like("nama", $nama);
+		}
+		if ($rek != '' && $rek != null) {
+			$this->db->where("idrekening", $rek);
+		}
 		$ttddata = $this->db
-			->select('id, nama,  npwpd')
+			->select('id, nama,  npwpd,nop')
 			->from('mst_wajibpajak')
 			->get()
 			->result();

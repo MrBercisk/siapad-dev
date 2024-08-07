@@ -89,9 +89,13 @@ class WP extends CI_Controller
 					'mst_kecamatan c' => [
 						'condition' => 'a.kecamatan = c.id',
 						'type' => 'LEFT'
+					],
+					'mst_rekening d' => [
+						'condition' => 'a.idrekening = d.id',
+						'type' => 'LEFT'
 					]
 				];
-				$selectFields 	= 	'a.id as id_wp,nomor,a.nama as nama_wp,alamat,notype,kecamatan,kelurahan,nop,npwpd,status,idrekening';
+				$selectFields 	= 	'a.id as id_wp,nomor,a.nama as nama_wp,alamat,notype,kecamatan,kelurahan,nop,npwpd,status,idrekening,d.nmrekening,d.kdrekening';
 				$kode 			= 	$this->Crud->gandengan('mst_wajibpajak a', $joinTables, $selectFields, 'a.id="' . $this->input->post('idnya') . '"')[0];
 				$Jssetup	= $this->Jssetup;
 				$status = '<option>-- Status --</option>
@@ -127,7 +131,14 @@ class WP extends CI_Controller
 		' . $Jssetup->jsKelurahan('master/WP/get_kelurahan', 'kecamatanx', 'kelurahanx') . '
 
 					
-					$(document).ready(function() {
+				
+						var selectedWp = ' . json_encode($kode) . ';
+    
+						if (selectedWp) {
+							
+							var option = new Option(selectedWp.nmrekening + " (" + selectedWp.kdrekening + ")", selectedWp.idrekening, true, true);
+							$("#rekeninge").append(option).trigger("change");
+						}
 						$("#rekeninge").select2({
 							ajax: {
 								url: "' . site_url('master/wp/getRek') . '",
@@ -168,19 +179,6 @@ class WP extends CI_Controller
 								return $("<span>" + kode + " - " + item.text + " </span>");
 							}
 						});
-
-							var selectedValue =' . $kode->idrekening . ';
-						
-						$.ajax({
-							type: "POST",
-							url: "' . site_url('master/wp/getRek') . '",
-							data: { data: selectedValue },
-							dataType: "json"
-						}).then(function (data) {
-							var option = new Option(data.items[0].kode + " - " + data.items[0].text, true,true);
-							$("#rekeninge").append(option).trigger("change");
-						});
-					});
 
 				</script>
 				';

@@ -22,6 +22,16 @@
     <script>
         $(document).ready(function() {
 
+
+
+
+
+
+
+
+
+
+
             $("#wajibpajak").select2({
                 ajax: {
                     url: "<?= site_url("'.transaksi / formsptpd / get_data "); ?>",

@@ -7,12 +7,114 @@ if ($this->session->flashdata('message')) :
 					</div>';
 endif;
 $theme['main'][] = implode($sidebar);
-$escaped_link = 'transaksi/FormSptpd/getDinas';
-// $cetak = 'transaksi/FormSptpd/Cetak';
+$escaped_link = 'transaksi/SyncSptpd/getApisptpd';
+$simpan = 'transaksi/SyncSptpd/aksi';
 
 $datatables = '<script type="text/javascript">
 $(document).ready(function(){
-  $(".select2").select2();
+  $("#select-all").click(function() {
+    var isChecked = $(this).is(":checked");
+    $("#ftf tbody input[type=\'checkbox\']").prop("checked", isChecked);
+    if (isChecked) {
+      $("#ftf tbody tr").addClass("selected");
+    } else {
+      $("#ftf tbody tr").removeClass("selected");
+    }
+  });
+
+  $("#ftf tbody").on("click", "input[type=\'checkbox\']", function() {
+    var $row = $(this).closest("tr");
+    if ($(this).is(":checked")) {
+      $row.addClass("selected");
+    } else {
+      $row.removeClass("selected");
+    }
+  });
+
+  
+  $("#simpan").click(function() {
+    var selectedData = [];
+    var AKSI = $("#simpan").val();
+    $("#ftf tbody input[type=\'checkbox\']:checked").each(function() {
+      var row = $(this).closest("tr");
+      var rowData = {
+        tgl_input:$("#tanggals").val(),
+        nomor: row.find("td:eq(2)").text(),
+        tanggal: row.find("td:eq(3)").text(),
+        wajibPajak: row.find("td:eq(4)").text(),
+        npwpd: row.find("td:eq(5)").text(),
+        nop: row.find("td:eq(6)").text(),
+        namausaha: row.find("td:eq(7)").text(),
+        rekening: row.find("td:eq(8)").text(),
+        bulan: row.find("td:eq(9)").text(),
+        tahun: row.find("td:eq(10)").text(),
+        pokok: row.find("td:eq(11)").text(),
+        denda: row.find("td:eq(12)").text(),
+        noPelaporan: row.find("td:eq(13)").text(),
+        jumlah: row.find("td:eq(14)").text(),
+        keterangan: row.find("td:eq(15)").text(),
+        jenispajak: row.find("td:eq(16)").text()
+      };
+
+      selectedData.push(rowData);
+    }); 
+      if (selectedData.length === 0) {
+        Swal.fire({
+              icon: "error",
+              title: "Gagal menyimpan data",
+              text: "Silahkan Pilih Data yang akan di save !",
+              showConfirmButton: true
+            });
+        return; 
+      }
+        var $icon = $(this).find("i");
+        var $button = $(this);
+      if ($icon.hasClass("fa-print")) {
+          $icon.removeClass("fa-print").addClass("spinner-border");
+          $(this).prop("disabled", true);
+      }
+    $.ajax({
+      url: "' . site_url($simpan) . '", 
+      type: "POST",
+      data: { data: selectedData,AKSI: AKSI },
+      success: function(response) {
+        if (response.success) {
+           Swal.fire({
+            icon: "success",
+            title: "Data berhasil disimpan",
+            showConfirmButton: true
+          });
+          var $icon = $button.find("i"); 
+                if ($icon.hasClass("spinner-border")) {
+                    $icon.removeClass("spinner-border").addClass("fas fa-print");
+                    $button.prop("disabled", false);
+                };
+        } else {
+              
+           Swal.fire({
+            icon: "error",
+            title: "Gagal menyimpan data",
+            text: response.message,
+            showConfirmButton: true
+          });
+             var $icon = $button.find("i"); 
+                if ($icon.hasClass("spinner-border")) {
+                    $icon.removeClass("spinner-border").addClass("fas fa-print");
+                    $button.prop("disabled", false);
+                }
+      
+        };
+      },
+      error: function(xhr, status, error) { 
+        alert("Terjadi kesalahan: " + error);
+         var $icon = $(this).find("i");
+        if ($icon.hasClass("spinner-border")) {
+            $icon.removeClass("spinner-border").addClass("fas fa-print");
+            $(this).prop("disabled", true);
+        }
+      }
+    });
+  });
 
 	$("#filters").click(function(){
    var $icon = $(this).find("i");
@@ -20,12 +122,8 @@ $(document).ready(function(){
         $icon.removeClass("fa-search").addClass("spinner-border");
         $(this).prop("disabled", true);
     }
-    var nomor = $("#nomor").val();
-    var rekening = $("#rekening").val();
-    var npwpd = $("#npwpd").val();
-    var nop = $("#nop").val();
-    var wajibpajak = $("#wajibpajak").val();
-    var tahun = $("#tahun").val();
+    var tanggals = $("#tanggals").val();
+   
         cariData();
   });
     var table = $("#ftf").DataTable({
@@ -33,18 +131,14 @@ $(document).ready(function(){
         "processing": false,
         "serverSide": true,
         "searching": false, 
+        "ordering": false,
         "paging": true,   
 
         "ajax": {
             url: "' . site_url($escaped_link) . '",
             type: "POST",
             data: function(d) {
-               d.nomor = $("#nomor").val();
-               d.rekening = $("#rekening").val();
-               d.npwpd = $("#npwpd").val();
-               d.nop = $("#nop").val();
-               d.wajibpajak = $("#wajibpajak").val();
-               d.tahun = $("#tahun").val();
+               d.tanggals = $("#tanggals").val();
             },
              "error": function(xhr, error, code) {
                 var $icon = $("#filters").find("i");
@@ -56,19 +150,19 @@ $(document).ready(function(){
         },
         "columnDefs": [
             {
-                "targets": 0,
+                "targets": 1,
                 "orderable": false,
                 "width": "1%"
             },
             {
-                "targets": -1,
+                "targets": 0,
                 "width": "10%"
             }
         ],
         "drawCallback": function(settings) {
             var api = this.api();
             var start = api.page.info().start;
-            api.column(0, { page: "current" }).nodes().each(function(cell, i) {
+            api.column(1, { page: "current" }).nodes().each(function(cell, i) {
                 cell.innerHTML = start + i + 1;
             });
 
@@ -77,13 +171,7 @@ $(document).ready(function(){
                 if ($icon.hasClass("spinner-border")) {
                     $icon.removeClass("spinner-border").addClass("fas fa-search");
                }
-        },
-        "buttons": [
-            "copyHtml5",
-            "excelHtml5",
-            "csvHtml5",
-            "pdfHtml5"
-        ]
+        }
     });
 
   function cariData() {
@@ -98,20 +186,24 @@ $(document).ready(function(){
 <table class="table table-striped table-responsive" style="width:100% !important;" id="ftf">
    <thead>                                 
      <tr>
+     <th><input type="checkbox" id="select-all"></th>
          <th>NO</th>
          <th>Nomor</th>
          <th>Tanggal</th>
-         <th>Tgl. Terbit</th>
          <th>Wajib Pajak</th>
          <th>NPWPD</th>
+         <th>NOP</th>
+         <th>Nama Usaha</th>
          <th>Rekening</th>
          <th>Bulan</th>
          <th>Tahun</th>
          <th>Pokok</th>
          <th>Denda</th>
+         <th>No. Pelaporan</th>
          <th>Jumlah</th>
          <th>Keterangan</th>
-		 <th></th>
+         <th>Jenis Pajak</th>
+		 
      </tr>
    </thead>
    <tbody>                                 
@@ -141,30 +233,18 @@ $theme['main'][] =
                     <div class="card">
                       <div class="card-body px-4 mx-0">
 					  	' . implode('', $theme['alert']) . '
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                          <li class="nav-item">
-                            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#data" role="tab" aria-controls="home" aria-selected="true">Data</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#insert" role="tab" aria-controls="profile" aria-selected="false">Insert Data</a>
-                          </li>
-                        </ul>
+                       
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
-                          <div class="text-right mb-3">
-                          <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                           <i class="fas fa-filter"></i> Filters
-                          </a>
-                           <div class="collapse mb-3" id="collapseExample">
+                          <div class="text-left mb-3">
+                           <div class="mb-3">
                           ' . $filters . '
                           </div>
                           </div>
                           
                           ' . $datatables . '
                           </div>
-                          <div class="tab-pane fade" id="insert" role="tabpanel" aria-labelledby="profile-tab">
-						  ' . $forminsert . '
-                          </div>
+                        
                         </div>
                       </div>
                     </div>
