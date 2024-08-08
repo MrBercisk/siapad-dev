@@ -95,19 +95,16 @@
     <h3>DAFTAR NAMA WAJIB PAJAK HOTEL, RESTORAN DAN HIBURAN</h3>
     <h3>YANG BELUM MEMBAYAR PAJAK S.D. BULAN <?= $format_bulan;?> <?= $format_tahun ?></h3>
 </div>
-
-    <table border="1">
-        <thead>
+<table border="1">
+    <thead>
         <tr>
             <th>NO</th>
             <th>Jenis Pajak</th>
             <th>Nama Wajib Pajak</th>
             <th>Masa Pajak</th>
         </tr>
-      
-        </thead>
-        <tbody>
-        <tbody>
+    </thead>
+    <tbody>
     <?php
     $bulan_indonesia = array(
         'January' => 'Januari',
@@ -123,6 +120,7 @@
         'November' => 'November',
         'December' => 'Desember'
     );
+
     function romawi($angka) {
         $angka = intval($angka);
         $hasil = '';
@@ -151,37 +149,51 @@
 
         return $hasil;
     }
-    if (!empty($tablenya)):
-        $no = 1;
+
+    $groupedData = [];
+    foreach ($tablenya as $row) {
+        $nmrek = !empty($row['nmrek']) ? $row['nmrek'] : 'null';
+        if (!isset($groupedData[$nmrek])) {
+            $groupedData[$nmrek] = [
+                'nmrek' => $nmrek,
+                'entries' => [] 
+            ];
+        }
+        $groupedData[$nmrek]['entries'][] = [
+            'nmwp' => $row['nmwp'],
+            'tunggakan' => $row['tunggakan']
+        ];
+    }
+
+    if (!empty($groupedData)):
+        $noromawi = 1; 
         $count = 0;
-        $noromawi = 1;
-        
-        foreach ($tablenya as $row):  
-        
+        foreach ($groupedData as $data):
             $pageBreakClass = ($count % 3 === 0 && $count > 0) ? 'page-break' : 'page-break-none';
             $count++;
-        ?>
-                
-        <tr class="<?= $pageBreakClass ?>">
-            <td style="text-align: center;"><?= $no++ ?></td>
-            <td style="text-align: left; padding:5px;" ><b><?= htmlspecialchars($row['nmrek']) ?></b></td>
-            <td style="text-align: left; padding:5px;" ><b><?= htmlspecialchars($row['nmwp']) ?></b></td>
-            <td style="text-align: left; padding:5px;" ><b><?= htmlspecialchars($row['tunggakan']) ?></b></td>
-
-      
-        </tr>
-        <?php endforeach; ?>
-       
-    <?php else: ?>
-        <tr>
-            <td colspan="4" style="text-align: center;">Tidak Ada Data</td>
-        </tr>
+            $no = 1; 
+            $firstEntry = true;
+            foreach ($data['entries'] as $entry):
+    ?>
+                <tr class="<?= $pageBreakClass ?>">
+                    <td style="text-align: center;"><?= $firstEntry ? romawi($noromawi) : '' ?></td>
+                    <td style="text-align: left; padding:5px;"><?= $firstEntry ? htmlspecialchars($data['nmrek']) : '' ?></td>
+                    <td style="text-align: left; padding:5px;"><?= $no++ ?>.&nbsp;&nbsp;<?= htmlspecialchars($entry['nmwp']) ?></td>
+                    <td style="text-align: left; padding:5px;"><?= htmlspecialchars($entry['tunggakan']) ?></td>
+                </tr>
+                <?php
+                $firstEntry = false; 
+            endforeach;
+            $noromawi++; 
+        endforeach;
+    ?>
     <?php endif; ?>
-</tbody>
+    </tbody>
+</table>
 
-    </table>
 
-    <div class="footer-section">
+
+<div class="footer-section">
     <div class="tgl_cetak">
         <p>Bandar Lampung, <?= $tgl_cetak_format ?></p>
     </div>

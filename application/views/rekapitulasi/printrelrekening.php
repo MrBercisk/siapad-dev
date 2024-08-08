@@ -84,23 +84,24 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>REKAPITULASI REALISASI ANGGARAN PENDAPATAN DAERAH</h3>
+    <h3><?= strtoupper($nmrekening); ?></h3>
 
     
-    <h3>BULAN : <?= $format_bulan; ?> <?= $format_tahun ?></h3>
+    <h3>PER :  <?= htmlspecialchars($tglakhir_format) ?></h3>
 </div>
 <table>
     <thead>
         <tr>
             <th rowspan="2">NO</th>
-            <th rowspan="2">JENIS PAJAK</th>
+            <th rowspan="2">TANGGAL TRANSAKSI</th>
             <th rowspan="2">JUMLAH SSPD/STS (Rp.)</th>
-            <th colspan="3">JUMLAH WAJIB PAJAK (WP)/SKPD/STTS/SSPD</th>
+            <th rowspan="2">NAMA WAJIB PAJAK</th>
+            <th rowspan="2">MASA PAJAK</th>
+            <th colspan="1">JUMLAH</th>
             <th rowspan="2">KETERANGAN</th>
         </tr>
         <tr>
-            <th>S.D BULAN LALU</th>
-            <th>BULAN INI</th>
-            <th>S.D BULAN INI</th>
+            <th>SSPD/STS(Rp)</th>
         </tr>
         <tr>
             <th>1</th>
@@ -114,62 +115,75 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     </thead>
     <tbody>
     <?php
-        if (!empty($tablenya)):
-            $no = 1;
-            $count = 0;
-            $total_jmlrp = 0;
-            $total_sampai_bulan = $total_sampai_bulan; 
-            
-            foreach ($tablenya as $row): 
-                $total_jmlrp +=  $row['jmlrpini'];
-                $total_seluruh = $total_jmlrp + $total_sampai_bulan;
-            ?>
-                    
-            <tr>
-                <td style="text-align: center;"><?= $no++ ?></td>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['nmrek']) ?></td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlrpini'],2) ?></td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlwplalu']) ?></td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlwpini']) ?></td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlwpsdini']) ?></td>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['satuan']) ?></td>
+// Sort data in ascending order by 'nmwp'
+usort($tablenya, function($a, $b) {
+    return strcmp($a['nmwp'], $b['nmwp']);
+});
 
+function formatTanggal($tanggal) {
+    $parts = explode('-', $tanggal);
+
+    if (count($parts) == 3) {
+        return "{$parts[2]}-{$parts[1]}-{$parts[0]}";
+    }
+    return $tanggal; 
+}
+
+if (!empty($tablenya)):
+    $no = 1;
+    $previousNmwp = '';
+    $uniqueNmwpCount = 0;
+    $count = 0;
+    $total_jmlrp = 0;
+    $total_sampai_bulan = $total_sampai_bulan;
+    
+    foreach ($tablenya as $row): 
+        $total_jmlrp +=  $row['jumlah'];
+        $total_seluruh = $total_jmlrp + $row['totlalu'];
         
-            </tr>
-            <?php endforeach; ?>
-            <tr>
-                <td colspan="2" style="font-weight: bold;">JUMLAH PER <?= htmlspecialchars($tglakhir_format) ?> </td>
-                <td style="text-align: right; padding:5px;" ><b><?= number_format($total_jmlrp ,2) ?></b></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-               
-            </tr>
-            <tr>
-                <td colspan="2" style="font-weight: bold;">JUMLAH S.D <?= htmlspecialchars($tglsebelum_format) ?> </td>
-                <td style="text-align: right; padding:5px;"><b><?= number_format($total_sampai_bulan, 2) ?></b></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            
-            </tr>
-            <tr>
-                <td colspan="2" style="font-weight: bold;">JUMLAH PER <?= htmlspecialchars($tglakhir_format) ?> </td>
-                <td style="text-align: right; padding:5px;" ><b><?= number_format($total_seluruh ,2) ?></b></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-           
-            </tr>
-    <?php else: ?>
+        if ($row['nmwp'] !== $previousNmwp) {
+            $currentNo = $no++; 
+            $uniqueNmwpCount++; 
+        } else {
+            $currentNo = ''; 
+        }
+        
+        $previousNmwp = $row['nmwp']; 
+    ?>
         <tr>
-            <td></td>
-            <td colspan="6" style="text-align: center;">Tidak Ada Data</td>
+            <td style="text-align: center;"><?= $currentNo ?></td>
+            <td style="text-align: center; padding:4px;" ><?= formatTanggal(htmlspecialchars($row['tanggal'])) ?></td>
+            <td style="text-align: left; padding:4px;" ><?= htmlspecialchars($row['nobukti']) ?></td>
+            <td style="text-align: left; padding:4px;" ><?= htmlspecialchars($row['nmwp']) ?></td>
+            <td style="text-align: center; padding:4px;" ><?= htmlspecialchars($row['masapajak']) ?></td>
+            <td style="text-align: right; padding:4px;" ><?= number_format($row['jumlah'],2) ?></td>
+            <td style="text-align: left; padding:4px;" ></td>
         </tr>
-    <?php endif; ?>
+    <?php endforeach; ?>
+   
+    <tr>
+        <td colspan="5" style="font-weight: bold;">JUMLAH PER <?= htmlspecialchars($tglakhir_format) ?></td>
+        <td style="text-align: right; padding:4px;  font-weight: bold;" " ><?= number_format($total_jmlrp,2) ?></td>
+        <td style="text-align: right; padding:4px; font-weight: bold;" ><?= ($row['jmlini']) ?> WP</td>
+    </tr>
+    <tr>
+        <td colspan="5" style="font-weight: bold;">JUMLAH S.D <?= htmlspecialchars($tglsebelum_format) ?></td>
+        <td style="text-align: right; padding:4px; font-weight: bold;" ><?= number_format($row['totlalu'],2) ?></td>
+        <td style="text-align: right; padding:4px; font-weight: bold;" ><?= ($row['jmllalu']) ?> WP</td>
+    </tr>
+    <tr>
+        <td colspan="5" style="font-weight: bold;">JUMLAH PER <?= htmlspecialchars($tglakhir_format) ?></td>
+        <td style="text-align: right; padding:4px; font-weight: bold;" ><?= number_format($total_seluruh ,2) ?></td>
+        <td style="text-align: right; padding:4px; font-weight: bold;" ><?= ($row['jmlsdini']) ?> WP</td>
+    </tr>
+<?php else: ?>
+    <tr>
+        <td></td>
+        <td colspan="6" style="text-align: center;">Tidak Ada Data</td>
+    </tr>
+<?php endif; ?>
+
+
     </tbody>
 </table>
 

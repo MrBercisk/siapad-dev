@@ -183,7 +183,6 @@
         ?>
     
         <tr style="font-weight: bold;">
-            <!-- <td colspan="7" rowspan="2" style="text-align: center;"><b>JUMLAH</b></td> -->
             <td colspan="7" style="text-align: center;"><b>JUMLAH</b></td>
             <td style="text-align: right;">Rp. <?= number_format($total_jmlsts, 2) ?></td>
             <td style="text-align: right;">Rp. <?= number_format($total_jmlskpd, 2) ?></td>

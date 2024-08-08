@@ -2,7 +2,7 @@
 $(document).ready(function() {
     $('#idrecord').select2({
         ajax: {
-            url: 'PembayaranSkpd/get_record_option',
+            url: 'PendDaerah/get_record_option',
             dataType: 'json',
             delay: 250,
             data: function (params) {
