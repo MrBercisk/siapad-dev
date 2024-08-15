@@ -4,18 +4,33 @@ class Login extends CI_Controller
 {
     public function index()
     {
-        $base         = $this->Msetup->setup();
-        $setpage     = $this->Msetup->get_title(($base['halaman']) !== "" ? $base['halaman'] : 'dashboard');
-        $template     = $this->Msetup->loadTemplate($setpage->title);
-        $data = [];
-        $data['footer']     = $template['footer'];
-        $data['title']         = $setpage->title;
-        $data['topbar']     = $template['topbar'];
-        $data['sidebar']     = $template['sidebar'];
-        $this->load->view('login.php', $data);
+        $this->load->view('login.php');
     }
     public function getAuth()
     {
-        var_dump($_POST);
+        $username = $_POST['username'];
+        $pass = $_POST['userpassword'];
+
+        $password = md5($pass);
+
+        $this->db->where('login', $username);
+        $this->db->where('passwd', $password);
+        $query =  $this->db->get('sys_user');
+        if ($query->num_rows() > 0) {
+            // Login berhasil
+            $user = $query->row();
+            $this->session->set_userdata('role_id', $user->role);
+            $this->session->set_flashdata('message', 'Login berhasil');
+            redirect('/');
+        } else {
+            // Login gagal
+            $this->session->set_flashdata('message', 'Invalid username dan password');
+            redirect('login');
+        }
+    }
+    public function logout()
+    {
+        $this->session->sess_destroy();
+        redirect('login');
     }
 }

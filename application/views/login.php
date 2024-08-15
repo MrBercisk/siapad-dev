@@ -16,6 +16,7 @@
 </head>
 
 <body class="pb-0">
+
     <!-- Begin page -->
     <div class="accountbg"></div>
 
@@ -31,6 +32,17 @@
                 <div class="p-1">
                     <h4 class="font-18 m-b-5 text-center text-danger">Selamat datang di Siapad</h4>
                     <p class="text-muted text-center">Kota Bandar Lampung</p>
+
+                    <?php
+                    // var_dump($this->session->flashdata('message'));
+                    // die;
+                    if ($this->session->flashdata('message')):
+                        echo '<div class="alert alert-primary dark" role="alert">
+                        <p>' . $this->session->flashdata('message') . '</p>
+                    </div>';
+
+                    endif;
+                    ?>
 
                     <form class="form-horizontal m-t-30" action="<?= base_url('/Login/getAuth') ?>" method="POST">
 

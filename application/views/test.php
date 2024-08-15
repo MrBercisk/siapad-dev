@@ -187,6 +187,60 @@
                 });
             });
 
+            $(".form-check-input").change(function() {
+                var isChecked = $(this).is(":checked");
+                var id = $(this).val();
+                var role = $("#role").val();
+                if (isChecked) {
+                    $.ajax({
+                        url: "' . site_url('usermanagement/UserRole/saveRoleMenu') . '",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            role: role,
+                        },
+                        seccess: function(response) {
+                            console.log(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error saving data:", error);
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        url: "' . site_url('usermanagement/UserRole/deleteRoleMenu') . '",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            role: role,
+                        },
+                        seccess: function(response) {
+                            console.log(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error saving data:", error);
+                        }
+                    })
+                }
+            });
+
+            function sendData(id, role, action) {
+                $.ajax({
+                    url: " <?php echo site_url('usermanagement/UserRole/' + action) ?>",
+                    type: "POST",
+                    data: {
+                        id: id,
+                        role: role,
+                    },
+                    seccess: function(response) {
+                        console.log(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error saving data:", error);
+                    }
+                });
+            }
+
         });
     </script>
 

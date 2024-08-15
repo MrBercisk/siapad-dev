@@ -5,9 +5,16 @@ class Msetup extends CI_Model
 {
 	public function loadTemplate($title = NULL, $link = NULL)
 	{
+		// var_dump($this->session->userdata('role_id'));
+		// die;
+		if (!$this->session->userdata('role_id')) {
+			redirect('login');
+			return;
+		}
 		$base 	  			= $this->setup();
-		$getpola			= $this->get_menu_tree();
+		$getpola			= $this->get_menu_tree1();
 		$side				= $this->menuSide($getpola);
+
 		$theme['topbar'][] 	= '<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -171,7 +178,7 @@ class Msetup extends CI_Model
 							<i class="fas fa-cog"></i> Settings
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="' . base_url("/Login") . '" class="dropdown-item has-icon text-danger">
+						<a href="' . base_url("Login/logout") . '" class="dropdown-item has-icon text-danger">
 							<i class="fas fa-sign-out-alt"></i> Logout
 						</a>
 						</div>
@@ -293,6 +300,18 @@ class Msetup extends CI_Model
 		$this->db->order_by('id', 'ASC');
 		$query 	= $this->db->get('menu');
 		$menu 	= $query->result_array();
+
+		// $role = $this->session->userdata('role_id');
+		// $this->db->select('c.*');
+		// $this->db->from('mst_role a');
+		// $this->db->join('mst_level b', 'a.idlevel = b.idlevel', 'inner');
+		// $this->db->join('menu c', 'a.idmenu = c.id', 'inner');
+		// if ($role !== null || $role !== '') {
+		// 	$this->db->where("b.singkat", $role);
+		// }
+		// $query = $this->db->get();
+		$menu 	= $query->result_array();
+
 		$tree 	= array();
 		foreach ($menu as $menu) {
 			$children = $this->get_menu_tree($menu['id']);
@@ -303,18 +322,55 @@ class Msetup extends CI_Model
 		}
 		return $tree;
 	}
+	public function get_menu_tree1($parent_id = 0)
+	{
+		$role = $this->session->userdata('role_id');
+
+		// Ambil menu berdasarkan parent_id dan role
+		$this->db->select('c.*');
+		$this->db->from('mst_role a');
+		$this->db->join('mst_level b', 'a.idlevel = b.idlevel', 'inner');
+		$this->db->join('menu c', 'a.idmenu = c.id', 'inner');
+
+		// Filter berdasarkan role
+		if ($role !== null && $role !== '') {
+			$this->db->where("b.singkat", $role);
+		}
+
+		// Filter berdasarkan parent_id
+		$this->db->where('c.parent_id', $parent_id);
+		$this->db->order_by('c.id', 'ASC');
+
+		$query = $this->db->get();
+		$menu = $query->result_array();
+
+		$tree = array();
+		foreach ($menu as $item) {
+			// Rekursif ambil anak dari menu
+			$children = $this->get_menu_tree($item['id']);
+			if ($children) {
+				$item['children'] = $children;
+			}
+			$tree[] = $item;
+		}
+
+		return $tree;
+	}
+
 	public function menuSide($menus)
 	{
 		$base = $this->setup();
 		$html = [];
 		$menu_segment_1 = $this->uri->segment(1);
 		$menu_segment_2 = $this->uri->segment(2);
+		// $menu_segment_3 = $this->uri->segment(3);
 
 		foreach ($menus as $menu) {
 			$icon = !empty($menu['icon']) ? '<i class="' . $menu['icon'] . '" style="font-size:25px;"></i> ' : '';
 			$link = !empty($menu['link']) ? $base['url'] . $menu['link'] : '';
 			$isActive = ($menu_segment_1 == $menu['link'] ||  $menu_segment_2 == $menu['link'] || $menu_segment_1 . '/' . $menu_segment_2 == $menu['link']) ? ' active' : '';
-
+			// var_dump($isActive);
+			// die;
 
 			if (isset($menu['children'])) {
 				$html[] = '<li class="dropdown  ' . $isActive . ' ">';
