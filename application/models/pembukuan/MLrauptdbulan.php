@@ -1,10 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-class MRekonbpkad extends CI_Model {
-    public function ambildata($tahun,$bulan) {
+class MLrauptdbulan extends CI_Model {
+    public function ambildata($bulan, $tahun) {
         $mysqli = $this->db->conn_id; 
  
-        $statment = $mysqli->prepare("CALL spRptRekonBPKADLampiran(?, ?)");
-        $statment->bind_param('ss', $tahun,$bulan);  
+        $statment = $mysqli->prepare("CALL spRptLRAUPTDBulanan(?, ?)");
+        $statment->bind_param('ss', $bulan, $tahun);  
     
         $statment->execute();
         $result = $statment->get_result();  
@@ -29,7 +29,7 @@ class MRekonbpkad extends CI_Model {
         ->from('mst_tandatangan')
         ->get()
         ->result();
-        $opsittd = '<option disabled selected>Pilih Tanda Tangan</option>';
+        $opsittd = '<option></option>';
         foreach ($ttddata as $ttd) {
             $opsittd .= '<option value="'.$ttd->id.'">'.$ttd->nama.'</option>';
         }
@@ -53,13 +53,13 @@ class MRekonbpkad extends CI_Model {
         
         <div class="card">
             <div class="card-body">
-                <form action="' . site_url('rekonsiliasi/rekonbpkad/cetak') . '" class="form-row" method="post">
+                <form action="' . site_url('pembukuan/Lrauptdbulan/cetak') . '" class="form-row" method="post">
                 <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                 </div>
                 <div class="col-md-12">
                     <div class="row">
-                      <div class="col-md-3">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="tahun">Tahun:</label>
                             <input type="number" class="form-control" id="tahun" name="tahun" min="1900" max="9999" value="2024" required>
@@ -85,7 +85,15 @@ class MRekonbpkad extends CI_Model {
                             </select>
                         </div>
                     </div>
-                  
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="ttd">Tanda Tangan:</label>
+                              <select id="tanda_tangan" name="tanda_tangan" class="form-control select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;">
+                                      '.$opsittd.'
+                              </select>
+                        </div>
+                    </div>
                 
                     <div class="col-md-3">
                         <div class="form-group">
@@ -95,51 +103,57 @@ class MRekonbpkad extends CI_Model {
                     </div>
 
                
-                    <div class="col-md-1 mt-3">
-                         <div class="form-check">
+    
+                    </div>
+                </div>
+                
+                    <div class="col-md-1">
+                            <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="apbdp_checkbox" name="apbdp_checkbox" >
                             <label class="form-check-label" for="apbdp">APBDP</label>
                         </div>
-                        <div class="button-group mt-2">
+                       <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="wpajak_checkbox" name="wp" >
+                            <label class="form-check-label" for="wpajak">W.Pajak</label>
+                        </div>
+                        <div class="button-group">
                             <button type="submit" class="btn btn-primary">Cetak Laporan</button>
                         </div>
                     </div>
-                    </div>
-                </div>
-                <div class="row">
-					
-					<div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
-							<h5>Kabid Buklap</h5>
-					</div>
-					<div class="col-md-8">
-                        <div class="form-group">
-                            <label for="ttd">Tanda Tangan:</label>
-                              <select id="tanda_tangan_2" name="tanda_tangan_2" class="form-control tanda_tangan_2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
-                                      '.$opsittd.'
-                              </select>
-                        </div>
-                    </div>
-				</div>
-				<div class="row">
-					
-					<div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;" >
-							<h5>Kabid Akuntansi</h5>
-					</div>
-					<div class="col-md-8">
-                        <div class="form-group">
-                            <label for="ttd">Tanda Tangan:</label>
-                              <select id="tanda_tangan_1" name="tanda_tangan_1" class="form-control tanda_tangan_1 " data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
-                                      '.$opsittd.'
-                              </select>
-                        </div>
-                    </div>
-				</div>
-                  
                 </form>
             </div>
         </div>';
         return $form;
     }
 
+    public function iniopsirekening() {
+        $rekeningCumaIni = array(
+            '4.1.1.01' => 'Pajak Hotel',
+            '4.1.1.02' => 'Pajak Restoran',
+            '4.1.1.03' => 'Pajak Hiburan',
+            '4.1.1.04' => 'Pajak Reklame',
+            '4.1.1.05' => 'Pajak Penerangan Jalan',
+            '4.1.1.07' => 'Pajak Parkir',
+            '4.1.1.08' => 'Pajak Air Tanah',
+            '4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam',
+            '4.1.1.12' => 'Pajak Bumi dan Bangunan Pedesaan dan Perkotaan',
+            '4.1.1.13' => 'Bea Perolehan Hak Atas Tanah dan Bangunan',
+        );
+
+        $rekData = $this->db
+            ->select('mst_rekening.id, mst_rekening.kdrekening')
+            ->from('mst_rekening')
+            ->where_in('kdrekening', array_keys($rekeningCumaIni))
+            ->get()
+            ->result();
+    
+        $opsiRek = '<option></option>';
+        foreach ($rekData as $rek) {
+            $namaRek = isset($rekeningCumaIni[$rek->kdrekening]) ? $rekeningCumaIni[$rek->kdrekening] : $rek->kdrekening;
+            $opsiRek .= '<option value="'.$rek->kdrekening.'">'.$namaRek.'</option>';
+        }
+    
+        return $opsiRek;
+    }
     
 }

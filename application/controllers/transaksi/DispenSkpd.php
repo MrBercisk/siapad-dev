@@ -145,7 +145,7 @@ class DispenSkpd extends CI_Controller
                         $(".jumlah").val(selectedWp.jumlah);
                         $(".idskpdrek").val(selectedWp.idskpdrek);
                     }
-                $(\'.opsiwp2\').select2({
+                $(\'#wajibpajak\').select2({
                     
                     ajax: {
                         url: \'DispenSkpd/get_wp_data\',

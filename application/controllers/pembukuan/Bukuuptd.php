@@ -5,10 +5,10 @@ require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 
 date_default_timezone_set("Asia/Jakarta");
 
-class Rekonbpkad extends CI_Controller {
+class Bukuuptd extends CI_Controller {
 	public function __construct() {
         parent::__construct();
-		$this->load->model('rekonsiliasi/MRekonbpkad');
+		$this->load->model('pembukuan/MBukuuptdbap');
     }
 	public function index()
 	{	
@@ -23,8 +23,8 @@ class Rekonbpkad extends CI_Controller {
 		$data['modalEdit'] 	= [];
 		$data['modalDelete']= [];
 		$data['sidebar'] 	= $template['sidebar'];
-		$data['forminsert'] = implode($this->MRekonbpkad->formInsert());
-		$this->load->view('rekonsiliasi/rekonbpkad',$data);
+		$data['forminsert'] = implode($this->MBukuuptdbap->formInsert());
+		$this->load->view('pembukuan/bukuuptdbap',$data);
 	}
 	public function cetak() {
 		if ($this->input->server('REQUEST_METHOD') !== 'POST') {
@@ -36,48 +36,40 @@ class Rekonbpkad extends CI_Controller {
 		$template = $this->Msetup->loadTemplate($setpage->title);
 	
 		$tglcetak = $this->input->post('tglcetak');
-		$apbdp_checkbox = $this->input->post('apbdp_checkbox') ? true : false;
-		$bulan = $this->input->post('bulan');
-		$tahun = $this->input->post('tahun');
+		$tanggal = $this->input->post('tanggal');
+		$iduptd = $this->input->post('iduptd');
 		
-		$tanda_tangan_1 = $this->input->post('tanda_tangan_1');
-        $tanda_tangan_2 = $this->input->post('tanda_tangan_2');
-
-		$tablenya = $this->MRekonbpkad->ambildata($tahun,$bulan);
-		/* echo '<pre>';
+		$tanda_tangan = $this->input->post('tanda_tangan');
+		$tablenya = $this->MBukuuptdbap->ambildata($tanggal,$iduptd);
+		
+		/* echo"<pre>";
 		var_dump($tablenya);
 		die();
-		echo '</pre>'; */
-		
+		echo"</pre>"; */
 		$data = [
 			'footer' => $template['footer'],
 			'title' => $setpage->title,
 			'link' => $setpage->link,
 			'topbar' => $template['topbar'],
 			'sidebar' => $template['sidebar'],
-		/* 	'format_bulan' => $format_bulan, */
-            'apbdp_checkbox' => $apbdp_checkbox,
-            'format_bulan' => strftime('%B', strtotime("$tahun-$bulan")),
-			'format_tahun' => $tahun,
 			'tglcetak' => $tglcetak,
 			'tablenya' => $tablenya,
 			'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tglcetak)),
+			'tgl_format' =>strftime('%d %B %Y', strtotime($tanggal)),
 		];
 	
-	 	$tanda_tangan_data_1 = $this->Msetup->get_tanda_tangan_skpd_1($tanda_tangan_1);
-        $tanda_tangan_data_2 = $this->Msetup->get_tanda_tangan_skpd_2($tanda_tangan_2);
-    
-        if ($tanda_tangan_data_1) {
-            $data['tanda_tangan_1'] = $tanda_tangan_data_1;
-        }
-        if ($tanda_tangan_data_2) {
-            $data['tanda_tangan_2'] = $tanda_tangan_data_2;
-        }
- 
-		/* $this->load->view('rekonsiliasi/printrekonbpkad', $data); */
-
+		$tanda_tangan_data = $this->Msetup->get_tanda_tangan_tanpa_checbox($tanda_tangan);
+		if ($tanda_tangan_data) {
+			$data['tanda_tangan'] = $tanda_tangan_data;
+		}
+		$uptd_data = $this->Msetup->get_uptd($iduptd);
+		if ($uptd_data) {
+			$data['iduptd'] = $uptd_data;
+		}
+		$this->load->view('pembukuan/printbukuuptdbap', $data);
+/* 
 		ob_start();
-		$html = $this->load->view('rekonsiliasi/printrekonbpkad', $data, true);
+		$html = $this->load->view('rekapitulasi/printrekapbap', $data, true);
 		ob_get_clean();
 		
 	
@@ -85,8 +77,9 @@ class Rekonbpkad extends CI_Controller {
 		$dompdf->loadHtml($html);
 		$dompdf->setPaper('legal', 'landscape');
 		$dompdf->render();
-		$dompdf->stream("rekonbpkad.pdf", array("Attachment" => 0));
+		$dompdf->stream("rekapbap.pdf", array("Attachment" => 0)); */
 	}
+	
 	
 	
 }

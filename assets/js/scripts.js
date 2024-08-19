@@ -331,9 +331,9 @@ $(function () {
 	});
 
 	// Select2
-	// if (jQuery().select2) {
-	// 	$(".select2").select2();
-	// }
+	if (jQuery().select2) {
+		$(".select2").select2();
+	}
 
 	// Selectric
 	if (jQuery().selectric) {

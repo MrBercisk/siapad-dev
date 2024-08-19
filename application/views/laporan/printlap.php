@@ -32,7 +32,7 @@
             border: 1px solid black;
         }
         th {
-            padding: 10px;
+            padding: 2px;
             text-align: center;
             font-size: 10px;
         }
@@ -75,24 +75,6 @@
             font-weight: bold;
             margin-top: 70px;
         }
-        th:nth-child(1) {
-            width: 15%;
-        }
-        th:nth-child(2) {
-            width: 25%;
-        }
-        th:nth-child(3){
-            width: 15%;
-        }
-        th:nth-child(4){
-            width: 15%;
-        }
-        th:nth-child(5){
-            width: 15%;
-        }
-        th:nth-child(6){
-            width: 5%;
-        }
     </style>
 </head>
 <body>
@@ -106,23 +88,16 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>LAPORAN REALISASI ANGGARAN PENDAPATAN DAERAH</h3>
-    <h3>TANGGAL <?= strftime('%d %B %Y') ?></h3>
+    <h3>TANGGAL <?= $tgl_format ?></h3>
+    <?php if ($audited): ?>
+        <h3>(AUDITED BPK TAHUN <?= $tahun_depannya; ?>)</h3>
+    <?php endif; ?>
+    <?php if ($un_audited): ?>
+        <h3>(UN-AUDITED BPK TAHUN <?= $tahun_depannya; ?>)</h3>
+    <?php endif; ?>
 </div>
 <table>
-    <colgroup>
-        <col style="width: 15%;">
-        <col style="width: 25%;">
-        <col style="width: 10%;">
-        <?php if ($apbdp_checkbox): ?>
-            <col style="width: 10%;">
-        <?php endif; ?>
-        <col style="width: 10%;">
-        <col style="width: 5%;">
-        <col style="width: 10%;">
-        <col style="width: 5%;">
-        <col style="width: 10%;">
-        <col style="width: 10%;">
-    </colgroup>
+
     <thead>
         <tr>
             <th rowspan="2">KODE REKENING</th>
@@ -161,62 +136,169 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     <?php
     $totalApbd = 0;
     $totalApbdp = 0;
-    $totalTotlalu = 0;
-    $totalTotini = 0;
-    $totalTotlaluTotini = 0;
+    $totalBap = 0;
+    $totalBpkad = 0;
     $totalSelisih = 0;
-    
-    if (!empty($tablenya)): 
-        foreach($tablenya as $tbl): 
+    $groupedData = [];
 
+    if (!empty($tablenya)) {
+        foreach ($tablenya as $tbl) {
+
+            if (!isset($groupedData[$tbl['nmrek2']])) {
+                $groupedData[$tbl['nmrek2']] = [
+                    'kdrek2' => $tbl['kdrek2'],
+                    'totalApbd' => 0,
+                    'totalApbdp' => 0,
+                
+                ];
+            }
+    
+            if (!isset($groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']])) {
+                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']] = [
+                    'kdrek3' => $tbl['kdrek3'],
+                    'totalApbd' => 0,
+                    'totalApbdp' => 0,
+                  
+                ];
+            }
+    
+            if (!isset($groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']])) {
+                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']] = [
+                    'kdrek4' => $tbl['kdrek4'],
+                    'nmrek4' => $tbl['nmrek4'],
+                    'totalApbd' => 0,
+                    'totalApbdp' => 0,
+         
+                ];
+            }
+            if (!isset($groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']])) {
+                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']] = [
+                    'kdrek5' => $tbl['kdrek5'],
+                    'nmrek5' => $tbl['nmrek5'],
+                    'apbd' => 0,
+                    'apbdp' => 0,
+            
+                ];
+            }
+            if (!isset($groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['subSubSubTotals'][$tbl['kdrek6']])) {
+                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['subSubSubTotals'][$tbl['kdrek6']] = [
+                    'kdrek6' => $tbl['kdrek6'],
+                    'nmrek6' => $tbl['nmrek6'],
+                    'apbd' => 0,
+                    'apbdp' => 0,
+            
+                ];
+            }
+
+            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['subSubSubTotals'][$tbl['kdrek6']]['apbd'] += $tbl['apbd'];
+            if ($apbdp_checkbox) {
+                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['subSubSubTotals'][$tbl['kdrek6']]['apbdp'] += $tbl['apbdp'];
+            }
+
+
+    
+            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['totalApbd'] += $tbl['apbd'];
+            if ($apbdp_checkbox) {
+                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['totalApbdp'] += $tbl['apbdp'];
+            }
+
+ 
+    
+            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['totalApbd'] += $tbl['apbd'];
+            if ($apbdp_checkbox) {
+                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['totalApbdp'] += $tbl['apbdp'];
+            }
+
+    
+            $groupedData[$tbl['nmrek2']]['totalApbd'] += $tbl['apbd'];
+            if ($apbdp_checkbox) {
+                $groupedData[$tbl['nmrek2']]['totalApbdp'] += $tbl['apbdp'];
+            }
+           
+
+    
             $totalApbd += $tbl['apbd'];
             if ($apbdp_checkbox) {
                 $totalApbdp += $tbl['apbdp'];
             }
-            $totalTotlalu += $tbl['totlalu'];
-            $totalTotini += $tbl['totini'];
+   
 
-            $totalTotlaluTotini += ($tbl['totlalu'] + $tbl['totini']);
-            $totalSelisih += (($tbl['totlalu'] + $tbl['totini'] - $tbl['apbd'] ));
+        }
+    }
 
-    ?>
+    if (!empty($groupedData)) {
+        foreach ($groupedData as $nmrek2 => $data) {
+            ?>
             <tr>
-                <td><?= htmlspecialchars($tbl['kdrekening']) ?></td>
-                <td><strong><?= htmlspecialchars($tbl['nmrek1']) ?></strong></td>
-                <td><?= number_format($tbl['apbd'], 2) ?></td>
+                <td><?= htmlspecialchars($data['kdrek2']) ?></td>
+                <td><strong><?= htmlspecialchars($nmrek2) ?></strong></td>
+                <td><b><?= number_format($data['totalApbd'], 2) ?></b></td>
                 <?php if ($apbdp_checkbox): ?>
-                    <td><?= number_format($tbl['apbdp'], 2) ?></td>
+                    <td><b><?= number_format($data['totalApbdp'], 2) ?></b></td>
                 <?php endif; ?>
-                <td><?= number_format($tbl['totlalu'], 2) ?></td>
-                <td><?= number_format($tbl['totini'], 2) ?></td>
-                <td><?= number_format($tbl['totlalu'] + $tbl['totini'], 2) ?></td>
-                <td><?= ($tbl['apbd'] > 0) ? number_format((($tbl['totlalu'] + $tbl['totini']) / $tbl['apbd']) * 100, 2) : '0.00' ?></td>
-                <td><?= number_format($tbl['totlalu'] + $tbl['totini'] - $tbl['apbd'], 2) ?></td>
-                <td><?= ($tbl['apbd'] > 0) ? number_format(($tbl['apbd'] - ($tbl['totlalu'] + $tbl['totini'])) / $tbl['apbd'] * 100, 2) : '0.00' ?></td>
+                <td></td>
             </tr>
-            <?php for ($i = 2; $i <= 6; $i++): ?>
-                <?php if (!empty($tbl["kdrek$i"])): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($tbl["kdrek$i"]) ?></td>
-                        <td><?= htmlspecialchars($tbl["nmrek$i"]) ?></td>
-                        <td></td>
-                        <?php if ($apbdp_checkbox): ?>
-                            <td></td>
-                        <?php endif; ?>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                <?php endif; ?>
-            <?php endfor; ?>
-        <?php endforeach; ?>
+    
+            <?php foreach ($data['subTotals'] as $nmrek3 => $subData) { ?>
+                <tr>
+                    <td><?= htmlspecialchars($subData['kdrek3']) ?></td>
+                    <td><strong><?= htmlspecialchars($nmrek3) ?></strong></td>
+                    <td><b><?= number_format($subData['totalApbd'], 2) ?></b></td>
+                    <?php if ($apbdp_checkbox): ?>
+                        <td><b><?= number_format($subData['totalApbdp'], 2) ?></b></td>
+                    <?php endif; ?>
+                    <td></td>
+                </tr>
+    
+                <?php foreach ($subData['subTotals'] as $kdrek4 => $subSubData) { 
+                    if (!empty($subSubData['nmrek4'])) { ?>
+                        <tr>
+                            <td><?= htmlspecialchars($kdrek4) ?></td>
+                            <td><b><?= strtoupper(htmlspecialchars($subSubData['nmrek4'])) ?></b></td>
+                            <td><b><?= number_format($subSubData['totalApbd'], 2) ?></b></td>
+                            <?php if ($apbdp_checkbox): ?>
+                                <td><b><?= number_format($subSubData['totalApbdp'], 2) ?></b></td>
+                            <?php endif; ?>
+                            <td><?= htmlspecialchars($tbl['nmdinas']) ?></td>
+                        </tr>
+    
+                        <?php foreach ($subSubData['subSubTotals'] as $kdrek5 => $subSubSubData) { 
+                            if (!empty($subSubSubData['nmrek5'])) { ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($kdrek5) ?></td>
+                                    <td><?= htmlspecialchars($subSubSubData['nmrek5']) ?></td>
+                                    <td><?= number_format($subSubSubData['apbd'], 2) ?></td>
+                                    <?php if ($apbdp_checkbox): ?>
+                                        <td><?= number_format($subSubSubData['apbdp'], 2) ?></td>
+                                    <?php endif; ?>
+                                    <td><?= htmlspecialchars($tbl['nmdinas']) ?></td>
+                                </tr>
+    
+                                <?php foreach ($subSubSubData['subSubSubTotals'] as $kdrek6 => $subSubSubSubData) { 
+                                    if (!empty($subSubSubSubData['nmrek6'])) { ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($kdrek6) ?></td>
+                                            <td>-<?= htmlspecialchars($subSubSubSubData['nmrek6']) ?></td>
+                                            <td><?= number_format($subSubSubSubData['apbd'], 2) ?></td>
+                                            <?php if ($apbdp_checkbox): ?>
+                                                <td><?= number_format($subSubSubSubData['apbdp'], 2) ?></td>
+                                            <?php endif; ?>
+                                            <td><?= htmlspecialchars($tbl['nmdinas']) ?></td>
+                                        </tr>
+                                    <?php }
+                                }
+                            }
+                        }
+                    }
+                } ?>
+            <?php } ?>
+        <?php } ?>
+    }
+    
         <?php 
         // Calculate total percentage values for the entire table
-        $totalPersenPend = ($totalApbd > 0) ? number_format(($totalTotlaluTotini / $totalApbd) * 100, 2) : '0.00';
-        $totalPersenSisa = ($totalApbd > 0) ? number_format(($totalSelisih / $totalApbd) * 100, 2) : '0.00';
+        // $totalPersenPend = ($totalApbd > 0) ? number_format(($totalTotlaluTotini / $totalApbd) * 100, 2) : '0.00';
+        // $totalPersenSisa = ($totalApbd > 0) ? number_format(($totalSelisih / $totalApbd) * 100, 2) : '0.00';
         ?>
         <tr>
             <td colspan="2"><strong>Total Pendapatan + Pembiayaan</strong></td>
@@ -224,14 +306,9 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
             <?php if ($apbdp_checkbox): ?>
                 <td><?= number_format($totalApbdp, 2) ?></td>
             <?php endif; ?>
-            <td><?= number_format($totalTotlalu, 2) ?></td>
-            <td><?= number_format($totalTotini, 2) ?></td>
-            <td><?= number_format($totalTotlaluTotini, 2) ?></td>
-            <td><?= $totalPersenPend ?></td>
-            <td><?= number_format($totalSelisih, 2) ?></td>
-            <td><?= $totalPersenSisa ?></td>
+         
         </tr>
-    <?php endif; ?>
+        <?php } ?>
 </tbody>
 
 

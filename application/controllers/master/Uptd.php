@@ -22,7 +22,7 @@ class Uptd extends CI_Controller {
 		'jsedit'      => $Jssetup->jsModal('#edit', 'Edit', 'master/Dinas/myModal', '#modalkuE'),
 		'jsdelete'    => $Jssetup->jsModal('#delete', 'Delete', 'master/Dinas/myModal', '#modalkuD'),
 		'forminsert'  => implode('', $this->MDinas->formInsert()) ];
-		$this->load->view('master/Dinas',$data);
+		$this->load->view('master/uptd',$data);
 	}
 	public function getDinas() {
 		$status = $this->Status;
