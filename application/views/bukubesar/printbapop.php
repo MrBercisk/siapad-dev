@@ -9,7 +9,13 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header img {
+            max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
         }
         .header img {
             max-width: 100px;
@@ -18,6 +24,9 @@
             margin: 0;
             margin-bottom: 5px;
             font-weight: bold;
+        }
+        .sub-header{
+            margin-top: 20px;
         }
         .sub-header h3{
             font-weight: 400;
@@ -78,6 +87,7 @@
 <body>
 
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENGELOLA PAJAK DAN RETRIBUSI DAERAH</h3>
     <h3>BUKU BESAR PEMBANTU PENERIMAAN</h3>

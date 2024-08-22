@@ -13,6 +13,12 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -108,6 +114,7 @@ endif;
 $total_sampai_hari_ini = $saldo + $total_hari_ini;
 ?>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>IKHTISAR PENDAPATAN RINCIAN OBJEK PENDAPATAN</h3>
@@ -154,11 +161,11 @@ $total_sampai_hari_ini = $saldo + $total_hari_ini;
             ?>       
                 <tr>
                     <td style="text-align: center;"><?= $no++ ?></td>
-                    <td><?= htmlspecialchars($tbl['tanggal']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['tanggal']) ?></td>
                     <td style="text-align: left;"><?= htmlspecialchars($tbl['nmwp']) ?></td>
-                    <td><?= htmlspecialchars($tbl['uptd']) ?></td>
-                    <td><?= htmlspecialchars($tbl['tgl']) ?></td>
-                    <td style="text-align: right;"><?= htmlspecialchars($tbl['skpd']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['uptd']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['tgl']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['skpd']) ?></td>
                     <td style="text-align: center;"><?= htmlspecialchars($tbl['masapajak'] ) ?></td>
                     <td style="text-align: center;"><?= htmlspecialchars( $tbl['nomor']) ?></td>
                     <td style="text-align: right;"><?= number_format($tbl['pokok'], 2) ?></td>

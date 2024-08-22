@@ -113,46 +113,185 @@
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 $tanggal_saat_ini = strftime('%d %B %Y');
 $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
+function penyebut($nilai)
+{
+    $nilai = abs($nilai);
+    $huruf = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+    $temp = "";
+    if ($nilai < 12) {
+        $temp = " " . $huruf[$nilai];
+    } else if ($nilai < 20) {
+        $temp = penyebut($nilai - 10) . " belas";
+    } else if ($nilai < 100) {
+        $temp = penyebut($nilai / 10) . " puluh" . penyebut($nilai % 10);
+    } else if ($nilai < 200) {
+        $temp = " seratus" . penyebut($nilai - 100);
+    } else if ($nilai < 1000) {
+        $temp = penyebut($nilai / 100) . " ratus" . penyebut($nilai % 100);
+    } else if ($nilai < 2000) {
+        $temp = " seribu" . penyebut($nilai - 1000);
+    } else if ($nilai < 1000000) {
+        $temp = penyebut($nilai / 1000) . " ribu" . penyebut($nilai % 1000);
+    } else if ($nilai < 1000000000) {
+        $temp = penyebut($nilai / 1000000) . " juta" . penyebut($nilai % 1000000);
+    } else if ($nilai < 1000000000000) {
+        $temp = penyebut($nilai / 1000000000) . " milyar" . penyebut(fmod($nilai, 1000000000));
+    } else if ($nilai < 1000000000000000) {
+        $temp = penyebut($nilai / 1000000000000) . " trilyun" . penyebut(fmod($nilai, 1000000000000));
+    }
+    return $temp;
+}
+
+function terbilang($nilai)
+{
+    if ($nilai < 0) {
+        $hasil = "minus " . trim(penyebut($nilai));
+    } else {
+        $hasil = trim(penyebut($nilai));
+    }
+    return $hasil;
+}
+function bulan_indo($tanggal)
+{
+    $bulan = array(
+        1 =>   'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+    );
+
+
+    return  $bulan[(int)$tanggal[1]];
+}
+function bulan_tanggal($tanggal)
+{
+    $bulan = array(
+        1 => 'Januari',
+        2 => 'Februari',
+        3 => 'Maret',
+        4 => 'April',
+        5 => 'Mei',
+        6 => 'Juni',
+        7 => 'Juli',
+        8 => 'Agustus',
+        9 => 'September',
+        10 => 'Oktober',
+        11 => 'November',
+        12 => 'Desember'
+    );
+
+    $bulan_tanggal = (int)date('m', strtotime($tanggal));
+    return $bulan[$bulan_tanggal];
+}
+function tanggal_hari_ini($tanggal)
+{
+    $hari = (int)date('j', strtotime($tanggal));
+    return terbilang($hari);
+}
+function hari_ini($hari)
+{
+
+    $hari1 = explode('-', $hari);
+    $hari2 = $hari1[2];
+    $hari = date("D", strtotime($hari));
+    switch ($hari) {
+        case 'Sun':
+            $hari_ini = "Minggu";
+            break;
+
+        case 'Mon':
+            $hari_ini = "Senin";
+            break;
+
+        case 'Tue':
+            $hari_ini = "Selasa";
+            break;
+
+        case 'Wed':
+            $hari_ini = "Rabu";
+            break;
+
+        case 'Thu':
+            $hari_ini = "Kamis";
+            break;
+
+        case 'Fri':
+            $hari_ini = "Jumat";
+            break;
+
+        case 'Sat':
+            $hari_ini = "Sabtu";
+            break;
+
+        default:
+            $hari_ini = "Tidak di ketahui";
+            break;
+    }
+
+    return  $hari_ini;
+}
+
 ?>
 <div class="header">
-
-    <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
-    <h3>BADAN PENDAPATAN DAERAH</h3>
-    <h3>REKONSILIASI LAPORAN REALISASI ANGGARAN PENDAPATAN DAERAH</h3>
-    <h3>s.d BULAN: <?= $format_bulan; ?> <?= $format_tahun;?></h3>
     <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
+    <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
+    <h3>BERITA ACARA REKONSILIASI BIDANG PEMBUKUAN DAN PELAPORAN DENGAN BIDANG PAJAK</h3>
+    <h3>PEMBAYARAN SURAT PEMBERITAHUAN PAJAK DAERAH (SPTPD) PAJAK HOTEL, RESTORAN, HIBURAN DAN PARKIR</h3>
+    <h3>BULAN: <?= $format_bulan; ?> s.d. <?= $format_bulan_akhir; ?> <?= $format_tahun;?></h3>
+   
 </div>
+<div class="sub-header">
+    <h3>Pada hari ini, <?= hari_ini($tglcetak) ?>, tanggal <?= tanggal_hari_ini($tglcetak) ?> , bulan <?= bulan_tanggal($tglcetak) ?> , 
+    <?= terbilang($format_tahun) ?>, telah dilakukan Rekonsiliasi Data Pembayaran Surat Pemberitahuan Pajak Daerah (SPTPD) Pajak Reklame, Air Tanah dan Mineral Bukan Logam dan Batuan yang Diterbitkan pada Bidang Pajak dengan Surat Setoran Pajak Daerah/Surat Tanda Setoran (SSPD/STS) Pajak Pajak Reklame, Air Tanah dan Mineral Bukan Logam dan Batuan Yang Diterima pada Bidang Bidang Pembukuan dan Pelaporan (Buklap) Badan Pendapatan Daerah (BAPENDA) Kota Bandar Lampung Bulan 
+    <?= $format_bulan; ?> s.d. <?= $format_bulan_akhir; ?> Tahun <?= terbilang($format_tahun) ?> dan diperoleh data Selisih SPTPD dan SSPD/STS, sebagai berikut :
+</h3>
+</div>
+
 <table>
   
     <thead>
         <tr>
-            <th rowspan="2">KODE REKENING</th>
-            <th rowspan="2">URAIAN AKUN</th>
-            <th rowspan="2">APBD</th>
-            <?php if ($apbdp_checkbox): ?>
-                <th rowspan="2">APBDP</th>
-            <?php endif; ?>
-            <th colspan="4">REKONSILIASI BAPENDA DAN BPKAD KOTA BANDAR LAMPUNG</th>
-            <th rowspan="2">SKPD PENGELOLA</th>
+            <th rowspan="2">N0</th>
+            <th colspan="14">KODE SPTPD DITERBITKAN BULAN <?= strtoupper($format_bulan); ?> s.d. <?= strtoupper($format_bulan_akhir); ?> <?= $format_tahun;?></th>
+            <th colspan="8">SSPD/STS TERBAYAR BULAN <?= strtoupper($format_bulan); ?> s.d. <?= strtoupper($format_bulan_akhir); ?> <?= $format_tahun;?></th>
+            <th colspan="3">SELISIH SPTPD DENGAN SSPD/STS</th>
+            <th rowspan="2">KETERANGAN</th>
         </tr>
         <tr>
-            <th>BAPENDA</th>
-            <th>BPKAD</th>
-            <th>SELISIH</th>
-            <th>PENJELASAN SELISIH</th>
-        </tr>
-        <tr>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <?php if ($apbdp_checkbox): ?>
-                <th>4</th>
-            <?php endif; ?>
-            <th>5</th>
-            <th>6</th>
-            <th>7 = 5-6</th>
-            <th>8</th>
-            <th>9</th>
+            <th>No. Pelaporan</th>
+            <th>NPWPD</th>
+            <th>Nama Pajak</th>
+            <th>Nama WP</th>
+            <th>Alamat OP</th>
+            <th>Tahun Pajak</th>
+            <th>Masa Pajak</th>
+            <th>Tanggal Disetujui</th>
+            <th>Pokok</th>
+            <th>Denda</th>
+            <th>Total</th>
+            <th>Kode Bayar</th>
+            <th>Tanggal Bayar</th>
+            <th>Status</th>
+            <th>TANGGAL TRANSAKSI</th>
+            <th>NAMA OBJEK PAJAK</th>
+            <th>UPTD</th>
+            <th>MASA PAJAK</th>
+            <th>NO. SSPD/STS</th>
+            <th>POKOK</th>
+            <th>DENDA</th>
+            <th>JUMLAH</th>
+            <th>POKOK</th>
+            <th>DENDA</th>
+            <th>JUMLAH</th>
+   
         </tr>
     </thead>
     <tbody>

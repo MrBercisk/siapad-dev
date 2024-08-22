@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 use Dompdf\Dompdf;
+use Dompdf\Options;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class Bkbesar extends CI_Controller {
@@ -47,29 +48,34 @@ class Bkbesar extends CI_Controller {
 		'format_tanggal' =>strftime('%d %B %Y', strtotime($tanggal)),
 		'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
 		'tanggal_sebelumnya' =>strftime('%d %B %Y', strtotime('-1 day', strtotime($tanggal))),
-		'tablenya' => $this->MBkBesar->get_data_hari_ini($tanggal),
+		'tablenya' => $this->MBkBesar->ambildata($tanggal)
+		/* 'tablenya' => $this->MBkBesar->get_data_hari_ini($tanggal),
 		'saldo' => $this->MBkBesar->get_saldo_awal($tanggal),
 		'pembiayaan' => $this->MBkBesar->get_pembiayaan($tanggal),
 		'blud' => $this->MBkBesar->get_blud($tanggal),
 		'bos' => $this->MBkBesar->get_bos($tanggal),
-		'rilau' => $this->MBkBesar->get_rilau($tanggal),
+		'rilau' => $this->MBkBesar->get_rilau($tanggal), */
 	];
 	$tanda_tangan_data = $this->Msetup->get_tanda_tangan($ttd_checkbox, $tanda_tangan);
 
 	if ($tanda_tangan_data) {
 		$data['tanda_tangan'] = $tanda_tangan_data;
 	}
-	
-	ob_start();
+	$this->load->view('laporan/printbkbesar', $data);
+	/* ob_start();
 	$html = $this->load->view('laporan/printbkbesar', $data, true);
 	ob_get_clean();
 	
 
 	$dompdf = new Dompdf();
+	$options = new Options();
+	$options->set('isHtml5ParserEnabled', true);
+	$options->set('isPhpEnabled', true);
+	$dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->loadHtml($html);
-	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->setPaper('legal', 'landscape');
 	$dompdf->render();
-	$dompdf->stream("laporan_buku_besar.pdf", array("Attachment" => 0));
+	$dompdf->stream("laporan_buku_besar.pdf", array("Attachment" => 0)); */
 }
 
 

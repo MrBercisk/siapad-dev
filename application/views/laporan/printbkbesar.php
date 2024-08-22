@@ -79,13 +79,14 @@
     $total_hari_ini = 0;
     if (!empty($tablenya)):
         foreach($tablenya as $tbl) {
-            $total_hari_ini += $tbl['jumlahdibayar'];
-          
+            $total_hari_ini += $tbl['jumlah'];
+            $total_sampai_hari_ini = $tbl['issaldo'] + $total_hari_ini;
         }
     endif;
-    $total_sampai_hari_ini = $saldo + $total_hari_ini;
+    
     ?>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h4>BUKU PENERIMAAN KAS</h4>
@@ -118,95 +119,91 @@
     <tbody>
     <?php
 
-            if (!empty($tablenya)):
-                $groupedData = [];
+if (!empty($tablenya)):
+    $groupedData = [];
 
-                // Mengelompokkan data berdasarkan singkatdinas
-                foreach($tablenya as $tbl) {
-                    $singkatdinas = $tbl['singkatdinas'];
-                    if (!isset($groupedData[$singkatdinas])) {
-                        $groupedData[$singkatdinas] = [];
-                    }
-                    $groupedData[$singkatdinas][] = $tbl;
-                }
+    foreach($tablenya as $tbl) {
+        $singkatdinas = $tbl['nmdinas'];
+        if (!isset($groupedData[$singkatdinas])) {
+            $groupedData[$singkatdinas] = [];
+        }
+        $groupedData[$singkatdinas][] = $tbl;
+    }
 
-                foreach($groupedData as $singkatdinas => $rows):
-                    $jumlahTotal = 0;
-                    $pokokTotal = 0;
-                    foreach($rows as $tbl):
-                        $jumlahTotal += $tbl['jumlahdibayar']; 
-                        $pokokTotal += $tbl['pokokpajak']
-                        ?>
-                        <tr>
-                            <td><?= htmlspecialchars($tbl['nomor'])?></td>
-                            <td><?= htmlspecialchars($tbl['koderekening'])?></td>
-                            <td style="text-align: left;"><?= htmlspecialchars($tbl['namarekening'])?></td>
-                            <td style="text-align: left;"><?= htmlspecialchars($tbl['singkatdinas'])?></td>
-                            <td><?= number_format($tbl['jumlahdibayar'], 2) ?></td>
-                            <td><?= number_format($tbl['pokokpajak'], 2) ?></td>
-                            <td><?= htmlspecialchars($tbl['keterangan'])?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    <tr>
-                        <td colspan="4" style="text-align: right;"><b>JUMLAH</b></td>
-                        <td style="text-align: right;"><b><?= number_format($jumlahTotal, 2) ?></b></td>
-                        <td style="text-align: right;"><b><?= number_format($pokokTotal, 2) ?></b></td>
-                        <td><?= htmlspecialchars($tbl['keterangan'])?></td>
-                    </tr>
-                <?php endforeach;
-            endif; 
-            ?>
+    $totalSaldo = 0;
+    $totalPembiayaan = 0;
+    $totalseluruh = 0;
 
-                        <tr>
-                            <td colspan="4" style="text-align: center;"><b>Jumlah Per <?= $format_tanggal; ?></b> </td>
-                            <td style="text-align: right;"><b> <?= number_format($total_hari_ini, 2) ?></b></td>
-                            <td style="text-align: right;"><b> <?= number_format($total_hari_ini, 2) ?></b></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4" style="text-align: center;"><b>Jumlah s.d.  <?= $tanggal_sebelumnya; ?></b></td>
-                            <td style="text-align: right;"><b><?= number_format($saldo, 2) ?><</b></td>
-                            <td style="text-align: right;"><b><?= number_format($saldo, 2) ?><</b></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4" style="text-align: center;"><b>Jumlah s.d. <?= $format_tanggal; ?></b> </td>
-                            <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
-                            <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
-                            <td></td>
-                        </tr>
-            </tbody>
-        </table>
-        <h4>Keterangan</h4>
-        <table cellpadding="4">
-            <?php
-            $total_pendapatan_penerimaan = $total_sampai_hari_ini + $pembiayaan;
+    foreach($groupedData as $singkatdinas => $rows):
+        $jumlahTotal = 0;
+        $pokokTotal = 0;
+        foreach($rows as $tbl):
+            $jumlahTotal += $tbl['jumlah']; 
+            $pokokTotal += $tbl['total'];
+            $totalSaldo = $tbl['issaldo'];
+            $totalPembiayaan += $tbl['pembiayaan'];
             ?>
             <tr>
-                <td style="width:20%;">Penerimaan Kasda</td>
-                <td style="width:40%;">Rp. <?= number_format($total_sampai_hari_ini, 2) ?> </td>
+                <td><?= htmlspecialchars($tbl['nomor']) ?></td>
+                <td><?= htmlspecialchars($tbl['kdrekening']) ?></td>
+                <td style="text-align: left;"><?= htmlspecialchars($tbl['uraian']) ?></td>
+                <td style="text-align: left;"><?= htmlspecialchars($tbl['nmdinas']) ?></td>
+                <td><?= number_format($tbl['jumlah'], 2) ?></td>
+                <td><?= number_format($tbl['total'], 2) ?></td>
+                <td><?= htmlspecialchars($tbl['keterangan']) ?></td>
             </tr>
-          <!--   <tr>
-                <td style="width:20%;">BLUD</td>
-                <td style="width:40%;">Rp. <?= number_format($blud, 2) ?> </td>
-            </tr>
-            <tr>
-                <td style="width:20%;">Hibah Dana BOS</td>
-                <td style="width:40%;">Rp. <?= number_format($bos, 2) ?> </td>
-            </tr>
-            <tr>
-                <td style="width:20%;">Penghapusan Hutang PDAM Way Rilau</td>
-                <td style="width:40%;">Rp. <?= number_format($rilau, 2) ?> </td>
-            </tr> -->
-            <tr>
-                <td style="width:20%;">PEMBIAYAAN</td>
-                <td style="width:40%;">Rp. <?= number_format($pembiayaan, 2) ?></td>
-            </tr>
-            <tr>
-                <td style="width:30%;"><b>Jumlah Pendapatan + Pembiayaan</b></td>
-                <td style="width:30%;">Rp. <b><?= number_format($total_pendapatan_penerimaan, 2) ?></b></td>
-            </tr>
-        </table>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="4" style="text-align: right;"><b>JUMLAH</b></td>
+            <td style="text-align: right;"><b><?= number_format($jumlahTotal, 2) ?></b></td>
+            <td style="text-align: right;"><b><?= number_format($pokokTotal, 2) ?></b></td>
+            <td></td>
+        </tr>
+    <?php endforeach; 
+    ?>
+
+    <tr>
+        <td colspan="4" style="text-align: center;"><b>Jumlah Per <?= $format_tanggal; ?></b> </td>
+        <td style="text-align: right;"><b> <?= number_format($jumlahTotal, 2) ?></b></td>
+        <td style="text-align: right;"><b> <?= number_format($total_hari_ini, 2) ?></b></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align: center;"><b>Jumlah s.d. <?= $tanggal_sebelumnya; ?></b></td>
+        <td style="text-align: right;"><b><?= number_format($totalSaldo, 2) ?></b></td>
+        <td style="text-align: right;"><b><?= number_format($totalSaldo, 2) ?></b></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align: center;"><b>Jumlah s.d. <?= $format_tanggal; ?></b> </td>
+        <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
+        <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
+        <td></td>
+    </tr>
+<?php endif; ?>
+
+</tbody>
+</table>
+
+<h4>Keterangan</h4>
+<table cellpadding="4">
+    <?php
+    $total_pendapatan_penerimaan = $total_sampai_hari_ini + $totalPembiayaan;
+    ?>
+    <tr>
+        <td style="width:20%;">Penerimaan Kasda</td>
+        <td style="width:40%;">Rp. <?= number_format($total_sampai_hari_ini, 2) ?> </td>
+    </tr>
+    <tr>
+        <td style="width:20%;">PEMBIAYAAN</td>
+        <td style="width:40%;">Rp. <?= number_format($totalPembiayaan, 2) ?></td>
+    </tr>
+    <tr>
+        <td style="width:30%;"><b>Jumlah Pendapatan + Pembiayaan</b></td>
+        <td style="width:30%;">Rp. <b><?= number_format($total_pendapatan_penerimaan, 2) ?></b></td>
+    </tr>
+</table>
+
         <br><br>
 <div class="tgl_cetak">
         <p>Bandar Lampung, <?= $tgl_cetak_format; ?></p>

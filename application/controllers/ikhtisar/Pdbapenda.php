@@ -59,6 +59,7 @@ class Pdbapenda extends CI_Controller {
 
 	$html = $this->load->view('ikhtisar/printbap', $data, true);
 	$dompdf = new Dompdf();
+	$dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->loadHtml($html);
 	$dompdf->setPaper('A4', 'landscape');
 	$dompdf->render();

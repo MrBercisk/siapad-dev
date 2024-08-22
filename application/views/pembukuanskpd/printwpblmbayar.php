@@ -14,6 +14,12 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -92,6 +98,7 @@
 <body>
 
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h3>DAFTAR NAMA WAJIB PAJAK HOTEL, RESTORAN DAN HIBURAN</h3>
     <h3>YANG BELUM MEMBAYAR PAJAK S.D. BULAN <?= $format_bulan;?> <?= $format_tahun ?></h3>
 </div>

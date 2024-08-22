@@ -72,6 +72,7 @@ class PiutangReklame extends CI_Controller {
 	
 
 	$dompdf = new Dompdf();
+	$dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->loadHtml($html);
 	$dompdf->setPaper('A4', 'landscape');
 	$dompdf->render();

@@ -13,6 +13,12 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -42,7 +48,9 @@
         tbody td {
             text-align: right;
         }
-        tbody td:first-child,
+        tbody td:first-child{
+            text-align: center;
+        }
         tbody td:nth-child(2) {
             text-align: left;
         }
@@ -88,6 +96,7 @@
 <body>
 
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>BUKU BESAR PEMBANTU PENERIMAAN</h3>
@@ -175,9 +184,9 @@
             <td></td>
             <td></td>
             <td style="text-align: right;"><b>JUMLAH</b></td>
-            <td style="text-align: right;"><?= number_format($jumlah_total, 2) ?></td>
-            <td style="text-align: right;"><?= number_format($saldo_kumulatif, 2) ?></td>
-            <td style="text-align: right;"><?= number_format($persentase, 2) ?>%</td>
+            <td style="text-align: right;"><b><?= number_format($jumlah_total, 2) ?></b></td>
+            <td style="text-align: right;"><b><?= number_format($saldo_kumulatif, 2) ?></b></td>
+            <td style="text-align: right;"><b><?= number_format($persentase, 2) ?>%</b></td>
             <td></td>
         </tr>
        

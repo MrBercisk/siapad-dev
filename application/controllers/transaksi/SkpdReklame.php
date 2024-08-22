@@ -63,7 +63,7 @@ class SkpdReklame extends CI_Controller
             "mst_wajibpajak.tglskp",
         ]);
         $datatables->setOrderColumn([null, "wajibpajak", "noskpd", "tgljthtmp", "teks", "blnpajak", "thnpajak", "jumlah", "bunga", "total", "tglbayar", "keterangan"]);
-        $datatables->setSearchColumns(["nama", "nomor", "tanggal", "teks", "thnpajak"]);
+        $datatables->setSearchColumns(["nama", "trx_skpdreklame.nomor", "tanggal", "teks", "thnpajak"]);
         $datatables->addJoin('mst_wajibpajak', 'mst_wajibpajak.id=trx_skpdreklame.idwp', 'left');
         
         $fetch_data = $this->Datatables->make_datatables();
@@ -163,8 +163,9 @@ class SkpdReklame extends CI_Controller
         
     
         $dompdf = new Dompdf();
+        $dompdf->set_option('isRemoteEnabled', true);
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('legal', 'landscape');
         $dompdf->render();
         $dompdf->stream("skpd_reklame.pdf", array("Attachment" => 0));
     }
@@ -175,7 +176,7 @@ class SkpdReklame extends CI_Controller
         $offset = $this->input->get('offset') ?: 0;
         $search = $this->input->get('search') ?: '';
 
-        $this->db->select('id, nama,  tgljthtmp, tglskp');
+        $this->db->select('id, nama, tgljthtmp, tglskp');
         $this->db->from('mst_wajibpajak');
         if (!empty($search)) {
             $this->db->like('nama', $search);
@@ -239,7 +240,7 @@ class SkpdReklame extends CI_Controller
                                     results: $.map(data, function (item) {
                                         return {
                                             id: item.id,
-                                            text: item.nama + " (" + item.nomor + ")",
+                                            text: item.nama,
                                             nomor: item.nomor,
                                             tglskp: item.tglskp,
                                         };

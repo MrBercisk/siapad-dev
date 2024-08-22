@@ -51,7 +51,10 @@
         }
         tbody td:first-child,
         tbody td:nth-child(2) {
-            text-align: left;
+            text-align: center;
+        }
+        tbody td:nth-child(4){
+            text-wrap: nowrap;
         }
         .tgl_cetak p {
             font-size: 12px;
@@ -167,8 +170,8 @@
                 
         <tr>
             <td style="text-align: center;"><?= $no++ ?></td>
-            <td style="text-align: left;"><?= htmlspecialchars($row->tglskp) ?></td>
-            <td style="text-align: left;"><?= htmlspecialchars($row->noskpd) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row->tglskp) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row->noskpd) ?></td>
             <td style="text-align: left;"><?= htmlspecialchars($row->wajibpajak) ?></td>
             <td style="text-align: left;"><?= htmlspecialchars($row->alamat) ?></td>
             <td style="text-align: right;"><?= number_format($row->jumlah, 2) ?></td>

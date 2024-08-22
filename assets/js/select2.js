@@ -63,7 +63,7 @@ $(document).ready(function() {
             minimumInputLength: 5, 
 
     });
-    $('.opsiwp').select2({
+    $('#opsiwp').select2({
         ajax: {
             url: 'SkpdReklame/get_wp_data',
             dataType: 'json',

@@ -73,18 +73,19 @@ class LraPerUptdbap extends CI_Controller {
 			$data['iduptd'] = $uptd_data;
 		}
 	
-		$this->load->view('pembukuan/printlraperuptd', $data);
-/* 
+	/* 	$this->load->view('pembukuan/printlraperuptd', $data); */
+
 		ob_start();
-		$html = $this->load->view('pembukuan/printbukubesarrek', $data, true);
+		$html = $this->load->view('pembukuan/printlraperuptd', $data, true);
 		ob_get_clean();
 		
 	
 		$dompdf = new Dompdf();
+		$dompdf->set_option('isRemoteEnabled', true);
 		$dompdf->loadHtml($html);
 		$dompdf->setPaper('legal', 'landscape');
 		$dompdf->render();
-		$dompdf->stream("rekapbap.pdf", array("Attachment" => 0)); */
+		$dompdf->stream("lraperuptd.pdf", array("Attachment" => 0));
 	}
 	
 	public function get_rekening($idrekheader) {

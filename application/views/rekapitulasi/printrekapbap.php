@@ -13,6 +13,12 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -81,6 +87,7 @@ $tanggal_saat_ini = strftime('%d %B %Y');
 $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
 ?>
 <div class="header">
+<img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENGELOLA PAJAK DAN RETRIBUSI DAERAH</h3>
     <h3>REKAP REALISASI PENDAPATAN PAJAK DAERAH</h3>

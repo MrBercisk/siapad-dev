@@ -85,8 +85,9 @@ class Ropendapatan extends CI_Controller {
     echo ob_get_clean();
 
 	$dompdf = new Dompdf();
+	$dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->loadHtml($html);
-	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->setPaper('legal', 'landscape');
 	$dompdf->render();
 	$dompdf->stream("laporan_perencanaan_objek.pdf", array("Attachment" => 0));
 }

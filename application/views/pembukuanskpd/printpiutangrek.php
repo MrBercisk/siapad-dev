@@ -9,7 +9,13 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 70px;
+        }
+        .header img {
+            max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
         }
         .header img {
             max-width: 100px;
@@ -25,7 +31,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 40px;
         }
         table, th, td {
             border: 1px solid black;
@@ -37,15 +43,16 @@
         }
         td {
             text-align: left;
-            padding-left: 8px;
-            padding-right: 8px;
+            text-wrap: nowrap;
         }
         tbody td {
             text-align: right;
         }
+      
         tbody td:first-child,
         tbody td:nth-child(2) {
             text-align: left;
+            
         }
         .tgl_cetak p {
             text-align: center;
@@ -58,7 +65,7 @@
         .signature {
             font-weight: bold;
             text-align: center;
-            margin-top: 50px;
+            margin-top: 60px;
             margin-right: 20px;
             position: relative;
             float: right;
@@ -94,6 +101,7 @@
 </head>
 <body>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h3>PIUTANG PAJAK REKLAME</h3>
     <h3>TAHUN <?= htmlspecialchars($format_tahun) ?></h3>
 </div>

@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 use Dompdf\Dompdf;
+use Dompdf\Options;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class RekonSspd extends CI_Controller {
@@ -100,7 +101,11 @@ class RekonSspd extends CI_Controller {
 	
 
 	$dompdf = new Dompdf();
+    $options = new Options();
 	$dompdf->loadHtml($html);
+    $options->set('isHtml5ParserEnabled', true);
+	$options->set('isPhpEnabled', true);
+    $dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->setPaper('legal', 'landscape');
 	$dompdf->render();
 	$dompdf->stream("laprekonsspd.pdf", array("Attachment" => 0));

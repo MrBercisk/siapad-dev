@@ -31,32 +31,7 @@ class PembayaranSkpd extends CI_Controller
 
         $this->load->view('transaksi/pmbyrnskpd', $data);
     }
-   /*  public function get_record_option()
-    {
-        $limit = $this->input->get('limit') ?: 10;
-        $offset = $this->input->get('offset') ?: 0;
-        $search = $this->input->get('search') ?: '';
-        $this->db->select('a.id, b.nomor AS noskpd, b.tglskp AS tglskpd, b.tgljthtmp, a.idwp, b.nama AS nmwp, a.teks, a.blnpajak, a.thnpajak, 
-                a.jumlah, a.bunga, a.total, a.tglbayar, a.isbayar, a.isdispen, b.idrekening, c.nmrekening, 
-                e.iduptd, f.nama AS nmuptd, f.singkat AS nmuptdsingkat, a.keterangan');
-        $this->db->from('trx_skpdreklame a');
-        $this->db->join('mst_wajibpajak b', 'b.id=a.idwp');
-        $this->db->join('mst_rekening c', 'c.id=b.idrekening');
-        $this->db->join('mst_kelurahan d', 'd.id=b.idkelurahan', 'left');
-        $this->db->join('mst_kecamatan e', 'e.id=d.idkecamatan', 'left');
-        $this->db->join('mst_uptd f', 'f.id=e.iduptd', 'left');
-        $this->db->order_by('a.isbayar', 'ASC');
-        if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('b.nama', $search);
-            $this->db->or_like('b.nomor', $search);
-            $this->db->group_end();
-        }
-         $this->db->limit($limit, $offset);
-        $wpdata = $this->db->get()->result();
-
-        echo json_encode($wpdata);
-    } */
+ 
     public function get_record_option()
     {
         $limit = $this->input->get('limit') ?: 10;
@@ -202,17 +177,23 @@ class PembayaranSkpd extends CI_Controller
 
         echo json_encode($wpdata);
     }
-
+  
     public function get_skpd_data(){
         $limit = $this->input->get('limit') ?: 10;
         $offset = $this->input->get('offset') ?: 0;
         $search = $this->input->get('search') ?: '';
-    
-        $this->db->select('a.id, a.idwp, b.idrekening, c.iduptd, c.idrapbd, d.nmrekening, b.nomor AS nomor, b.nama AS nama, a.teks, a.blnpajak, a.thnpajak, a.jumlah, c.nil_denda as bunga, a.total, c.prs_denda as persen');
-        $this->db->join('mst_wajibpajak b', 'b.id = a.idwp');
-        $this->db->join('trx_stsdetail c', 'c.idskpd = a.id');
-        $this->db->join('mst_rekening d', 'd.id = b.idrekening');
+
         $this->db->from('trx_skpdreklame a');
+        $this->db->select('a.id, b.nomor AS noskpd, b.tglskp AS tglskpd, b.tgljthtmp, a.idwp, b.nama AS nmwp, a.teks, a.blnpajak, a.thnpajak, 
+                a.jumlah, a.bunga, a.total, a.tglbayar, a.isbayar, a.isdispen, b.idrekening, c.nmrekening, 
+                e.iduptd, f.nama AS nmuptd, f.singkat AS nmuptdsingkat, a.keterangan', false);
+        $this->db->join('mst_wajibpajak b', 'b.id = a.idwp');
+        $this->db->join('mst_rekening c', 'c.id=b.idrekening');
+        $this->db->join('mst_kelurahan d', 'd.id=b.idkelurahan', 'left');
+        $this->db->join('mst_kecamatan e', 'e.id=d.idkecamatan', 'left');
+      /*   $this->db->join('trx_stsdetail c', 'c.idskpd = a.id'); */
+        $this->db->join('mst_uptd f', 'f.id=e.iduptd', 'left');
+      
         
         if (!empty($search)) {
             $this->db->like('b.nomor', $search);
@@ -577,7 +558,7 @@ class PembayaranSkpd extends CI_Controller
         $datatables->addJoin('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd', 'left');
         $datatables->addJoin('mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening', 'left');
         $datatables->addWhere('trx_stsdetail.idstsmaster', $opsireklame);
-        $datatables->addWhere('mst_rekening.kdrekview','4.1.01.09.01.01');
+        $datatables->addWhere('mst_rekening.idheader','46');
        /*  $datatables->addWhere('trx_stsmaster.nomor', '20240226/rek.trf'); */
     
         $datatables->setOrder('trx_stsdetail.nourut', 'asc');
@@ -634,10 +615,10 @@ class PembayaranSkpd extends CI_Controller
     
     public function get_namarekening_skpd() {
         $apbdData = $this->db
-            ->select('trx_rapbd.id, trx_rapbd.idrekening, trx_rapbd.iddinas, mst_rekening.idheader, mst_rekening.kdrekview, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
+            ->select('trx_rapbd.id as idrapbd, trx_rapbd.idrekening, trx_rapbd.iddinas, mst_rekening.idheader, mst_rekening.kdrekview, mst_rekening.kdrekening, mst_rekening.nmrekening, mst_rekening.islrauptd')
             ->from('trx_rapbd')
             ->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left')
-            ->where('mst_rekening.kdrekview', '4.1.01.09.01.01')
+            ->where('mst_rekening.idheader', '46')
             ->get()
             ->result();
     
@@ -650,7 +631,7 @@ class PembayaranSkpd extends CI_Controller
     
         $options = '<option disabled selected></option>';
         foreach ($dataunik as $item) {
-            $options .= '<option value="'.$item->id.'">'.$item->nmrekening.' ('.$item->kdrekview.')</option>'; 
+            $options .= '<option value="'.$item->idrapbd.'">'.$item->nmrekening.' ('.$item->kdrekview.')</option>'; 
         }
     
         echo $options;
@@ -688,43 +669,59 @@ class PembayaranSkpd extends CI_Controller
     
     public function add_data() {
         $idstsmaster = $this->input->post('idstsmaster');
+        $idskpd = $this->input->post('idskpd');
+        $idrapbd = $this->input->post('idrapbd');
         $jumlah = (float) $this->input->post('jumlah');
         $prs_denda = (float) $this->input->post('prs_denda');
-
-         
+    
         if (!is_numeric($jumlah) || !is_numeric($prs_denda)) {
-            $respon = ['success' => false, 'message' => 'harus angka.'];
+            $respon = ['success' => false, 'message' => 'Jumlah dan persentase denda harus berupa angka.'];
             echo json_encode($respon);
             return;
         }
-        
-        /* Hitung denda rp */
-        $nil_denda = ($jumlah * $prs_denda) / 100;
-        
-        /* Hitung total */
-        $total = $jumlah + $nil_denda;
-        
-        $nomor_data = $this->Mbyrskpd->ambilnomornyaMaster($idstsmaster);
-        if ($nomor_data) {
-            $nomor = $nomor_data->nomor;
-        } else {
-            $nomor = NULL; 
+    
+        $dataAda = $this->Mbyrskpd->cekIdadatidak($idstsmaster, $idskpd);
+        if ($dataAda) {
+            $respon = ['success' => false, 'message' => 'SKPD tidak boleh sama!'];
+            echo json_encode($respon);
+            return;
         }
-       /* Ambil nourut terakhir */
-       $last_nourut = $this->Mbyrskpd->ambilnourut($idstsmaster);
-       if (!$last_nourut) {
-           $last_nourut = '0000';
-       }
-   
-       $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
 
-       $nobukti = $next_nourut . '/' . $nomor;
+        $sudahBayar = $this->Mbyrskpd->cekSudahbayar($idskpd);
+        if ($sudahBayar) {
+            $respon = ['success' => false, 'message' => 'SKPD telah dibayar, tidak dapat diproses!'];
+            echo json_encode($respon);
+            return;
+        }
+    
+        // Hitung denda rp
+        $nil_denda = ($jumlah * $prs_denda) / 100;
+    
+        // Hitung total
+        $total = $jumlah + $nil_denda;
+    
+        // Ambil nomor
+        $nomor_data = $this->Mbyrskpd->ambilnomornyaMaster($idstsmaster);
+        $nomor = $nomor_data ? $nomor_data->nomor : NULL;
+    
+        // Ambil nourut terakhir
+        $last_nourut = $this->Mbyrskpd->ambilnourut($idstsmaster);
+        $last_nourut = $last_nourut ? $last_nourut : '0000';
+    
+        $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
+        $nobukti = $next_nourut . '/' . $nomor;
+
+        /* Jika apbd tidak diisi */
+        if (empty($idrapbd)) {
+            $idrapbd = 93;
+        }
+    
         $data = [
             'idstsmaster' => $idstsmaster,
             'idwp' => $this->input->post('idwp'),
             'iduptd' => $this->input->post('iduptd'),
-            'idrapbd' => $this->input->post('idrapbd'),
-            'idskpd' => $this->input->post('idskpd'),
+            'idrapbd' => $idrapbd,
+            'idskpd' => $idskpd,
             'nobukti' => $nobukti,
             'nourut' => $next_nourut,
             'blnpajak' => $this->input->post('blnpajak'),
@@ -735,21 +732,31 @@ class PembayaranSkpd extends CI_Controller
             'total' => $total,
             'keterangan' => $this->input->post('keterangan'),
         ];
+   /*      echo "<pre>";
+        var_dump($data);
+        echo "</pre>"; */
+       /*  die(); */
     
         $insert = $this->Mbyrskpd->insertdata($data);
     
         if ($insert) {
-            $response = ['success' => true, 'message' => 'Berhasil Tambah Data.'];
+            $this->db->where('id', $idskpd);
+            $this->db->update('trx_skpdreklame', ['isbayar' => 1]);
+    
+            $response = ['success' => true, 'message' => 'Record telah disimpan!'];
         } else {
-            $response = ['success' => false, 'message' => 'Gagal Tambah Data'];
+            $response = ['success' => false, 'message' => 'Gagal Tambah Record'];
         }
     
         echo json_encode($response);
     }
+    
     public function update_data() 
     {
         $this->load->model('Mbyrskpd'); 
         $idstsmaster = $this->input->post('idstsmaster');
+        $idskpd = $this->input->post('idskpd');
+        $idrapbd = $this->input->post('idrapbd');
         $nourut = $this->input->post('nourut');
         
         $jumlah = (float) $this->input->post('jumlah');
@@ -761,14 +768,20 @@ class PembayaranSkpd extends CI_Controller
             return;
         }
 
+        $sudahBayar = $this->Mbyrskpd->cekSudahbayar($idskpd);
+        if ($sudahBayar) {
+            $respon = ['success' => false, 'message' => 'SKPD telah dibayar, tidak dapat diproses!'];
+            echo json_encode($respon);
+            return;
+        }
         $nil_denda = ($jumlah * $prs_denda) / 100;
         $total = $jumlah + $nil_denda;
         
         $data = [
             'idwp' => $this->input->post('idwp'),
             'iduptd' => $this->input->post('iduptd'),
-            'idrapbd' => $this->input->post('idrapbd'),
-            'idskpd' => $this->input->post('idskpd'),
+            'idrapbd' => $idrapbd,
+            'idskpd' => $idskpd,
             'nobukti' => $this->input->post('nobukti'),
             'nourut' => $nourut,
             'blnpajak' =>  $this->input->post('blnpajak'),
@@ -783,19 +796,20 @@ class PembayaranSkpd extends CI_Controller
         $update = $this->Mbyrskpd->updatedata($idstsmaster, $nourut, $data);
         
         if ($update) {
-            $response = ['success' => true, 'message' => 'Berhasil update Data.'];
+            $response = ['success' => true, 'message' => 'Berhasil update Record.'];
         } else {
-            $response = ['success' => false, 'message' => 'Gagal update Data'];
+            $response = ['success' => false, 'message' => 'Gagal update Record'];
         }
         
         echo json_encode($response);
     }
     
-     public function delete() {
+         public function delete() {
             $this->load->model('Mbyrskpd'); 
      
             $idstsmaster = $this->input->post('idstsmaster');
             $nourut = $this->input->post('nourut');
+            $idskpd = $this->input->post('idskpd');
 
             header('Content-Type: application/json'); 
             if (empty($idstsmaster) || empty($nourut)) {
@@ -807,7 +821,9 @@ class PembayaranSkpd extends CI_Controller
             $delete_result = $this->Mbyrskpd->delete_record($idstsmaster, $nourut);
 
             if ($delete_result) {
-              $response = ['success' => true, 'message' => 'Data Berhasil Dihapus.'];
+                $this->db->where('id', $idskpd);
+                $this->db->update('trx_skpdreklame', ['isbayar' => 0]);
+              $response = ['success' => true, 'message' => 'Record Berhasil Dihapus.'];
             } else {
               $response = ['success' => false, 'message' => 'Gagal Delete Record'];
             }
@@ -816,22 +832,33 @@ class PembayaranSkpd extends CI_Controller
           }
           public function delete_all_data() {
             $this->load->model('Mbyrskpd'); 
-     
+             
             $idstsmaster = $this->input->post('idstsmaster');
-
+            $idskpd = $this->input->post('idskpd');
+        
             header('Content-Type: application/json'); 
-          
+        
             $delete_all_results = $this->Mbyrskpd->deleteAll($idstsmaster);
-
+        
             if ($delete_all_results) {
-              $response = ['success' => true, 'message' => 'Berhasil Hapus Semua Data.'];
+              
+            /*     $idcocok = $this->Mbyrskpd->ambildataCocok($idstsmaster);
+
+                $this->db->where_in('id', $idcocok);
+                $this->db->update('trx_skpdreklame', ['isbayar' => 0]); */
+              /*   if (!empty($idcocok)) {
+                    $this->db->where('id', $idskpd);
+                    $this->db->update('trx_skpdreklame', ['isbayar' => 0]);
+                } */
+        
+                $response = ['success' => true, 'message' => 'Berhasil Hapus Semua Record'];
             } else {
-              $response = ['success' => false, 'message' => 'Gagal Delete Record'];
+                $response = ['success' => false, 'message' => 'Gagal Delete Record'];
             }
-          
+        
             echo json_encode($response);
-          }
-          
+        }
+        
           public function getapisimpada()
           {
               $nosptpd = empty($this->input->get('nosptpd')) ? 0 : $this->input->get('nosptpd');

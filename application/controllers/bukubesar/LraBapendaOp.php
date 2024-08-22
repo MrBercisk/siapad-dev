@@ -79,12 +79,13 @@ class LraBapendaOp extends CI_Controller {
 	}
 	$this->load->view('bukubesar/printlrabapop', $data );
 	
-	/* ob_start();
+/* 	ob_start();
 	$html = $this->load->view('bukubesar/printbapop', $data, true);
 	ob_get_clean();
 	
 
 	$dompdf = new Dompdf();
+	$dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->loadHtml($html);
 	$dompdf->setPaper('A4', 'landscape');
 	$dompdf->render();
@@ -93,13 +94,26 @@ class LraBapendaOp extends CI_Controller {
 public function get_wajib_pajak_by_rekening() {
     $kdrekening = $this->input->get('kdrekening');
     
-	$limit = $this->input->get('limit') ?: 10;
+	$limit = $this->input->get('limit') ?: 200;
     $offset = $this->input->get('offset') ?: 0;
+	$search = $this->input->get('search') ?: '';
 
-    $this->db->select('mst_wajibpajak.id, nama');
-    $this->db->from('mst_wajibpajak');
-	$this->db->join('mst_rekening','mst_rekening.id = mst_wajibpajak.idrekening');
+    $this->db->select("a.id, a.nama, CONCAT(a.nama, ' - ', a.nomor) AS nmwp, a.alamat, a.idkelurahan, 
+                       b.nama AS kelurahan, b.idkecamatan, c.nama AS kecamatan, a.nomor, 
+                       a.notype, a.tglskp, a.tgljthtmp, a.idrekening, d.nmrekening, 
+                       d.jenis, a.pemilik, c.iduptd, e.nama AS nmuptd, e.singkat AS nmuptdsingkat, 
+                       a.awalpajakbln, a.awalpajakthn, a.akhirpajakbln, a.akhirpajakthn, a.isclosed", false);
+    $this->db->from('mst_wajibpajak a');
+    $this->db->join('mst_rekening d', 'd.id = a.idrekening');
+    $this->db->join('mst_kelurahan b', 'b.id = a.idkelurahan', 'left');
+    $this->db->join('mst_kecamatan c', 'c.id = b.idkecamatan', 'left');
+    $this->db->join('mst_uptd e', 'e.id = c.iduptd', 'left');
     $this->db->where('kdrekening', $kdrekening);
+	if (!empty($search)) {
+		$this->db->group_start();
+		$this->db->like('a.nama', $search);
+		$this->db->group_end();
+	}
 	$this->db->limit($limit, $offset);
 	$result = $this->db->get()->result();
 

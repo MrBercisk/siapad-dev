@@ -9,7 +9,13 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 60px;
+        }
+        .header img {
+            max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
         }
         .header img {
             max-width: 100px;
@@ -23,10 +29,10 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed;
+         
         }
         table, th, td {
-            border: 1px solid black;
+            border: 2px solid black;
         }
         th {
             padding: 5px;
@@ -35,16 +41,20 @@
         }
         td {
             font-size: 10px;
+            padding: 2px;
         }
         th {
             background-color: #f2f2f2;
         }
         tbody td {
             text-align: right;
+            text-wrap: nowrap;
+        
         }
         tbody td:first-child,
-        tbody td:nth-child(2) {
+        tbody td:nth-child(3) {
             text-align: left;
+            
         }
         .tgl_cetak p {
             text-align: center;
@@ -81,6 +91,7 @@ $tanggal_saat_ini = strftime('%d %B %Y');
 $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
 ?>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>DAFTAR PENDAPATAN DITERIMA DIMUKA</h3> 
     <h3>TAHUN ANGGARAN : <?= $format_tahun; ?></h3>
@@ -97,15 +108,13 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
             <th rowspan="2">POKOK</th>
             <th rowspan="2">DENDA</th>
             <th rowspan="2">JUMLAH</th>
-            <th colspan="5">PERHITUNGAN MASA PAJAK</th>
+            <th colspan="3">PERHITUNGAN MASA PAJAK</th>
             <th rowspan="2">PENDAPATAN DITERIMA DIMUKA</th>
         </tr>
         <tr>
             <th>MASA PAJAK</th>
             <th>Tgl Awal</th>
             <th>Tgl Akhir</th>
-            <th>Jumlah Hari</th>
-            <th></th>
         </tr>
         <tr>
             <th>1</th>
@@ -121,8 +130,6 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
             <th>11</th>
             <th>12</th>
             <th>13</th>
-            <th>14</th>
-            <th>15</th>
           </tr>
     </thead>
     <tbody>
@@ -158,20 +165,18 @@ if (!empty($tablenya)): ?>
         ?>
         <tr>
             <td style="text-align: center;"><?= $no++ ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['tglbayar']) ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['nmwp']) ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['uptd']) ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['masapajak']) ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['nosspd']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row['tglbayar']) ?></td>
+            <td style="text-align: left;"><?= htmlspecialchars($row['nmwp']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row['uptd']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row['masapajak']) ?></td>
+            <td style="text-align: left;"><?= htmlspecialchars($row['nosspd']) ?></td>
             <td style="text-align: right;" ><?= number_format($row['jumlah'],2) ?></td>
             <td style="text-align: right;" ><?= number_format($row['denda'],2)  ?></td>
             <td style="text-align: right;" ><?= number_format($row['total'],2)  ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['masapajak']) ?> s.d <?= htmlspecialchars($row['jthtempo']) ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['masapajak']) ?></td>
-            <td style="text-align: left; padding:5px"><?= htmlspecialchars($row['jthtempo']) ?></td>
-            <td style="text-align: left; padding:5px"></td>
-            <td style="text-align: left; padding:5px"></td>
-            <td style="text-align: left; padding:5px"><?= number_format($row['totdimuka'],2) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row['masapajak']) ?> s.d <?= htmlspecialchars($row['jthtempo']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row['masapajak']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row['jthtempo']) ?></td>
+            <td style="text-align: right;"><?= number_format($row['totdimuka'],2) ?></td>
          
         </tr>
     <?php endforeach; ?>
@@ -179,15 +184,13 @@ if (!empty($tablenya)): ?>
     <tr>
             <td></td>
             <td colspan="5" style="text-align: center; font-weight:bold;">JUMLAH</td>
-            <td style="text-align: center; font-weight:bold;"><?= number_format($total_jum,2) ?></td>
-            <td style="text-align: center; font-weight:bold;"><?= number_format($total_denda,2) ?></td>
-            <td style="text-align: center; font-weight:bold;"><?= number_format($total_seluruh,2) ?></td>
+            <td style="text-align: right; font-weight:bold;"><?= number_format($total_jum,2) ?></td>
+            <td style="text-align: right; font-weight:bold;"><?= number_format($total_denda,2) ?></td>
+            <td style="text-align: right; font-weight:bold;"><?= number_format($total_seluruh,2) ?></td>
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
-            <td></td>
-            <td style="text-align: center; font-weight:bold;"><?= number_format($total_seluruh_piutang,2) ?></td>                    
+            <td style="text-align: right; font-weight:bold;"><?= number_format($total_seluruh_piutang,2) ?></td>                    
         </tr>
    
 <?php else: ?>

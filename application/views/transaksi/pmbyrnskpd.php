@@ -371,7 +371,7 @@ $theme['main'][] =
                                                   </div>
                                 </div>
                               
-                                <input type="hidden" name="idwp" id="idwpskpdsadd" class="form-control" readonly >
+                                <input type="hidden" name="idwp" id="idwpskpdsadd" class="form-control" >
                                 <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="idwp">Wajib Pajak</label>
@@ -411,18 +411,19 @@ $theme['main'][] =
                                        <input type="number" class="form-control jumlahskpd" id="jumlahskpdsadd" name="jumlah">
                                   </div>
                               </div>
+                               <div class="col-md-4">
+                                  <div class="form-group">
+                                      <label for="nil_denda">Bunga(Rp.).</label>
+                                      <input type="number" class="form-control bunga" id="bungasadd" name="nil_denda">
+                                  </div>
+                              </div>
                               <div class="col-md-4">
                                   <div class="form-group">
                                       <label for="prs_denda">Bunga(%).</label>
                                        <input type="number" class="form-control persen" id="persensadd" name="prs_denda">
                                  </div>
                               </div>
-                              <div class="col-md-4">
-                                  <div class="form-group">
-                                      <label for="nil_denda">Bunga(Rp.).</label>
-                                      <input type="number" class="form-control bunga" id="bungasadd" name="nil_denda">
-                                  </div>
-                              </div>
+                             
                              
                               <div class="col-md-4">
                                   <div class="form-group">

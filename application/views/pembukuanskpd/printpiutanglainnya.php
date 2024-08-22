@@ -9,11 +9,18 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             font-size: 12px;
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
+            
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -92,6 +99,7 @@
 <body>
 
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h3>BUKU PEMBANTU TUNGGAKAN PIUTANG</h3>
     <h3>PAJAK HOTEL,RESTORAN DAN HIBURAN</h3>
     <?php if (!empty($kdrekening)) : ?>
@@ -99,12 +107,12 @@
     <?php endif; ?>   
     <h3>TAHUN <?= $format_tahun ?></h3>
 </div>
-<div class="sub-header">
+<!-- <div class="sub-header">
     <?php if (!empty($kdrekening)) : ?>
         <h3><b>Rekening&nbsp;&nbsp;  : <?= $kdrekening['nmrekening'] ?></b></h3>
     <?php endif; ?>
   
-</div>
+</div> -->
 
     <table border="1">
         <thead>

@@ -44,8 +44,12 @@ class Basptd extends CI_Controller {
         $tanda_tangan_4 = $this->input->post('tanda_tangan_4');
         $tanda_tangan_5 = $this->input->post('tanda_tangan_5');
         
-        $tablenya = $this->MBasptd->cetaktotal($tahun, $bulan, $bulanakhir);
-        
+       /*  $tablenya = $this->MBasptd->cetaktotal($tahun, $bulan, $bulanakhir); */
+
+       /*  echo '<pre>';
+        var_dump($tablenya);
+        die();
+        echo '</pre>'; */
         $tanda_tangan_data_1 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_1);
         $tanda_tangan_data_2 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_2);
         $tanda_tangan_data_3 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_3);
@@ -62,7 +66,7 @@ class Basptd extends CI_Controller {
             'format_bulan_akhir' => strftime('%B', strtotime("$tahun-$bulanakhir")),
             'format_tahun' => $tahun,
             'tglcetak' => $tglcetak,
-            'tablenya' => $tablenya,
+           /*  'tablenya' => $tablenya, */
             'tgl_cetak_format' => strftime('%d %B %Y', strtotime($tglcetak)),
             'nama_1' => isset($tanda_tangan_data_1['nama']) ? $tanda_tangan_data_1['nama'] : '',
             'nip_1' => isset($tanda_tangan_data_1['nip']) ? $tanda_tangan_data_1['nip'] : '',
@@ -84,8 +88,8 @@ class Basptd extends CI_Controller {
                 $data[str_replace('tanda_tangan_', 'nip_', $key)] = $value['nip'];
             }
         }
-   
-        ob_start();
+        $this->load->view('rekonsiliasi/printbasptd', $data);
+       /*  ob_start();
         $html = $this->load->view('rekonsiliasi/printbasptd', $data, true);
         ob_get_clean();
     
@@ -93,7 +97,7 @@ class Basptd extends CI_Controller {
         $dompdf->loadHtml($html);
         $dompdf->setPaper('legal', 'landscape');
         $dompdf->render();
-        $dompdf->stream("basptdsspd.pdf", array("Attachment" => 0));
+        $dompdf->stream("basptdsspd.pdf", array("Attachment" => 0)); */
     }
     
 

@@ -101,7 +101,7 @@ class Mlrabapop extends CI_Model {
         $form[] = '
         <div class="card">
             <div class="card-body">
-                <form action="' . site_url('bukubesar/lrabapendaop/cetak') . '" class="form-row" method="post">
+                <form id="reportForm"  action="' . site_url('bukubesar/lrabapendaop/cetak') . '" class="form-row" method="post" onsubmit="printForm(); return false;">
                 <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                 </div>
@@ -137,7 +137,7 @@ class Mlrabapop extends CI_Model {
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="rekening">Rekening:</label>
-                              <select id="opsirekwp" name="kdrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
+                              <select id="opsirekbapop" name="kdrekening" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;">
                                       '.$opsiRek.'
                               </select>
                         </div>
@@ -145,7 +145,7 @@ class Mlrabapop extends CI_Model {
                      <div class="col-md-4">
                         <div class="form-group">
                             <label for="wajib_pajak">Wajib Pajak:</label>
-                            <select id="wajib_pajak" name="idwp" class="form-control select2" data-placeholder="Pilih Wajib Pajak" style="width: 100%;">
+                            <select id="wpbapop" name="idwp" class="form-control select2" data-placeholder="Pilih Wajib Pajak" style="width: 100%;">
                               
                             </select>
                         </div>
@@ -171,9 +171,71 @@ class Mlrabapop extends CI_Model {
                         </div>
                     </div>
                 </form>
+                <div id="loadingSpinner" style="display:none; text-align:center; margin-top: 20px;">
+                <img src="' . base_url('/assets/img/load2.gif') . '" alt="Loading..." />
+                 <p>Silahkan tunggu...</p>
+            </div>
             </div>
         </div>
-        
+         <style>
+        #loadingSpinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            text-align: center;
+            width: 200px;
+        }
+        #loadingSpinner img {
+            width: 120px; 
+            height: 120px; 
+        }
+        #loadingSpinner p {
+            margin-top: 20px;
+            font-size: 16px;
+            color: black; 
+        }
+    </style>
+
+    <script>
+       function printForm() {
+        var form = document.getElementById("reportForm");
+        var formData = new FormData(form);
+        var loadingSpinner = document.getElementById("loadingSpinner");
+        var printWindow;
+
+        loadingSpinner.style.display = "block";
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", form.action, true);
+        xhr.onload = function () {
+            loadingSpinner.style.display = "none";
+
+            if (xhr.status === 200) {
+                if (printWindow && !printWindow.closed) {
+                    printWindow.focus();
+                    printWindow.document.open();
+                    printWindow.document.write(xhr.responseText);
+                    printWindow.document.close();
+                } else {
+                    printWindow = window.open("", "", "width=800,height=600");
+                    printWindow.document.open();
+                    printWindow.document.write("<html><head><title>SIAPAD - Lra Bapenda Per Objek Pajak</title>");
+                    printWindow.document.write("<style>body{font-family:Arial,sans-serif; padding: 20px;} table{width: 100%; border-collapse: collapse;} th, td{border: 1px solid black; padding: 8px; text-align: left;}</style>");
+                    printWindow.document.write("</head><body>");
+                    printWindow.document.write(xhr.responseText);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                }
+            } else {
+                alert("An error occurred during the request.");
+            }
+        };
+        xhr.send(formData);
+    }
+    </script>
         ';
         return $form;
     }

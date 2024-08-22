@@ -84,8 +84,8 @@ class Lradaerah extends CI_Controller {
 		$data['tanda_tangan'] = $ttddetail;
 	}
 
-	$this->load->view('laporan/printlap', $data);
-	/* ob_start();
+/* 	$this->load->view('laporan/printlap', $data); */
+	ob_start();
 	$html = $this->load->view('laporan/printlap', $data, true);
 	ob_clean();
     ob_flush();
@@ -94,10 +94,11 @@ class Lradaerah extends CI_Controller {
 	$options = new Options();
 	$options->set('isHtml5ParserEnabled', true);
 	$options->set('isPhpEnabled', true);
+	$dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->loadHtml($html);
-	$dompdf->setPaper('A4', 'landscape');
+	$dompdf->setPaper('legal', 'landscape');
 	$dompdf->render();
-	$dompdf->stream("laporan_lra_harian.pdf", array("Attachment" => 0)); */
+	$dompdf->stream("laporan_lra_harian.pdf", array("Attachment" => 0));
 }
 
 }

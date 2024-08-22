@@ -89,6 +89,7 @@
 <body>
 
 <div class="header">
+   
     <h3>BUKU BESAR PEMBANTU PENDAPATAN DAERAH</h3>
     <h3>REALISASI ANGGARAN PAJAK BAPENDA KOTA BANDAR LAMPUNG PER WAJIB PAJAK</h3>
     <?php if (!empty($kdrekening)) : ?>

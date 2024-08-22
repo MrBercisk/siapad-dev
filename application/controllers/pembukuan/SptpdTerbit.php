@@ -71,6 +71,7 @@ class SptpdTerbit extends CI_Controller {
         ob_get_clean();
     
         $dompdf = new Dompdf();
+        $dompdf->set_option('isRemoteEnabled', true);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('legal', 'landscape');
         $dompdf->render();

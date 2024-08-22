@@ -497,9 +497,9 @@ $(document).ready(function() {
                     results: $.map(data, function (item) {
                         return {
                             id: item.id,
-                            text: item.nomor + ' (' + item.nama + ')', 
-                            nomor: item.nomor,
-                            nama: item.nama,
+                            text: item.noskpd + ' (' + item.nmwp + ')', 
+                            noskpd: item.noskpd,
+                            nmwp: item.nmwp,
                             teks: item.teks,
                             total: item.total,
                             bunga: item.bunga,
@@ -524,7 +524,7 @@ $(document).ready(function() {
         templateResult: formatSkpd,
         templateSelection: formatSkpdSelection
     });
-    $('.opsiskpdadd').select2({
+    $('#opsiskpdadd').select2({
         ajax: {
             url: 'PembayaranSkpd/get_skpd_data',
             dataType: 'json',
@@ -542,9 +542,9 @@ $(document).ready(function() {
                     results: $.map(data, function (item) {
                         return {
                             id: item.id,
-                            text: item.nomor + ' (' + item.nama + ')', 
-                            nomor: item.nomor,
-                            nama: item.nama,
+                            text: item.noskpd + ' (' + item.nmwp + ')', 
+                            noskpd: item.noskpd,
+                            nmwp: item.nmwp,
                             teks: item.teks,
                             total: item.total,
                             bunga: item.bunga,
@@ -587,7 +587,7 @@ $(document).ready(function() {
         $('#idwpskpdsadd').val(data.idwp || ''); 
         $('#idrapbdsadd').val(data.idrapbd || ''); 
         $('#iduptdsadd').val(data.iduptd || ''); 
-        $('#nmwpsadd').val(data.nama || '');
+        $('#nmwpsadd').val(data.nmwp || '');
         $('#bln').val(data.blnpajak || ''); 
         $('#thn').val(data.thnpajak || ''); 
         $('#jumlahskpdsadd').val(data.jumlah || ''); 
@@ -601,7 +601,7 @@ $(document).ready(function() {
         $('#idwpskpds').val(data.idwp || ''); 
         $('#idrapbds').val(data.idrapbd || ''); 
         $('#iduptds').val(data.iduptd || ''); 
-        $('#nmwp').val(data.nama || '');
+        $('#nmwp').val(data.nmwp || '');
         $('#bln').val(data.blnpajak || ''); 
         $('#thn').val(data.thnpajak || ''); 
         $('#jumlahskpd').val(data.jumlah || ''); 
@@ -1358,9 +1358,8 @@ $('#delete').on('click', function() {
     }
 });
 
-$('.select2').select2();
 
-$("#opsirekwp").change(function() {
+$("#opsirekbapop").change(function() {
     var idrekening = $(this).val();
     $.ajax({
         url: "LraBapendaOp/get_wajib_pajak_by_rekening",
@@ -1368,7 +1367,7 @@ $("#opsirekwp").change(function() {
         data: { kdrekening: idrekening },
         dataType: 'html', 
         success: function(data) {
-            $("#wajib_pajak").html(data).trigger("change");
+            $("#wpbapop").html(data).trigger("change");
         }
     });
 });

@@ -70,6 +70,7 @@ class RekapBap extends CI_Controller {
 		
 	
 		$dompdf = new Dompdf();
+		$dompdf->set_option('isRemoteEnabled', true);
 		$dompdf->loadHtml($html);
 		$dompdf->setPaper('legal', 'landscape');
 		$dompdf->render();

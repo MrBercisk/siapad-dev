@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 use Dompdf\Dompdf;
+use Dompdf\Options;
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 class BeritaAcarattd extends CI_Controller {
@@ -99,6 +100,9 @@ class BeritaAcarattd extends CI_Controller {
         ob_get_clean();
     
         $dompdf = new Dompdf();
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('legal', 'landscape');
         $dompdf->render();

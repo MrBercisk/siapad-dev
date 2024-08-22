@@ -227,5 +227,23 @@ class Mbyrskpd extends CI_Model {
             return false;
         }
     }
-  
+    public function cekIdadatidak($idstsmaster, $idskpd) {
+        return $this->db->where('idstsmaster', $idstsmaster)
+                        ->where('idskpd', $idskpd)
+                        ->get('trx_stsdetail')
+                        ->row();
+    }
+    public function cekSudahbayar($idskpd) {
+        return $this->db->where('id', $idskpd)
+                        ->where('isbayar', 1)
+                        ->get('trx_skpdreklame')
+                        ->row();
+    }
+    public function ambildataCocok($idstsmaster) {
+        return $this->db->where('idstsmaster', $idstsmaster)
+                        ->get('trx_stsdetail')
+                        ->row();
+    }
+    
+    
 }

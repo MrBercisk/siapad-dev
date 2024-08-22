@@ -56,7 +56,7 @@ class DispenSkpd extends CI_Controller
         ]);
         
         $datatables->setOrderColumn([null, "wajibpajak", "noskpd", "tglskp", "teks", "masapajak", "jumlah", "keterangan"]);
-        $datatables->setSearchColumns(["nama", "nomor","teks"]);    
+        $datatables->setSearchColumns(["nama", "mst_wajibpajak.nomor","teks"]);    
         $datatables->addJoin('trx_skpdreklame', 'trx_skpdreklame.id=trx_dispensasi_skpd.idskpdrek', 'left');
         $datatables->addJoin('mst_wajibpajak', 'mst_wajibpajak.id=trx_skpdreklame.idwp', 'left');
         
@@ -214,7 +214,7 @@ class DispenSkpd extends CI_Controller
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="wp">Wajib Pajak:</label>
-                        <select id="editwp2" class="form-control opsiwp2 select2" name="idwp" data-placeholder="Pilih WP" style="width: 100%;"></select>
+                        <select id="wajibpajak" class="form-control opsiwp2 select2" name="idwp" data-placeholder="Pilih WP" style="width: 100%;"></select>
                     </div>
                 </div>
                 <div class="col-md-12">' . implode($this->Form->hiddenText('idskpdrek', 'skpdrek')) . '</div>

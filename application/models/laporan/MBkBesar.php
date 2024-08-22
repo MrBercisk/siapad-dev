@@ -1,6 +1,26 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class MBkBesar extends CI_Model {
+    public function ambildata($tanggal) {
+        $mysqli = $this->db->conn_id; 
+ 
+        $statment = $mysqli->prepare("CALL spRptBBPKHarian(?)");
+        $statment->bind_param('s', $tanggal);  
+    
+        $statment->execute();
+        $result = $statment->get_result();  
+    
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        while ($mysqli->more_results()) {
+            $mysqli->next_result(); 
+        }
+    
+        return $data;
    
+    }
     public function get_saldo_awal($tanggal) {
         $tahun = date('Y', strtotime($tanggal));
         

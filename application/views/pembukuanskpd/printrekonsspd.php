@@ -13,6 +13,12 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -100,6 +106,7 @@
 </head>
 <body>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h3>PEMERINTAH KOTA BANDAR LAMPUNG</h3>
     <h2><b>BADAN PENDAPATAN DAERAH</b></h2>
     <h3>REKONSILIASI SSPD/STS DAN SKPD/SKPN</h3>
