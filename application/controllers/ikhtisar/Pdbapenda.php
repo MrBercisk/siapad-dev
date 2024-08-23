@@ -46,10 +46,8 @@ class Pdbapenda extends CI_Controller {
 		'ttd_checkbox' => $ttd_checkbox,
 		'format_tanggal' =>strftime('%d %B %Y', strtotime($tanggal)),
 		'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
-
-		'penerimaan_hari_sebelumnya' => $this->MPbapenda->get_data_hari_lalu($tanggal),
 		'tablenya' => $this->MPbapenda->get_data_hari_ini($tanggal),
-		'saldo' => $this->MPbapenda->get_saldo($tanggal),
+		'saldo' => $this->MPbapenda->get_saldo_awal($tanggal),
 	];
 	
 	$tanda_tangan_data = $this->Msetup->get_tanda_tangan($ttd_checkbox, $tanda_tangan);
@@ -61,6 +59,7 @@ class Pdbapenda extends CI_Controller {
 
 	$html = $this->load->view('ikhtisar/printbap', $data, true);
 	$dompdf = new Dompdf();
+	$dompdf->set_option('isRemoteEnabled', true);
 	$dompdf->loadHtml($html);
 	$dompdf->setPaper('A4', 'landscape');
 	$dompdf->render();

@@ -31,8 +31,17 @@ class Ropendapatan extends CI_Controller {
     $template 		  = $this->Msetup->loadTemplate($setpage->title);
 	
 	$tgl_cetak = $this->input->post('tgl_cetak');
+
 	$tanda_tangan = $this->input->post('tanda_tangan');
 	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
+
+	$pembuat = $this->input->post('pembuat');
+	$pembuat_checkbox = $this->input->post('pembuat_checkbox') ? true : false;
+
+	$bulan =  $this->input->post('bulan');
+	$tahun = $this->input->post('tahun');
+	$kdrekening = $this->input->post('kdrekening');
+
 	
 	$data = [
 		'footer' => $template['footer'],
@@ -41,45 +50,46 @@ class Ropendapatan extends CI_Controller {
 		'topbar' => $template['topbar'],
 		'sidebar' => $template['sidebar'],
 		'ttd_checkbox' => $ttd_checkbox,
+		'pembuat_checkbox' => $pembuat_checkbox,
+		'format_bulan' => strftime('%B', strtotime("$tahun-$bulan")),
+		'format_tahun' => $tahun,
+		'kdrekening' => $kdrekening,
 		'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
+		'tablenya' => $this->Mropendapatan->get_laporan_bulanan($bulan, $tahun, $kdrekening),
+		'saldo' => $this->Mropendapatan->get_saldo_awal($bulan, $tahun, $kdrekening)
 	];
-	
-	$data['tgl_cetak'] = $this->input->post('tgl_cetak');
-
-	$bulan =  $this->input->post('bulan');
-    $data['format_bulan'] = strftime('%B', strtotime($bulan));
-
-	$data['tahun'] = $this->input->post('tahun');
-	
-	$rekening = $this->input->post('rekening');
-	
-	$tanda_tangan = $this->input->post('tanda_tangan');
-	$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
+	/* $cek = $this->Mropendapatan->get_laporan_bulanan($bulan, $tahun);
+	echo '<pre>';
+	var_dump($cek);
+	echo '</pre>';
+	die(); */
+/* 	$this->load->view('ikhtisar/tes',$data); */
 
 	
-    if($rekening){
-        $rekdetail = $this->db
-        ->select('id,kdrekening, nmrekening')
-		->from('mst_rekening')
-		->where('id', $rekening)
-		->get()
-		->row_array();
-		$data['rekening'] = $rekdetail;
-    }
-	if($ttd_checkbox && $tanda_tangan){
-		$ttddetail = $this->db
-		->select('id, nama, nip, jabatan1, jabatan2')
-		->from('mst_tandatangan')
-		->where('id', $tanda_tangan)
-		->get()
-		->row_array();
-		$data['tanda_tangan'] = $ttddetail;
+	$tanda_tangan_data = $this->Msetup->get_tanda_tangan($ttd_checkbox, $tanda_tangan);
+	if ($tanda_tangan_data) {
+		$data['tanda_tangan'] = $tanda_tangan_data;
 	}
-	$data['ttd_checkbox'] = $ttd_checkbox;
+	$rek_data = $this->Msetup->get_rekening($kdrekening);
+	if ($rek_data) {
+		$data['kdrekening'] = $rek_data;
+	}
+	$pembuat_data = $this->Msetup->get_pembuat($pembuat_checkbox, $pembuat);
+	if ($pembuat_data) {
+		$data['pembuat'] = $pembuat_data;
+	}
+
 
     ob_start();
-    $this->load->view('ikhtisar/printlopen', $data);
+    $html = $this->load->view('ikhtisar/printlopen', $data, true);
     echo ob_get_clean();
+
+	$dompdf = new Dompdf();
+	$dompdf->set_option('isRemoteEnabled', true);
+	$dompdf->loadHtml($html);
+	$dompdf->setPaper('legal', 'landscape');
+	$dompdf->render();
+	$dompdf->stream("laporan_perencanaan_objek.pdf", array("Attachment" => 0));
 }
 
 }

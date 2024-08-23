@@ -13,6 +13,12 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -29,7 +35,7 @@
             border: 1px solid black;
         }
         th {
-            padding: 10px;
+            padding: 5px;
             text-align: center;
             font-size: 10px;
         }
@@ -81,25 +87,27 @@ $tanggal_saat_ini = strftime('%d %B %Y');
 $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
 ?>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>REKAPITULASI REALISASI ANGGARAN PENDAPATAN DAERAH</h3>
-    <?php if (!empty($rekening)) : ?>
-        <h3><?= $rekening['nmrekening'] ?></h3>
-    <?php endif; ?>
+
     
-    <h3>PER : <?= $format_bulan; ?> <?= $tahun ?></h3>
+    <h3>BULAN : <?= $format_bulan; ?> <?= $format_tahun ?></h3>
 </div>
 <table>
     <thead>
         <tr>
-            <th>NO</th>
-            <th>TANGGAL TRANSAKSI</th>
-            <th>No. SPPD/STS</th>
-            <th>NAMA WAJIB PAJAK</th>
-            <th>MASA PAJAK</th>
-            <th>JUMLAH</th>
-            <th>KETERANGAN</th>
+            <th rowspan="2">NO</th>
+            <th rowspan="2">JENIS PAJAK</th>
+            <th rowspan="2">JUMLAH SSPD/STS (Rp.)</th>
+            <th colspan="3">JUMLAH WAJIB PAJAK (WP)/SKPD/STTS/SSPD</th>
+            <th rowspan="2">KETERANGAN</th>
+        </tr>
+        <tr>
+            <th>S.D BULAN LALU</th>
+            <th>BULAN INI</th>
+            <th>S.D BULAN INI</th>
         </tr>
         <tr>
             <th>1</th>
@@ -112,19 +120,67 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
           </tr>
     </thead>
     <tbody>
+    <?php
+        if (!empty($tablenya)):
+            $no = 1;
+            $count = 0;
+            $total_jmlrp = 0;
+            $total_sampai_bulan = $total_sampai_bulan; 
+            
+            foreach ($tablenya as $row): 
+                $total_jmlrp +=  $row['jmlrpini'];
+                $total_seluruh = $total_jmlrp + $total_sampai_bulan;
+            ?>
+                    
+            <tr>
+                <td style="text-align: center;"><?= $no++ ?></td>
+                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['nmrek']) ?></td>
+                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlrpini'],2) ?></td>
+                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlwplalu']) ?></td>
+                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlwpini']) ?></td>
+                <td style="text-align: right; padding:5px;" ><?= number_format($row['jmlwpsdini']) ?></td>
+                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['satuan']) ?></td>
+
+        
+            </tr>
+            <?php endforeach; ?>
+            <tr>
+                <td colspan="2" style="font-weight: bold;">JUMLAH PER <?= htmlspecialchars($tglakhir_format) ?> </td>
+                <td style="text-align: right; padding:5px;" ><b><?= number_format($total_jmlrp ,2) ?></b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+               
+            </tr>
+            <tr>
+                <td colspan="2" style="font-weight: bold;">JUMLAH S.D <?= htmlspecialchars($tglsebelum_format) ?> </td>
+                <td style="text-align: right; padding:5px;"><b><?= number_format($total_sampai_bulan, 2) ?></b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            
+            </tr>
+            <tr>
+                <td colspan="2" style="font-weight: bold;">JUMLAH PER <?= htmlspecialchars($tglakhir_format) ?> </td>
+                <td style="text-align: right; padding:5px;" ><b><?= number_format($total_seluruh ,2) ?></b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+           
+            </tr>
+    <?php else: ?>
         <tr>
-            <td>1</td>
-            <td>tes</td>
-            <td>tes</td>
-            <td>tes</td>
-            <td>tes</td>
-            <td>tes</td>
-            <td>tes</td>
+            <td></td>
+            <td colspan="6" style="text-align: center;">Tidak Ada Data</td>
         </tr>
+    <?php endif; ?>
     </tbody>
 </table>
 
-<?php if(!empty($tgl_cetak)): ?>
+<?php if(!empty($tglcetak)): ?>
     <div class="tgl_cetak">
         <p>Bandar Lampung, <?= strftime('%d %B %Y') ?></p>
     </div>

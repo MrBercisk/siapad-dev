@@ -29,27 +29,28 @@ class MPbapenda extends CI_Model {
     
         return $result;
     }
-    public function get_saldo_awal($tahun, $bulan, $iduptd = null) {
-        $this->db->select('SUM(trx_stsdetail.total) as saldoawal')
-                 ->from('trx_stsdetail')
-                 ->join('trx_stsmaster', '
-				 trx_stsmaster.id = trx_stsdetail.idstsmaster')
-                 ->join('trx_rapbd', 'trx_rapbd.id = trx_stsdetail.idrapbd')
-                 ->join('mst_rekening mst_rekening', 'mst_rekening.id = trx_rapbd.idrekening')
-                 ->where('mst_rekening.jenis', 'BPHTB')
-                 ->where('MONTH(trx_stsmaster.tanggal) <', $bulan)
-                 ->where('trx_stsmaster.tahun', $tahun);
 
-        if ($iduptd !== null) {
-            $this->db->where('a.iduptd', $iduptd);
-        }
-
+    public function get_saldo_awal($tanggal) {
+        $tahun = date('Y', strtotime($tanggal));
+    
+        $this->db->select('COALESCE(SUM(a.total), 0) as saldoawal')
+                 ->from('trx_stsdetail a')
+                 ->join('trx_stsmaster b', 'b.id = a.idstsmaster')
+                 ->join('trx_rapbd c', 'c.id = a.idrapbd')
+                 ->join('mst_rekening d', 'd.id = c.idrekening')
+                 ->where('b.tanggal <', $tanggal)
+                 ->where('YEAR(b.tanggal)', $tahun)
+                 ->where('(d.kdrekening LIKE \'4.1.1.01%\' OR d.kdrekening LIKE \'4.1.1.02%\' OR d.kdrekening LIKE \'4.1.1.03%\' OR d.kdrekening LIKE \'4.1.1.04%\'
+                          OR d.kdrekening LIKE \'4.1.1.05%\' OR d.kdrekening LIKE \'4.1.1.07%\' OR d.kdrekening LIKE \'4.1.1.08%\' OR d.kdrekening LIKE \'4.1.1.11%\'
+                          OR d.kdrekening LIKE \'4.1.1.12%\' OR d.kdrekening LIKE \'4.1.1.13%\' OR d.kdrekening LIKE \'4.1.1.08%\' OR d.kdrekening LIKE \'4.1.1.11%\')');
+    
         $query = $this->db->get();
         $result = $query->row();
         return $result ? (float) $result->saldoawal : 0.00;
-    }
+    }    
     
     public function get_data_hari_ini($tanggal) {
+        $tahun = date('Y', strtotime($tanggal));
         $this->db->select(
            'idstsmaster, 
             nobukti as nomor, 
@@ -71,19 +72,22 @@ class MPbapenda extends CI_Model {
             '
             );
         $this->db->from('trx_stsdetail');
-        $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
-        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
-        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
+        $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'inner');
+        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'inner');
+        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'inner');
         $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
         $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
+        $this->db->where('trx_stsmaster.tahun', $tahun);
         $this->db->where('trx_stsmaster.tanggal', $tanggal);
-        $this->db->order_by('mst_rekening.id');
+
         $query = $this->db->get();
         $results = $query->result_array();
 
         return $results;
     }
-    public function get_data_hari_lalu($tanggal) {
+  
+    public function getdata($tanggal) {
+        $tahun = date('Y', strtotime($tanggal));
         $this->db->select(
            'idstsmaster, 
             nobukti as nomor, 
@@ -105,65 +109,21 @@ class MPbapenda extends CI_Model {
             '
             );
         $this->db->from('trx_stsdetail');
-        $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
-        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
-        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
+        $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'inner');
+        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'inner');
+        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'inner');
         $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
         $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
-        $this->db->where('trx_stsmaster.tanggal <', $tanggal);
-        $this->db->order_by('mst_rekening.idheader');
+        $this->db->where('trx_stsmaster.tahun', $tahun);
+        $this->db->where('trx_stsmaster.tanggal', $tanggal);
+        $this->db->where("(nobukti LIKE '%PBB%' OR nobukti LIKE '/pbb%')");
+
         $query = $this->db->get();
         $results = $query->result_array();
 
         return $results;
     }
-    public function get_data_sd_hari_ini($tanggal) {
-        $this->db->select(
-           'idstsmaster, 
-            nobukti as nomor, 
-            idrapbd, 
-            tglpajak, 
-            blnpajak, 
-            thnpajak, 
-            trx_stsdetail.keterangan, 
-            jumlah as pokokpajak, 
-            prs_denda as persendenda, 
-            nil_denda as jumlahdenda, 
-            total as jumlahdibayar, 
-            mst_rekening.nmrekening as namarekening, 
-            mst_uptd.singkat as singkatanupt, 
-            mst_wajibpajak.nama as namawp,
-            mst_wajibpajak.idrekening ,
-            trx_stsmaster.tahun,
-            trx_stsmaster.tanggal,
-            '
-            );
-        $this->db->from('trx_stsdetail');
-        $this->db->join('trx_stsmaster', 'trx_stsdetail.idstsmaster = trx_stsmaster.id', 'left');
-        $this->db->join('trx_rapbd', 'trx_stsdetail.idrapbd = trx_rapbd.id', 'left');
-        $this->db->join('mst_rekening', 'trx_rapbd.idrekening = mst_rekening.id', 'left');
-        $this->db->join('mst_uptd', 'trx_stsdetail.iduptd = mst_uptd.id', 'left');
-        $this->db->join('mst_wajibpajak', 'trx_stsdetail.idwp = mst_wajibpajak.id', 'left');
-        $this->db->where('trx_stsmaster.tanggal <=', $tanggal);
-        $this->db->order_by('mst_rekening.idheader');
-        $query = $this->db->get();
-        $results = $query->result_array();
-
-        return $results;
-    }
-    public function get_saldo($tanggal) {
-        $date_format = explode('-', $tanggal);
-        $tahun = $date_format[0];
-        $hari = $date_format[2];
-        
-        $this->db->select_sum('total', 'saldo');
-        $this->db->where('thnpajak', $tahun);
-        $this->db->where('tglpajak <=', $hari);
-        $query = $this->db->get('trx_stsdetail');
-        
-        $result = $query->row();
-        return $result->saldo;
-    }
+  
     
     public function get_data_bapenda($tanggal) {
         $query = $this->db->query("CALL spRptIkhtisarBPPRD(?)", array($tanggal));

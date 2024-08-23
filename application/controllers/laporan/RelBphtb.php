@@ -34,7 +34,6 @@ class RelBphtb extends CI_Controller {
     $template 		  = $this->Msetup->loadTemplate($setpage->title);
 	
 	$tanggal = $this->input->post('tanggal');
-	$tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($tanggal)));
 	
 	$tgl_cetak = $this->input->post('tgl_cetak');
 	$tanda_tangan = $this->input->post('tanda_tangan');
@@ -49,15 +48,15 @@ class RelBphtb extends CI_Controller {
 		'ttd_checkbox' => $ttd_checkbox,
 		'format_tanggal' =>strftime('%d %B %Y', strtotime($tanggal)),
 		'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
-		'tablenya' => $this->MLapBphtb->get_laporan_hari($tanggal)
+		'tanggal_sebelumnya' =>strftime('%d %B %Y', strtotime('-1 day', strtotime($tanggal))),
+		'tablenya' => $this->MLapBphtb->get_laporan_hari($tanggal),
+		'saldo' => $this->MLapBphtb->get_saldo_awal($tanggal),
 	];
 
 	$tanda_tangan_data = $this->Msetup->get_tanda_tangan($ttd_checkbox, $tanda_tangan);
 	if ($tanda_tangan_data) {
 		$data['tanda_tangan'] = $tanda_tangan_data;
 	}
-
-	$data['tablenya'] = $this->MLapBphtb->get_laporan_hari($tanggal);
 	
 	ob_start();
 	$html = $this->load->view('laporan/printbphtb', $data, true);

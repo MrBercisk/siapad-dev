@@ -170,6 +170,22 @@ class WP extends CI_Controller {
         break;
     }
 }
+public function get_wp_data() {
+	$limit = $this->input->get('limit') ?: 5;
+	$offset = $this->input->get('offset') ?: 0;
+	$search = $this->input->get('search') ?: '';
+
+	$this->db->select('id, nama, nomor, tgljthtmp');
+	$this->db->from('mst_wajibpajak');
+	if (!empty($search)) {
+		$this->db->like('nama', $search);
+	}
+	$this->db->limit($limit, $offset);
+	$wpdata = $this->db->get()->result();
+
+	echo json_encode($wpdata);
+}
+
 }
 ?>
 		

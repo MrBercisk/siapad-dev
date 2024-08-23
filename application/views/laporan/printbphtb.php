@@ -66,6 +66,16 @@
     </style>
 </head>
 <body>
+    <?php
+    $total_hari_ini = 0;
+    if (!empty($tablenya)):
+        foreach($tablenya as $tbl) {
+            $total_hari_ini += $tbl['jumlsspd'];
+          
+        }
+    endif;
+    $total_sampai_hari_ini = $saldo + $total_hari_ini;
+    ?>
 <div class="header">
     <h2>LAPORAN HARIAN REALISASI PAJAK BAPENDA</h2>
     <h3>BEA PEROLEHAN HAK ATAS TANAH DAN BANGUNAN (BPHTB)</h3>
@@ -110,17 +120,17 @@
                  <tr>
                     <td></td>
                     <td colspan="4"><b>Jumlah Per <?= $format_tanggal; ?></b> </td>
-                    <td></td>
+                    <td style="text-align: right;"><b>Rp. <?= number_format($total_hari_ini, 2) ?></b></td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td colspan="4"><b>Jumlah s.d.  </b></td>
-                    <td></td>
+                    <td colspan="4"><b>Jumlah s.d.  <?= $tanggal_sebelumnya; ?></b></td>
+                    <td style="text-align: right;"><b>Rp. <?= number_format($saldo, 2) ?></b></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td colspan="4"><b>Jumlah s.d. <?= $format_tanggal; ?></b> </td>
-                    <td></td>
+                    <td style="text-align: right;"><b>Rp. <?= number_format($total_sampai_hari_ini, 2) ?></b></td>
                 </tr>
     </tbody>
 </table>

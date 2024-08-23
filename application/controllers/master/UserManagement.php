@@ -168,6 +168,39 @@ class UserManagement extends CI_Controller {
 			break;
 		}
 	}
+	public function get_datatable_data() {
+		$idrecord = $this->input->get('id');  
+	
+		$datatables = $this->Datatables;
+		$datatables->setTable("trx_stsdetail");
+		$datatables->setSelectColumn('trx_stsdetail.idstsmaster,trx_stsdetail.nourut, trx_stsdetail.tglpajak, trx_stsdetail.idskpd, trx_stsdetail.nobukti, trx_stsdetail.blnpajak, trx_stsdetail.thnpajak, trx_stsdetail.jumlah, trx_stsdetail.prs_denda, trx_stsdetail.nil_denda, trx_stsdetail.total, trx_stsdetail.keterangan');
+		$datatables->setOrderColumn(["trx_stsdetail.nourut", "trx_stsdetail.nobukti", "trx_stsdetail.blnpajak", "trx_stsdetail.thnpajak"]);
+		$datatables->addJoin('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'left');
+		$datatables->addWhere('trx_stsdetail.idstsmaster', $idrecord); 
+		$fetch_data = $this->Datatables->make_datatables();
+		$data = array();
+		foreach ($fetch_data as $row) {
+			$sub_array = array();
+			$sub_array[] = $row->nourut;
+			$sub_array[] = $row->nobukti;
+			$sub_array[] = $row->tglpajak;
+			$sub_array[] = $row->blnpajak;
+			$sub_array[] = $row->thnpajak;
+			$sub_array[] = $row->jumlah;
+			$sub_array[] = $row->prs_denda;
+			$sub_array[] = $row->nil_denda;
+			$sub_array[] = $row->total;
+			$sub_array[] = $row->keterangan;
+			$sub_array[] = implode('',$datatables->tombol($row->idstsmaster));
+			$data[] = $sub_array;
+		}
+		$output = array(
+			"draw" => intval($_POST["draw"]),
+			"data" => $data
+		);
+	
+		echo json_encode($output);
+	}
 	}
 ?>
 		

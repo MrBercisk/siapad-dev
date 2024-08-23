@@ -2,8 +2,25 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Mlradaerah extends CI_Model {
     public function get_data_harian($tanggal) {
-        $query = $this->db->query("CALL spRptLRAHarian(?)", array($tanggal));
-        return $query->result_array();
+
+        $mysqli = $this->db->conn_id; 
+ 
+        $statment = $mysqli->prepare("CALL spRptLRAHarian(?)");
+        $statment->bind_param('s',$tanggal);  
+    
+        $statment->execute();
+        $result = $statment->get_result();  
+    
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        while ($mysqli->more_results()) {
+            $mysqli->next_result(); 
+        }
+    
+        return $data;
     }
   
  
@@ -59,19 +76,17 @@ class Mlradaerah extends CI_Model {
                             <input type="checkbox" class="form-check-input" id="apbdp_checkbox" name="apbdp_checkbox" >
                             <label class="form-check-label" for="apbdp">APBDP</label>
                         </div>
-                        <label class="label mt-2" for="label"><b>BPK</b></label>
-                       <div class="form-check">
-                            <input type="radio" class="form-check-input" id="no_choice" name="audit_status" value="" checked>
-                            <label class="form-check-label" for="no_choice">Tidak keduanya</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" class="form-check-input" id="un_audited" name="audit_status" value="un_audited">
-                            <label class="form-check-label" for="un_audited">Un-Audited BPK</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" class="form-check-input" id="audited" name="audit_status" value="audited">
-                            <label class="form-check-label" for="audited">Audited BPK</label>
-                        </div>
+                       <label class="label mt-2" for="label"><b>BPK</b></label>
+                           
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="un_audited" name="un_audited" data-check-group="bpk-group">
+                                <label class="form-check-label" for="un_audited">Un-Audited BPK</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="audited" name="audited" data-check-group="bpk-group">
+                                <label class="form-check-label" for="audited">Audited BPK</label>
+                            </div>
+
                     </div>
                 </div>
                 <div class="col-md-1">
@@ -82,7 +97,26 @@ class Mlradaerah extends CI_Model {
                  </div>
             </form>
         </div>
-    </div>';
+    </div>
+    <script>
+    document.addEventListener(\'DOMContentLoaded\', function () {
+    const checkboxes = document.querySelectorAll(\'input[type="checkbox"][data-check-group="bpk-group"]\');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener(\'change\', function () {
+            if (this.checked) {
+                checkboxes.forEach(cb => {
+                    if (cb !== this) {
+                        cb.checked = false;
+                    }
+                });
+            }
+        });
+    });
+});
+
+    </script>
+    ';
     return $form;
 }
 

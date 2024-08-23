@@ -13,6 +13,12 @@
         }
         .header img {
             max-width: 100px;
+            position: absolute;
+            left: 20px; 
+            top: 10px; 
+        }
+        .header img {
+            max-width: 100px;
         }
         .header h2, .header h3, .header h4 {
             margin: 0;
@@ -23,7 +29,6 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed;
         }
         table, th, td {
             border: 1px solid black;
@@ -47,13 +52,20 @@
         .tgl_cetak p {
             text-align: center;
             margin-top: 50px;
-            margin-bottom: 30px;
+            margin-bottom: 50px;
             margin-right: 70px;
             position: relative;
             float: right;
             clear: both;
         }
-        .signature {
+        .footer-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+         }
+    
+        .pembuat {
+            font-size: 12px;
             font-weight: bold;
             text-align: center;
             margin-top: 60px;
@@ -62,8 +74,23 @@
             float: right;
             clear: both;
         }
-        .signature .jabatan1 {
-            margin-top: 30px;
+        .pembuat .jabatan1 {
+            margin-top: 10px;
+        }
+        .pembuat .name {
+            text-decoration: underline;
+            font-weight: bold;
+            margin-top: 70px;
+        }
+        .signature {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 40px;
+            margin-left: 30px;
+            position: relative;
+            float: left;
+            clear: both;
         }
         .signature .name {
             text-decoration: underline;
@@ -74,18 +101,27 @@
 </head>
 <body>
 <?php
-setlocale(LC_ALL, 'id-ID', 'id_ID');
-$tanggal_saat_ini = strftime('%d %B %Y');
-$tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
+$total_hari_ini = 0;
+$total_denda = 0;
+
+if (!empty($tablenya)):
+    foreach($tablenya as $tbl) {
+        $total_hari_ini += $tbl['pokok'];
+        $total_denda += $tbl['denda_lalu'];
+    }
+endif;
+
+$total_sampai_hari_ini = $saldo + $total_hari_ini;
 ?>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h3>IKHTISAR PENDAPATAN RINCIAN OBJEK PENDAPATAN</h3>
-    <?php if (!empty($rekening)) : ?>
-        <h3><?= $rekening['nmrekening'] ?></h3>
+    <?php if (!empty($kdrekening)) : ?>
+        <h3><?= $kdrekening['nmrekening'] ?></h3>
     <?php endif; ?>
-    <h3>BULAN <?= $format_bulan; ?>-<?= $tahun ?></h3>
+    <h3>BULAN <?= $format_bulan; ?>-<?= $format_tahun ?></h3>
 </div>
 <table>
     <thead>
@@ -118,36 +154,93 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     </thead>
     <tbody>
         <?php
-         if (!empty($tablenya)):
+         if (!empty($tablenya)):   
             $no = 1;
-            foreach($tablenya as $tbl): ?>       
+            foreach($tablenya as $tbl): 
+            $jml = number_format($tbl['pokok'] + $tbl['denda'], 2);
+            ?>       
                 <tr>
                     <td style="text-align: center;"><?= $no++ ?></td>
-                    <td><?= htmlspecialchars($tbl['nosspd']) ?></td>
-                    <td><?= htmlspecialchars($tbl['formulir']) ?></td>
-                    <td><?= htmlspecialchars($tbl['namawp']) ?></td>
-                    <td><?= htmlspecialchars($tbl['nmuptd']) ?></td>
-                    <td style="text-align: right;"><?= number_format($tbl['jumlsspd'], 2) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['tanggal']) ?></td>
+                    <td style="text-align: left;"><?= htmlspecialchars($tbl['nmwp']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['uptd']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['tgl']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['skpd']) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars($tbl['masapajak'] ) ?></td>
+                    <td style="text-align: center;"><?= htmlspecialchars( $tbl['nomor']) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['pokok'], 2) ?></td>
+                    <td style="text-align: right;"><?= number_format($tbl['denda'], 2) ?></td>
+                    <td style="text-align: right;"><?= $jml ?></td>
                 </tr>
             <?php endforeach; ?>        
         <?php endif; ?>
+        
+        <tr style=" background-color: #f2f2f2;">
+            <td></td>
+            <td></td>
+            <td colspan="5" style="text-align: left;"><b>JUMLAH</b></td>
+            <td></td>
+            <td><b><?= number_format($total_hari_ini, 2) ?></b></td>
+            <td><b><?= number_format($total_denda, 2) ?></b></td>
+            <td><b><?= number_format($total_hari_ini, 2) ?></b></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td colspan="5" style="text-align: left;"><b>JUMLAH BULAN INI</b></td>
+            <td></td>
+            <td><b><?= number_format($total_hari_ini, 2) ?></b></td>
+            <td><b><?= number_format($total_denda, 2) ?></b></td>
+            <td><b><?= number_format($total_hari_ini, 2) ?></b></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td colspan="5" style="text-align: left;"><b>JUMLAH S.D BULAN LALU</b></td>
+            <td></td>
+            <td><b><?= number_format($saldo, 2) ?></b></td>
+            <td><b><?= number_format($total_denda, 2) ?></b></td>
+            <td><b><?= number_format($saldo, 2) ?></b></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td colspan="5" style="text-align: left;"><b>JUMLAH S.D BULAN INI</b></td>
+            <td></td>
+            <td><b><?= number_format($total_sampai_hari_ini, 2) ?></b></td>
+            <td><b><?= number_format($total_denda, 2) ?></b></td>
+            <td><b><?= number_format($total_sampai_hari_ini, 2) ?></b></td>
+        </tr>
     </tbody>
 </table>
 
-<?php if(!empty($tgl_cetak)): ?>
+
+<div class="footer-section">
     <div class="tgl_cetak">
-        <p>Bandar Lampung, <?= strftime('%d %B %Y') ?></p>
+        <p>Bandar Lampung, <?= $tgl_cetak_format ?></p>
     </div>
-<?php endif; ?>
+</div>
 
-<?php if (!empty($tanda_tangan)) : ?>
-    <div class="signature">
-        <p class="jabatan1"><?= $tanda_tangan['jabatan1'] ?></p>
-        <p><?= $tanda_tangan['jabatan2'] ?>,</p>
-        <p class="name"><?= $tanda_tangan['nama'] ?></p>
-        <p>NIP. <?= $tanda_tangan['nip'] ?></p>
-    </div>
-<?php endif; ?>
+<div class="footer-section">
+    <?php if (!empty($tanda_tangan)) : ?>
+        <div class="signature">
+            <p>Mengetahui,</p>
+            <p class="jabatan1"><?= $tanda_tangan['jabatan1'] ?></p>
+            <p><?= $tanda_tangan['jabatan2'] ?>,</p>
+            <p class="name"><?= $tanda_tangan['nama'] ?></p>
+            <p>NIP. <?= $tanda_tangan['nip'] ?></p>
+        </div>
+    <?php endif; ?>
 
+    <?php if (!empty($pembuat)) : ?>
+        <div class="pembuat">
+            <p>PEMBUAT DOKUMEN</p>
+            <p class="jabatan1"><?= $pembuat['jabatan1'] ?></p>
+            <p><?= $pembuat['jabatan2'] ?>,</p>
+            <p class="name"><?= $pembuat['nama'] ?></p>
+            <p>NIP. <?= $pembuat['nip'] ?></p>
+        </div>
+    <?php endif; ?>
+</div>
 </body>
 </html>

@@ -27,21 +27,17 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed;
         }
         table, th, td {
             border: 1px solid black;
+            font-size: 12px;
+        }
+        td{
+            text-align: right;
         }
         th {
-            padding: 10px;
+            padding: 5px;
             text-align: center;
-            font-size: 15px;
-        }
-        td {
-            font-size: 15px;
-        }
-        th {
-            background-color: #f2f2f2;
         }
         tbody td {
             text-align: right;
@@ -80,13 +76,17 @@
 </head>
 <body>
 <?php
-setlocale(LC_ALL, 'id-ID', 'id_ID');
-$tanggal_saat_ini = strftime('%d %B %Y'); 
-$tanggal_sebelumnya = date('Y-m-d', strtotime('-1 day', strtotime($format_tanggal)));
-$tanggal_sebelumnya_display = strftime('%d %B %Y', strtotime($tanggal_sebelumnya));
-$tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
-?>
+    $total_hari_ini = 0;
+    if (!empty($tablenya)):
+        foreach($tablenya as $tbl) {
+            $total_hari_ini += $tbl['jumlah'];
+            $total_sampai_hari_ini = $tbl['issaldo'] + $total_hari_ini;
+        }
+    endif;
+    
+    ?>
 <div class="header">
+    <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
     <h3>BADAN PENDAPATAN DAERAH</h3>
     <h4>BUKU PENERIMAAN KAS</h4>
@@ -95,49 +95,115 @@ $tgl_cetak_format = strftime('%d %B %Y', strtotime($tgl_cetak));
 <table class="table-container">
     <thead>
         <tr>
-            <th>NO. BUKTI<br>(STS/NOTA DEBET/KREDIT)</th>
-            <th>KODE REKENING</th>
-            <th>URAIAN</th>
-            <th>DINAS</th>
-            <th>JUMLAH</th>
-            <th>KETERANGAN</th>
+                <th rowspan="2">NO. BUKTI (STS/NOTA DEBIT/KREDIT)</th>
+                <th rowspan="2">KODE REKENING</th>
+                <th rowspan="2">URAIAN</th>
+                <th rowspan="2">DINAS</th>
+                <th colspan="2">JUMLAH</th>
+                <th rowspan="2">KETERANGAN</th>
+        </tr>  
+        <tr>
+                <th>PER KODE REKENING</th>
+                <th>PER SETORAN</th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
         </tr>
     </thead>
     <tbody>
     <?php
-        $tanggal_saat_ini = strftime('%d %B %Y'); 
-        $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
-        if (!empty($tablenya)):
-            foreach($tablenya as $tbl): ?>
-                <tr>
-                    <td><?= htmlspecialchars($tbl['nomor'])?></td>
-                    <td><?= htmlspecialchars($tbl['kdrekening'])?></td>
-                    <td><?= htmlspecialchars($tbl['uraian'])?></td>
-                    <td><?= htmlspecialchars($tbl['nmdinas'])?></td>
-                    <td><?= number_format($tbl['jumlah'], 2)?></td>
-                    <td><?= htmlspecialchars($tbl['keterangan'])?></td>
 
-                </tr>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </tbody>
+if (!empty($tablenya)):
+    $groupedData = [];
+
+    foreach($tablenya as $tbl) {
+        $singkatdinas = $tbl['nmdinas'];
+        if (!isset($groupedData[$singkatdinas])) {
+            $groupedData[$singkatdinas] = [];
+        }
+        $groupedData[$singkatdinas][] = $tbl;
+    }
+
+    $totalSaldo = 0;
+    $totalPembiayaan = 0;
+    $totalseluruh = 0;
+
+    foreach($groupedData as $singkatdinas => $rows):
+        $jumlahTotal = 0;
+        $pokokTotal = 0;
+        foreach($rows as $tbl):
+            $jumlahTotal += $tbl['jumlah']; 
+            $pokokTotal += $tbl['total'];
+            $totalSaldo = $tbl['issaldo'];
+            $totalPembiayaan += $tbl['pembiayaan'];
+            ?>
+            <tr>
+                <td><?= htmlspecialchars($tbl['nomor']) ?></td>
+                <td><?= htmlspecialchars($tbl['kdrekening']) ?></td>
+                <td style="text-align: left;"><?= htmlspecialchars($tbl['uraian']) ?></td>
+                <td style="text-align: left;"><?= htmlspecialchars($tbl['nmdinas']) ?></td>
+                <td><?= number_format($tbl['jumlah'], 2) ?></td>
+                <td><?= number_format($tbl['total'], 2) ?></td>
+                <td><?= htmlspecialchars($tbl['keterangan']) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="4" style="text-align: right;"><b>JUMLAH</b></td>
+            <td style="text-align: right;"><b><?= number_format($jumlahTotal, 2) ?></b></td>
+            <td style="text-align: right;"><b><?= number_format($pokokTotal, 2) ?></b></td>
+            <td></td>
+        </tr>
+    <?php endforeach; 
+    ?>
+
+    <tr>
+        <td colspan="4" style="text-align: center;"><b>Jumlah Per <?= $format_tanggal; ?></b> </td>
+        <td style="text-align: right;"><b> <?= number_format($jumlahTotal, 2) ?></b></td>
+        <td style="text-align: right;"><b> <?= number_format($total_hari_ini, 2) ?></b></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align: center;"><b>Jumlah s.d. <?= $tanggal_sebelumnya; ?></b></td>
+        <td style="text-align: right;"><b><?= number_format($totalSaldo, 2) ?></b></td>
+        <td style="text-align: right;"><b><?= number_format($totalSaldo, 2) ?></b></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="4" style="text-align: center;"><b>Jumlah s.d. <?= $format_tanggal; ?></b> </td>
+        <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
+        <td style="text-align: right;"><b><?= number_format($total_sampai_hari_ini, 2) ?> </b></td>
+        <td></td>
+    </tr>
+<?php endif; ?>
+
+</tbody>
 </table>
+
 <h4>Keterangan</h4>
 <table cellpadding="4">
-            
-            <tr>
-                <td style="width:20%;">Penerimaan Kasda</td>
-                <td style="width:40%;">Rp. 999.690.684.927,78</td>
-            </tr>
-            <tr>
-                <td style="width:20%;">PEMBIAYAAN</td>
-                <td style="width:40%;">Rp. 999.690.684.927,78</td>
-            </tr>
-            <tr>
-                <td style="width:30%;">Jumlah Pendapatan + Pembiayaan</td>
-                <td style="width:30%;">Rp. 1.007.550.565.412,16</td>
-            </tr>
-        </table>
+    <?php
+    $total_pendapatan_penerimaan = $total_sampai_hari_ini + $totalPembiayaan;
+    ?>
+    <tr>
+        <td style="width:20%;">Penerimaan Kasda</td>
+        <td style="width:40%;">Rp. <?= number_format($total_sampai_hari_ini, 2) ?> </td>
+    </tr>
+    <tr>
+        <td style="width:20%;">PEMBIAYAAN</td>
+        <td style="width:40%;">Rp. <?= number_format($totalPembiayaan, 2) ?></td>
+    </tr>
+    <tr>
+        <td style="width:30%;"><b>Jumlah Pendapatan + Pembiayaan</b></td>
+        <td style="width:30%;">Rp. <b><?= number_format($total_pendapatan_penerimaan, 2) ?></b></td>
+    </tr>
+</table>
+
         <br><br>
 <div class="tgl_cetak">
         <p>Bandar Lampung, <?= $tgl_cetak_format; ?></p>
