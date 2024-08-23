@@ -392,8 +392,6 @@ class PendDaerah extends CI_Controller {
 
         /* End record function */
  
-        
-        /* Action datatable Record fynction */
         public function add_data() {
             $idstsmaster = $this->input->post('idstsmaster');
             $jumlah = $this->input->post('jumlah');
@@ -511,6 +509,78 @@ class PendDaerah extends CI_Controller {
             }
         
             echo json_encode($response);
+        }
+       
+        public function checkAndAddWp() {
+            $idstsmaster = $this->input->post('idstsmaster');
+            $nobukti = $this->input->post('nobukti');
+            $kodebayar = $this->input->post('kodebayar');
+            $namaobjekpajak = $this->input->post('namaobjekpajak');
+            $blnpajak = $this->input->post('blnpajak');
+            $thnpajak = $this->input->post('thnpajak');
+            $jumlah = $this->input->post('jumlah');
+            $nil_denda = $this->input->post('nil_denda');
+            $total = $this->input->post('total');
+            $tgl_input = $this->input->post('tgl_input');
+            $nopelaporan = $this->input->post('nopelaporan');
+            $alamatop = $this->input->post('alamatop');
+            $npwpd = $this->input->post('npwpd');
+            $formulir = $this->input->post('formulir');
+            
+            // Ambil nilai nourut terakhir
+            $last_nourut = $this->Mpend->ambilnourut($idstsmaster);
+            if (!$last_nourut) {
+                $last_nourut = '0000';
+            }
+            
+            $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
+            
+            $check_duplicate = $this->Mpend->check_duplicate_data($idstsmaster, $kodebayar);
+            
+            if ($check_duplicate) {
+                echo json_encode(['exists' => true, 'message' => 'Data sudah pernah diinput.']);
+            } else {
+                $wpdahada = $this->db->get_where('mst_wajibpajak', ['npwpd' => $npwpd])->row();
+                
+                $this->db->trans_start();
+        
+                if ($wpdahada) {
+                    $idwp = $wpdahada->id;
+                } else {
+                    $this->db->insert('mst_wajibpajak', [
+                        'nama' => $namaobjekpajak,
+                        'alamat' => $alamatop,
+                        'npwpd' => $npwpd,
+                        'nopelaporan' => $nopelaporan
+                    ]);
+        
+                    $idwp = $this->db->insert_id();
+                }
+
+                $this->db->insert('trx_stsdetail', [
+                    'idstsmaster' => $idstsmaster,
+                    'nourut' => $next_nourut,
+                    'idwp' => $idwp,
+                    'nopelaporan' => $nopelaporan,
+                    'blnpajak' => $blnpajak,
+                    'thnpajak' => $thnpajak,
+                    'tgl_input' => $tgl_input,
+                    'jumlah' => $jumlah,
+                    'nil_denda' => $nil_denda,
+                    'total' => $total,
+                    'nobukti' => $nobukti,
+                    'kodebayar' => $kodebayar,
+                    'formulir' => $formulir
+                ]);
+        
+                $this->db->trans_complete();
+                
+                if ($this->db->trans_status() === FALSE) {
+                    echo json_encode(['exists' => false, 'message' => 'Gagal menyimpan data.']);
+                } else {
+                    echo json_encode(['exists' => false, 'message' => 'Data berhasil disimpan.', 'nama' => $namaobjekpajak]);
+                }
+            }
         }
         
         
@@ -637,7 +707,26 @@ class PendDaerah extends CI_Controller {
           
               echo json_encode($results);
           } */
-         
+          public function get_wp_data() {
+            $limit = $this->input->get('limit') ?: 10;
+            $offset = $this->input->get('offset') ?: 0;
+            $search = $this->input->get('search') ?: '';
+    
+            $this->db->select('id, nama, tgljthtmp, tglskp');
+            $this->db->from('mst_wajibpajak');
+    /*         $this->db->join('mst_rekening', 'mst_rekening.id=mst_wajibpajak.idrekening');
+            $this->db->join('mst_kelurahan', 'mst_kelurahan.id=mst_rekening.idkelurahan', 'left');
+            $this->db->join('mst_kecamatan', 'mst_kecamatan.id=mst_kelurahan.idkecamatan', 'left');
+            $this->db->join('mst_uptd', 'mst_uptd.id=mst_kecamatan.iduptd', 'left'); */
+            if (!empty($search)) {
+                $this->db->like('nama', $search);
+                $this->db->or_like('nomor', $search);
+            }
+            $this->db->limit($limit, $offset);
+            $wpdata = $this->db->get()->result();
+    
+            echo json_encode($wpdata);
+        }
           public function get_namarekening_by_iddinas() {
             $iddinas = $this->input->post('iddinas');
         
@@ -681,9 +770,7 @@ class PendDaerah extends CI_Controller {
           public function getapisimpada()
           {
               $nosptpd = empty($this->input->get('nosptpd')) ? 0 : $this->input->get('nosptpd');
-              
               $urlApi = ENDPOINT_API_SIMPATDA . "?kodeBayar=$nosptpd";
-          
               $data = [
                   'nosptpd' => $nosptpd
               ];

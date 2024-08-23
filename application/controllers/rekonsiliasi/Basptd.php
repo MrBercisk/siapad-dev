@@ -44,12 +44,20 @@ class Basptd extends CI_Controller {
         $tanda_tangan_4 = $this->input->post('tanda_tangan_4');
         $tanda_tangan_5 = $this->input->post('tanda_tangan_5');
         
-       /*  $tablenya = $this->MBasptd->cetaktotal($tahun, $bulan, $bulanakhir); */
+        $tablenya = $this->MBasptd->cetaktotal($tahun, $bulan, $bulanakhir);
 
-       /*  echo '<pre>';
+        $data_terbit = array_filter($tablenya, function($row) {
+            return $row['tgl_bayar'] !== '0000-00-00';
+        });
+    
+        $data_belum_kembali = array_filter($tablenya, function($row) {
+            return $row['tgl_bayar'] === '0000-00-00';
+        });
+
+        echo '<pre>';
         var_dump($tablenya);
         die();
-        echo '</pre>'; */
+        echo '</pre>';
         $tanda_tangan_data_1 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_1);
         $tanda_tangan_data_2 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_2);
         $tanda_tangan_data_3 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_3);
@@ -66,6 +74,8 @@ class Basptd extends CI_Controller {
             'format_bulan_akhir' => strftime('%B', strtotime("$tahun-$bulanakhir")),
             'format_tahun' => $tahun,
             'tglcetak' => $tglcetak,
+            'data_terbit' => $data_terbit,
+            'data_belum_kembali' => $data_belum_kembali,
            /*  'tablenya' => $tablenya, */
             'tgl_cetak_format' => strftime('%d %B %Y', strtotime($tglcetak)),
             'nama_1' => isset($tanda_tangan_data_1['nama']) ? $tanda_tangan_data_1['nama'] : '',

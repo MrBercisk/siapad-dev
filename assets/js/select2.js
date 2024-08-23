@@ -59,8 +59,38 @@ $(document).ready(function() {
     });
      */
     $('#idwp').select2({
-            placeholder: $('#idwp').data('placeholder'),
-            minimumInputLength: 5, 
+        ajax: {
+            url: 'PendDaerah/get_wp_data',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term, 
+                    limit: 10,
+                    offset: params.page ? (params.page - 1) * 5 : 0 
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nama,
+                            nomor: item.nomor, 
+                            tgljthtmp: item.tgljthtmp, 
+                        };
+                    }),
+                    pagination: {
+                        more: data.length === 10
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Pilih WP',
+        templateResult: formatWp,
+        templateSelection: formatWpSelection
 
     });
     $('#opsiwp').select2({
@@ -330,6 +360,7 @@ $(document).ready(function() {
 
     $('#fetchDataButton').on('click', function(e) {
         e.preventDefault();
+        
         var idstsmaster = $('#idstsmaster').val(); 
         var namaop = $('#namaop').val(); 
         var nosptpd = $('#nosptpd').val(); 
@@ -342,14 +373,18 @@ $(document).ready(function() {
         var denda = $('#denda').val();
         var jumlahbayar = $('#jumlahbayar').val();
         var TGLKirim = $('#TGLKirim').val();
-        var formulir = nosptpd.substring(4, 14); 
+        var formulir = nosptpd.substring(4, 14);
+        var alamatop = $('#alamatop').val();
+        var npwpd = $('#npwpd').val();
     
         $.ajax({
-            url: 'PendDaerah/add_data_temp',
+            url: 'PendDaerah/checkAndAddWp',
             type: 'POST',
+            dataType: 'json',
             data: {
                 idstsmaster: idstsmaster,
-                /* idwp: namaop, */
+                namaobjekpajak:  namaop,
+                alamatop:  alamatop,
                 nourut: nourut,
                 kodebayar: nosptpd,
                 nopelaporan: nopelaporan,
@@ -360,11 +395,30 @@ $(document).ready(function() {
                 nil_denda: denda,
                 jumlah: jumlahbayar,
                 tgl_input: TGLKirim,
-                formulir: formulir 
+                formulir: formulir,
+                npwpd: npwpd,
             },
-            dataType: 'json',
             success: function(response) {
-                console.log(response.data);
+                if (response.exists) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Data berhasil disimpan ',
+                        icon: 'success'
+                    }).then(() => {
+                        $('#searchModal').modal('hide');
+                        $('#pendapatan').DataTable().ajax.reload();
+                    });
+                } 
+            },
+                                       
+          /*   success: function(response) {
+                console.log(response);
                 if (response.success) {
                     Swal.fire({
                         title: 'Success!',
@@ -385,12 +439,19 @@ $(document).ready(function() {
                         confirmButtonText: 'OK'
                     });
                 }
-            },
+            }, */
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while processing your request.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             }
         });
     });
+    
     $('#fetchTableButton').on('click', function(e) {
         e.preventDefault();
         var idstsmaster = $('#idstsmaster').val(); 
@@ -406,6 +467,8 @@ $(document).ready(function() {
         var thnpajak = $('#thnpajak2').val();
         var idwp = $('#idwp').val();
         var nopelaporan = $('#nopelaporan2').val();
+        var alamatop = $('#alamatop2').val();
+        var npwpd = $('#npwpd2').val();
         var formulir = kodebayar.substring(4, 14); 
     
         $.ajax({
@@ -425,6 +488,8 @@ $(document).ready(function() {
                 nil_denda: nil_denda,
                 jumlah: jumlah,
                 tgl_input: tgl_input,
+                alamatop: alamatop,
+                npwpd: npwpd,
                 formulir: formulir 
             },
             dataType: 'json',
@@ -748,10 +813,40 @@ $(document).ready(function() {
     });
     
     $('#idwp2').select2({
-        placeholder: $('#idwp2').data('placeholder'),
-        minimumInputLength: 5, 
+        ajax: {
+            url: 'SkpdReklame/get_wp_data',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term, 
+                    limit: 10,
+                    offset: params.page ? (params.page - 1) * 5 : 0 
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nama,
+                            nomor: item.nomor, 
+                            tgljthtmp: item.tgljthtmp, 
+                        };
+                    }),
+                    pagination: {
+                        more: data.length === 10
+                    }
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Pilih WP',
+        templateResult: formatWp,
+        templateSelection: formatWpSelection
 
-        });
+       });
         
         $('#editForm').on('submit', function(e) {
             e.preventDefault();

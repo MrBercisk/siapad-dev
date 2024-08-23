@@ -1,39 +1,41 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class MBasptd extends CI_Model {
-    
+   
     public function cetaktotal($tahun, $bulan, $bulanakhir)
     {
-        $query = $this->db
-            ->select("
+        $this->db->select("
             a.thnpajak AS thnpajak,
             a.nomor,
             a.tgl_input,
             b.nama,
             b.alamat,
-            b.npwpd,
+            b.nomor AS npwpd,
             a.blnpajak AS masabulan,
             a.thnpajak AS thnpajak,
             a.pokok AS pokok,
             a.denda AS denda,
             a.jumlah AS total,
-            d.keterangan AS keterangan,
+            a.keterangan AS keterangan,
             d.nobukti AS sspd,
-            d.nopelaporan,
             a.tanggal AS tgl_bayar", false)
             ->join('mst_wajibpajak b', 'b.id=a.idwp', 'INNER')
             ->join('mst_rekening c', 'c.id=a.idrekening', 'INNER')
-            ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'left')
+            ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak ', 'left')
             ->where('a.thnpajak', $tahun)
             ->where('a.blnpajak >=', $bulan)
             ->where('a.blnpajak <=', $bulanakhir)
-            ->get('trx_sptpd a');
-            
-        $result = $query->result_array();
-        return $result;
-    }
-
+            ->group_start()
+                ->where('a.tanggal !=', '0000-00-00')
+                ->or_where('a.tanggal', '0000-00-00')
+            ->group_end();
     
+        $query = $this->db->get('trx_sptpd a');
+    
+        return $query->result_array();
+    }    
+
+   
     public function formInsert() {
       
         $ttddata = $this->db

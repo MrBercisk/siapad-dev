@@ -371,7 +371,7 @@ $theme['main'][] =
                                   <div class="form-group">
                                     <label for="idwp">Wajib Pajak</label>
                                      <select id="idwp" name="idwp" class="form-control select2" data-placeholder="Pilih WP" style="width: 100%;" required>
-                                      '.$opsiwp.'
+                                    
                                     </select>
                                   </div>
                                 </div>
@@ -383,21 +383,39 @@ $theme['main'][] =
                                     </select>
                                   </div>
                                 </div>
-                               <div class="col-md-6">
+                                 <div class="col-md-6">
+                                  <label for="bulan">Bulan :</label>
+                                  <div class="form-group">
+                                    
+                                      <select class="form-control" id="bulan" name="bulan" required>
+                                          <option value="" disabled selected>Pilih Bulan</option>
+                                          <option value="01">Januari</option>
+                                          <option value="02">Februari</option>
+                                          <option value="03">Maret</option>
+                                          <option value="04">April</option>
+                                          <option value="05">Mei</option>
+                                          <option value="06">Juni</option>
+                                          <option value="07">Juli</option>
+                                          <option value="08">Agustus</option>
+                                          <option value="09">September</option>
+                                          <option value="10">Oktober</option>
+                                          <option value="11">November</option>
+                                          <option value="12">Desember</option>
+                                      </select>
+                                  </div>
+                                </div>
+                              
+                                 <div class="col-md-4">
+                                 <label for="tanggal">Tanggal:</label>
+                                    <input type="number" name="tglpajak" id="tglpajak" class="form-control min="01" max="31" value="01" placeholder="Pilih Tanggal">                  
+                                </div>
+                                <div class="col-md-4">
                                   <div class="form-group">
                                     <label for="iddinas">UPTD</label>
                                     <select name="iduptd" id="iduptd" class="form-control" data-placeholder="Pilih UPTD" style="width: 100%;">
                                         '.$opsiUptd.'
                                     </select>
                                   </div>
-                                </div>
-                                 <div class="col-md-4">
-                                 <label for="tanggal">Tanggal:</label>
-                                    <input type="number" name="tglpajak" id="tglpajak" class="form-control min="01" max="31" value="01" placeholder="Pilih Tanggal">                  
-                                </div>
-                                <div class="col-md-4">
-                                 <label for="bulan">Bulan:</label>
-                                  <input type="number" name="blnpajak" id="blnpajak" class="form-control min="01" max="12" value="01" placeholder="Pilih Bulan">    
                                 </div>
                                 <div class="col-md-4">
                                   <div class="form-group">
@@ -507,9 +525,9 @@ $theme['main'][] =
                              
                                 <div class="col-md-12">
                                   <div class="form-group">
-                                    <label for="idwp">Wajib Pajak</label>
+                                    <label for="idwp">Wajib Pajak </label>
                                      <select id="idwp2" name="idwp" class="form-control select2" data-placeholder="Pilih WP" style="width: 100%;" >
-                                      '.$opsiwp.'
+                                
                                     </select>
                                   </div>
                                 </div>

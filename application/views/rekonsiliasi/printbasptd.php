@@ -303,7 +303,59 @@ function hari_ini($hari)
     <tbody>
 
            
-  
+    <tr>
+            <th colspan="12">Data SPTPD Terbit</th>
+        </tr>
+        <?php if (!empty($data_terbit)): ?>
+            <?php foreach ($data_terbit as $row): ?>
+                <tr>
+                    <td><?php echo $row['nomor']; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['alamat']; ?></td>
+                    <td><?php echo $row['npwpd']; ?></td>
+                    <td><?php echo $row['masabulan']; ?></td>
+                    <td><?php echo $row['thnpajak']; ?></td>
+                    <td><?php echo $row['pokok']; ?></td>
+                    <td><?php echo $row['denda']; ?></td>
+                    <td><?php echo $row['total']; ?></td>
+                    <td><?php echo $row['keterangan']; ?></td>
+                    <td><?php echo $row['sspd']; ?></td>
+                    <td><?php echo $row['tgl_bayar']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="12">Tidak ada data yang terbit.</td>
+            </tr>
+        <?php endif; ?>
+
+        <!-- Data yang belum kembali -->
+        <tr>
+            <th colspan="12">Data SPTPD Belum Kembali</th>
+        </tr>
+        <?php if (!empty($data_belum_kembali)): ?>
+            <?php foreach ($data_belum_kembali as $row): ?>
+                <tr>
+                    <td><?php echo $row['nomor']; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['alamat']; ?></td>
+                    <td><?php echo $row['npwpd']; ?></td>
+                    <td><?php echo $row['masabulan']; ?></td>
+                    <td><?php echo $row['thnpajak']; ?></td>
+                    <td><?php echo $row['pokok']; ?></td>
+                    <td><?php echo $row['denda']; ?></td>
+                    <td><?php echo $row['total']; ?></td>
+                    <td><?php echo $row['keterangan']; ?></td>
+                    <td><?php echo $row['sspd']; ?></td>
+                    <td><?php echo $row['tgl_bayar']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="12">Tidak ada data yang belum kembali.</td>
+            </tr>
+        <?php endif; ?>
+
 
      </tbody>
 
