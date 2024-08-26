@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
-class UserManagement extends CI_Controller
+class UserRole extends CI_Controller
 {
 	public function __construct()
 	{
@@ -20,37 +20,34 @@ class UserManagement extends CI_Controller
 		$data['modalEdit'] 	= $this->Form->modalKu('E', 'Edit', 'master/UserManagement/aksi', $actions = ['edit']);;
 		$data['modalDelete'] = $this->Form->modalKu('D', 'Delete', 'master/UserManagement/aksi', $actions = ['delete']);
 		$data['sidebar'] 	= $template['sidebar'];
-		$data['jstable']	= $Jssetup->jsDatatable('#ftf', 'master/UserManagement/getuser');
+		$data['jstable']	= $Jssetup->jsDatatable('#ftf', 'usermanagement/UserRole/getuser');
 		$data['jsedit']		= $Jssetup->jsModal('#edit', 'Edit', 'master/UserManagement/myModal', '#modalkuE');
 		$data['jsdelete']	= $Jssetup->jsModal('#delete', 'Delete', 'master/UserManagement/myModal', '#modalkuD');
-		$data['forminsert'] = implode($this->Muser->formInsert());
-		$this->load->view('users/user', $data);
+		$data['forminsert'] = implode($this->Muser->fromRole());
+		$this->load->view('users/role', $data);
 	}
 
 	public function getuser()
 	{
 		$datatables = new Datatables();
-		$datatables->setTable("sys_user");
+		$datatables->setTable("mst_role a");
 		$datatables->setSelectColumn([
-			"sys_user.id",
-			"sys_user.login",
-			"sys_user.username",
-			"sys_user.role",
-			"mst_uptd.nama as nama_uptd"
+			"a.idrole as id",
+			"name",
+			"b.singkat"
 		]);
 		$datatables->setOrderColumn([null, "login", "username", "role", "nama"]);
 		$datatables->setSearchColumns(['login', 'username', 'role', 'nama']);
-		$datatables->addJoin("mst_uptd", "sys_user.iduptd = mst_uptd.id", "left");
+		$datatables->addJoin("mst_level b", "a.idlevel=b.idlevel", "INNER");
+		$datatables->addJoin("menu c", "a.idmenu= c.id", "INNER");
 		$fetch_data = $datatables->make_datatables();
 		$data 		= array();
 		$no   		= 1;
 		foreach ($fetch_data as $row) {
 			$sub_array = array();
 			$sub_array[] = $no++;
-			$sub_array[] = $row->login;
-			$sub_array[] = $row->username;
-			$sub_array[] = $row->role;
-			$sub_array[] = $row->nama_uptd;
+			$sub_array[] = $row->name;
+			$sub_array[] = $row->singkat;
 			$sub_array[] = implode('', $datatables->tombol($row->id));
 			$data[] = $sub_array;
 		}
@@ -84,7 +81,7 @@ class UserManagement extends CI_Controller
 					. implode($this->Form->inputText('username', 'Username', $iduser->username)) .
 					'</div>
 					<div class="col-md-12">'
-					. implode($this->Form->inputText('passwd', 'Password', $iduser->passwd)) .
+					. implode($this->Form->inputPassword('passwd', 'Password', $iduser->passwd)) .
 					'</div>
 					<div class="col-md-12">'
 					. $this->Form->inputEnumOptions('role', 'Role', $enum) .
@@ -208,5 +205,145 @@ class UserManagement extends CI_Controller
 		);
 
 		echo json_encode($output);
+	}
+	public function getMenu($role = null)
+	{
+		$role = $_POST['role'];
+		$this->db->select('a.idrole,c.id as idmenu, name, b.singkat');
+		$this->db->from('mst_role a');
+		$this->db->join('mst_level b', 'a.idlevel = b.idlevel', 'inner');
+		$this->db->join('menu c', 'a.idmenu = c.id', 'inner');
+		if ($role !== null || $role !== '') {
+			$this->db->where("b.singkat", $role);
+		}
+		$query = $this->db->get();
+		// var_dump($this->db->last_query());
+		header('Content-Type: application/json');
+		echo json_encode($query->result_array());
+	}
+
+	public function saveRoleMenu()
+	{
+		$idlevel = $_POST['role'];
+
+		// ambil level Role
+		$role = $this->db->from('mst_level')->where('singkat', $idlevel)->get()->row();
+		$idrole = $role->idlevel;
+		// ambil id terbesar
+		$query = $this->db->select_max('idrole')->get('mst_role')->row();
+		$idbig = $query->idrole + 1;
+		// foreach ($_POST["id"] as $menu) {
+		// 	$data[] = [
+		// 		"idrole" => $idbig++,
+		// 		"idmenu" => $menu,
+		// 		"status" => 1,
+		// 		"idlevel" => $idrole,
+		// 	];
+		// }
+		// $insert = $this->db->insert_batch("mst_role", $data);
+
+		// var_dump($data);
+		// die;
+		$idmenu = $_POST['id'];
+
+		// ambil level Role
+		$role = $this->db->from('mst_level')->where('singkat', $idlevel)->get()->row();
+		$idrole = $role->idlevel;
+		// simpan data
+		$data = [
+			"idrole" => $idbig,
+			"idmenu" => $idmenu,
+			"status" => 1,
+			"idlevel" => $idrole,
+		];
+		$insert = $this->db->insert("mst_role", $data);
+		// Menyiapkan respons JSON
+		if ($insert) {
+			// Jika insert berhasil
+			$response = array('success' => true);
+		} else {
+			// Jika insert gagal
+			$response = array('success' => false);
+		}
+
+		// Mengatur header konten ke JSON dan mengirimkan respons
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($response));
+	}
+	public function deleteRoleMenu()
+	{
+		$idmenu = $_POST['id'];
+		$idlevel = $_POST['role'];
+		var_dump($_POST);
+		die;
+		// ambil level Role
+		$role = $this->db->from('mst_level')->where('singkat', $idlevel)->get()->row();
+		$idrole = $role->idlevel;
+
+		$this->db->where('idlevel', $idrole);
+		$this->db->where('idmenu', $idmenu);
+		$delete = $this->db->delete('mst_role');
+
+		// Menyiapkan respons JSON
+		if ($delete) {
+			// Jika delete berhasil
+			$response = array('success' => true);
+		} else {
+			// Jika delete gagal
+			$response = array('success' => false);
+		}
+
+		// Mengatur header konten ke JSON dan mengirimkan respons
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($response));
+	}
+
+	public function simpanMenu()
+	{
+		$idlevel = $_POST['role'];
+
+		// ambil level Role
+		$role = $this->db->from('mst_level')->where('singkat', $idlevel)->get()->row();
+		$idrole = $role->idlevel;
+
+		// lakukan pengecekan ke dalam database menggunkan wherein anatra id menu dan idlevel
+		$menus = $_POST["menus"];
+		// $this->db->select('idmenu, idlevel');
+		$this->db->from('mst_role'); // Ganti dengan nama tabel yang sesuai
+		// $this->db->where_in('idmenu', $menus);
+		$this->db->where('idlevel', $idrole);
+		$query = $this->db->get();
+		// Mengambil hasil query
+		$result = $query->result_array();
+
+		// Jika data ada, hapus semua entri
+		if (!empty($result)) {
+			// $this->db->where_in('idmenu', $menus);
+			$this->db->where('idlevel', $idrole);
+			$this->db->delete('mst_role'); // Hapus entri dari tabel
+		}
+		// ambil id terbesar
+		$query = $this->db->select_max('idrole')->get('mst_role')->row();
+		$idbig = $query->idrole + 1;
+		foreach ($_POST["menus"] as $menu) {
+			$data[] = [
+				"idrole" => $idbig++,
+				"idmenu" => $menu,
+				"status" => 1,
+				"idlevel" => $idrole,
+			];
+		}
+
+		$insert = $this->db->insert_batch("mst_role", $data);
+
+		if ($insert) {
+			$this->session->set_flashdata('message', 'Data has been saved successfully');
+			redirect('usermanagement/userrole');
+		} else {
+			$this->session->set_flashdata('message', 'Failed to save data');
+			redirect('usermanagement/userrole');
+		}
 	}
 }

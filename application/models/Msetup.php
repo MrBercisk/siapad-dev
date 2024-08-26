@@ -5,9 +5,16 @@ class Msetup extends CI_Model
 {
 	public function loadTemplate($title = NULL, $link = NULL)
 	{
+		// var_dump($this->session->userdata('role_id'));
+		// die;
+		if (!$this->session->userdata('role_id')) {
+			redirect('login');
+			return;
+		}
 		$base 	  			= $this->setup();
-		$getpola			= $this->get_menu_tree();
+		$getpola			= $this->get_menu_tree1();
 		$side				= $this->menuSide($getpola);
+
 		$theme['topbar'][] 	= '<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -33,9 +40,7 @@ class Msetup extends CI_Model
 			  <script src="' . $base['url'] . 'assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js"></script>	  
 			 <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script> 
 			  <script src="https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js"></script>
-			  <script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>
-
-			 
+			  <script src="' . $base['url'] . 'assets/modules/select2/dist/js/select2.full.js"></script>			 
 			  <style>
 					/* Custom CSS to ensure menu alignment */
 					.sidebar-menu .nav-link {
@@ -173,7 +178,7 @@ class Msetup extends CI_Model
 							<i class="fas fa-cog"></i> Settings
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="#" class="dropdown-item has-icon text-danger">
+						<a href="' . base_url("Login/logout") . '" class="dropdown-item has-icon text-danger">
 							<i class="fas fa-sign-out-alt"></i> Logout
 						</a>
 						</div>
@@ -263,14 +268,15 @@ class Msetup extends CI_Model
 				<script src="' . $base['url'] . 'assets/js/scripts.js"></script>
 				<script src="' . $base['url'] . 'assets/js/custom.js"></script>
 				<script src="' . $base['url'] . 'assets/js/select2.js"></script>
-        		<script src="'.$base['url'].'assets/js/skpd.js"></script>
-	      		<script src="'.$base['url'].'assets/js/datatableaction.js"></script>
+
+    			<script src="' . $base['url'] . 'assets/js/skpd.js"></script>
+	     		 <script src="' . $base['url'] . 'assets/js/datatableaction.js"></script>
+
 
 				
 				</body>
 				</html>';
 		return $theme;
-
 	}
 
 	public function setup()
@@ -282,6 +288,7 @@ class Msetup extends CI_Model
 			'halaman'	=> isset($uri[2]) ? $uri[2] : NULL,
 			'fungsi'	=> isset($uri[3]) ? $uri[3] : NULL
 		];
+
 		return $base;
 	}
 	public function get_menu()
@@ -295,6 +302,18 @@ class Msetup extends CI_Model
 		$this->db->order_by('id', 'ASC');
 		$query 	= $this->db->get('menu');
 		$menu 	= $query->result_array();
+
+		// $role = $this->session->userdata('role_id');
+		// $this->db->select('c.*');
+		// $this->db->from('mst_role a');
+		// $this->db->join('mst_level b', 'a.idlevel = b.idlevel', 'inner');
+		// $this->db->join('menu c', 'a.idmenu = c.id', 'inner');
+		// if ($role !== null || $role !== '') {
+		// 	$this->db->where("b.singkat", $role);
+		// }
+		// $query = $this->db->get();
+		$menu 	= $query->result_array();
+
 		$tree 	= array();
 		foreach ($menu as $menu) {
 			$children = $this->get_menu_tree($menu['id']);
@@ -305,18 +324,55 @@ class Msetup extends CI_Model
 		}
 		return $tree;
 	}
+	public function get_menu_tree1($parent_id = 0)
+	{
+		$role = $this->session->userdata('role_id');
+
+		// Ambil menu berdasarkan parent_id dan role
+		$this->db->select('c.*');
+		$this->db->from('mst_role a');
+		$this->db->join('mst_level b', 'a.idlevel = b.idlevel', 'inner');
+		$this->db->join('menu c', 'a.idmenu = c.id', 'inner');
+
+		// Filter berdasarkan role
+		if ($role !== null && $role !== '') {
+			$this->db->where("b.singkat", $role);
+		}
+
+		// Filter berdasarkan parent_id
+		$this->db->where('c.parent_id', $parent_id);
+		$this->db->order_by('c.id', 'ASC');
+
+		$query = $this->db->get();
+		$menu = $query->result_array();
+
+		$tree = array();
+		foreach ($menu as $item) {
+			// Rekursif ambil anak dari menu
+			$children = $this->get_menu_tree($item['id']);
+			if ($children) {
+				$item['children'] = $children;
+			}
+			$tree[] = $item;
+		}
+
+		return $tree;
+	}
+
 	public function menuSide($menus)
 	{
 		$base = $this->setup();
 		$html = [];
 		$menu_segment_1 = $this->uri->segment(1);
 		$menu_segment_2 = $this->uri->segment(2);
+		// $menu_segment_3 = $this->uri->segment(3);
 
 		foreach ($menus as $menu) {
 			$icon = !empty($menu['icon']) ? '<i class="' . $menu['icon'] . '" style="font-size:25px;"></i> ' : '';
 			$link = !empty($menu['link']) ? $base['url'] . $menu['link'] : '';
 			$isActive = ($menu_segment_1 == $menu['link'] ||  $menu_segment_2 == $menu['link'] || $menu_segment_1 . '/' . $menu_segment_2 == $menu['link']) ? ' active' : '';
-
+			// var_dump($isActive);
+			// die;
 
 			if (isset($menu['children'])) {
 				$html[] = '<li class="dropdown  ' . $isActive . ' ">';
@@ -453,27 +509,29 @@ class Msetup extends CI_Model
 		return null;
 	}
 	
-	public function get_pembuat($pembuat_checkbox, $pembuat) {
-        if ($pembuat_checkbox && $pembuat) {
-            $pembuatdetail = $this->db
-                ->select('id, nama, nip, jabatan1, jabatan2')
-                ->from('mst_tandatangan')
-                ->where('id', $pembuat)
-                ->get()
-                ->row_array();
-            
-            return $pembuatdetail;
-        }
-        return null;
-    }
-	
-	public function get_rekening($kdrekening) {
-		if($kdrekening){
 
+	public function get_rekening($kdrekening = '', $namarek = null)
+	{
+		if ($kdrekening != '') {
 			$rekdetail = $this->db
 				->select('id,kdrekening, nmrekening')
 				->from('mst_rekening')
 				->where('kdrekening', $kdrekening)
+				->get()
+				->row_array();
+			return $rekdetail;
+		} else if ($namarek != null) {
+			$rekdetail = $this->db
+				->select('id,kdrekening, nmrekening')
+				->from('mst_rekening')
+				->where('id', $namarek)
+				->get()
+				->row_array();
+			return $rekdetail;
+		} else {
+			$rekdetail = $this->db
+				->select('id,kdrekening, nmrekening')
+				->from('mst_rekening')
 				->get()
 				->row_array();
 			return $rekdetail;
@@ -504,14 +562,17 @@ class Msetup extends CI_Model
 		}
 		return null;
 	}
-	public function get_dinas($iddinas) {
-		if($iddinas){
+
+	public function get_dinas($iddinas)
+	{
+		if ($iddinas) {
+
 			$dinDetail = $this->db
-			->select('id,nama')
-			->from('mst_dinas')
-			->where('id', $iddinas)
-			->get()
-			->row_array();
+				->select('id,nama')
+				->from('mst_dinas')
+				->where('id', $iddinas)
+				->get()
+				->row_array();
 			return $dinDetail;
 		}
 		return null;
@@ -589,11 +650,22 @@ class Msetup extends CI_Model
 		return $triwulan;
 	}
 
-	public function mstWajibPajak($nama = '')
+	public function mstWajibPajak($nama = '', $npwpd = null, $nop = null, $rek = null)
 	{
-
+		if ($npwpd != null && $npwpd != '') {
+			$this->db->where("npwpd", $npwpd);
+		}
+		if ($nop != null && $nop != '') {
+			$this->db->where("nop", $nop);
+		}
+		if ($nama != '' && $nama != null) {
+			$this->db->like("nama", $nama);
+		}
+		if ($rek != '' && $rek != null) {
+			$this->db->where("idrekening", $rek);
+		}
 		$ttddata = $this->db
-			->select('id, nama,  npwpd')
+			->select('id, nama,  npwpd,nop')
 			->from('mst_wajibpajak')
 			->get()
 			->result();

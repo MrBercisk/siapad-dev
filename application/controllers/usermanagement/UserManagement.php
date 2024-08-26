@@ -20,7 +20,7 @@ class UserManagement extends CI_Controller
 		$data['modalEdit'] 	= $this->Form->modalKu('E', 'Edit', 'master/UserManagement/aksi', $actions = ['edit']);;
 		$data['modalDelete'] = $this->Form->modalKu('D', 'Delete', 'master/UserManagement/aksi', $actions = ['delete']);
 		$data['sidebar'] 	= $template['sidebar'];
-		$data['jstable']	= $Jssetup->jsDatatable('#ftf', 'master/UserManagement/getuser');
+		$data['jstable']	= $Jssetup->jsDatatable('#ftf', 'usermanagement/usermanagement/getuser');
 		$data['jsedit']		= $Jssetup->jsModal('#edit', 'Edit', 'master/UserManagement/myModal', '#modalkuE');
 		$data['jsdelete']	= $Jssetup->jsModal('#delete', 'Delete', 'master/UserManagement/myModal', '#modalkuD');
 		$data['forminsert'] = implode($this->Muser->formInsert());
@@ -84,7 +84,7 @@ class UserManagement extends CI_Controller
 					. implode($this->Form->inputText('username', 'Username', $iduser->username)) .
 					'</div>
 					<div class="col-md-12">'
-					. implode($this->Form->inputText('passwd', 'Password', $iduser->passwd)) .
+					. implode($this->Form->inputPassword('passwd', 'Password', $iduser->passwd)) .
 					'</div>
 					<div class="col-md-12">'
 					. $this->Form->inputEnumOptions('role', 'Role', $enum) .

@@ -1,45 +1,39 @@
-<?php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
 $theme['alert'][] = '';
-$theme['main'][]  = '';
-if ($this->session->flashdata('message')) :
-  $theme['alert'][] = '<div class="alert alert-success">' .
-    $this->session->flashdata('message') . '
+if($this->session->flashdata('message')): 
+$theme['alert'][] ='<div class="alert alert-success">'.
+						$this->session->flashdata('message').'
 					</div>';
-endif;
-$theme['main'][]  = implode($sidebar);
-$datatables     = '<script type="text/javascript">
-						$(document).ready(function() {
-							' . $jstable . $jsedit . $jsdelete . $jslurah . '	
-						});
-					 </script>
+endif; 
+$theme['main'][] = implode($sidebar);
+$datatables = '<script type="text/javascript">
+$(document).ready(function(){
+	'.$jstable.$jsedit.$jsdelete.'  
+});
+</script>
 <table class="table table-striped" style="width:100% !important;" id="ftf">
    <thead>                                 
      <tr>
          <th>NO</th>
-         <th>NPWPD</th>
-         <th>NOP</th>
-         <th>REKENING</th>
-         <th>NAMA</th>
-         <th>ALAMAT</th>
-         <th>KECAMATAN</th>
-         <th>KELURAHAN</th>
+         <th>LOGIN</th>
+         <th>NAMA USER</th>
+         <th>ROLE</th>
+         <th>UPTD</th>
          <th></th>
      </tr>
    </thead>
    <tbody>                                 
    </tbody>
-</table>
-';
-$theme['main'][] =
-
-  '<div id="page-title" class="page-title" data-title="' . $title . '"></div>
+</table>';
+$theme['main'][] = 
+    '<div id="page-title" class="page-title" data-title="'.$title.'"></div>
     <div class="main-content">
         <section class="section">
           <div class="section-header">
-            <h1>Wajib Pajak</h1>
+            <h1>'.$title.'</h1>
             <div class="section-header-breadcrumb">
-              <div class="breadcrumb-item active"><a href="' . base_url() . '"><i class="bx bxs-home"></i>Home</a></div>
-              <div class="breadcrumb-item"><a href="#">' . $title . '</a></div>
+              <div class="breadcrumb-item active"><a href="'.base_url().'"><i class="bx bxs-home"></i>Home</a></div>
+              <div class="breadcrumb-item"><a href="#">'.$title.'</a></div>
             </div>
           </div>
             <div class="container-fluid">
@@ -48,7 +42,7 @@ $theme['main'][] =
                   <div class="col-12 col-sm-12 col-lg-12">
                     <div class="card">
                       <div class="card-body">
-					  ' . implode('', $theme['alert']) . '
+					  	'.implode('',$theme['alert']).'
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                           <li class="nav-item">
                             <a class="nav-link active" id="home-tab" data-toggle="tab" href="#data" role="tab" aria-controls="home" aria-selected="true">Data</a>
@@ -59,11 +53,10 @@ $theme['main'][] =
                         </ul>
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="home-tab">
-                          ' . $datatables . '
+                          '.$datatables.'
                           </div>
                           <div class="tab-pane fade" id="insert" role="tabpanel" aria-labelledby="profile-tab">
-						  ' . $forminsert
-  . '
+						                '.$forminsert.'
                           </div>
                         </div>
                       </div>
@@ -72,5 +65,20 @@ $theme['main'][] =
               </div>
             </div>
 		</section>
-      </div>' . implode('', $modalEdit) . implode('', $modalDelete);
-echo preg_replace('/\r|\n|\t/', '', implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));
+      </div>'.implode('',$modalEdit).implode('',$modalDelete);
+echo preg_replace('/\r|\n|\t/', '',implode('', $topbar) . implode('', $theme['main']) . implode('', $footer));
+?>
+
+$sub_array = array();
+                $sub_array[] = $row->nourut;
+                $sub_array[] = $row->nobukti;
+                $sub_array[] = $row->tglpajak;
+                $sub_array[] = $row->blnpajak;
+                $sub_array[] = $row->thnpajak;
+                $sub_array[] = $row->jumlah;
+                $sub_array[] = $row->prs_denda;
+                $sub_array[] = $row->nil_denda;
+                $sub_array[] = $row->total;
+                $sub_array[] = $row->keterangan;
+                $sub_array[] = implode('',$datatables->tombol($row->idstsmaster));
+                $data[] = $sub_array;

@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
-class UserManagement extends CI_Controller
+class UserRole extends CI_Controller
 {
 	public function __construct()
 	{
@@ -24,7 +24,7 @@ class UserManagement extends CI_Controller
 		$data['jsedit']		= $Jssetup->jsModal('#edit', 'Edit', 'master/UserManagement/myModal', '#modalkuE');
 		$data['jsdelete']	= $Jssetup->jsModal('#delete', 'Delete', 'master/UserManagement/myModal', '#modalkuD');
 		$data['forminsert'] = implode($this->Muser->formInsert());
-		$this->load->view('users/user', $data);
+		$this->load->view('master/role', $data);
 	}
 
 	public function getuser()
@@ -84,7 +84,7 @@ class UserManagement extends CI_Controller
 					. implode($this->Form->inputText('username', 'Username', $iduser->username)) .
 					'</div>
 					<div class="col-md-12">'
-					. implode($this->Form->inputText('passwd', 'Password', $iduser->passwd)) .
+					. implode($this->Form->inputPassword('passwd', 'Password', $iduser->passwd)) .
 					'</div>
 					<div class="col-md-12">'
 					. $this->Form->inputEnumOptions('role', 'Role', $enum) .

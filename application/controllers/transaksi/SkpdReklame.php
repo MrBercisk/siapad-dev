@@ -1,5 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
+
 use Dompdf\Dompdf;
+
 setlocale(LC_ALL, 'id-ID', 'id_ID');
 require_once APPPATH . 'third_party/dompdf/autoload.inc.php';
 
@@ -37,13 +39,14 @@ class SkpdReklame extends CI_Controller
 
         $this->load->view('transaksi/skpd', $data);
     }
-   
 
-    public function getSkpd() {
+
+    public function getSkpd()
+    {
         $datatables = $this->Datatables;
         $datatables->setTable("trx_skpdreklame");
         $datatables->setSelectColumn([
-            "trx_skpdreklame.id as id_skpd", 
+            "trx_skpdreklame.id as id_skpd",
             "trx_skpdreklame.idwp",
             "trx_skpdreklame.tanggal",
             "trx_skpdreklame.teks",
@@ -65,25 +68,25 @@ class SkpdReklame extends CI_Controller
         $datatables->setOrderColumn([null, "wajibpajak", "noskpd", "tgljthtmp", "teks", "blnpajak", "thnpajak", "jumlah", "bunga", "total", "tglbayar", "keterangan"]);
         $datatables->setSearchColumns(["nama", "trx_skpdreklame.nomor", "tanggal", "teks", "thnpajak"]);
         $datatables->addJoin('mst_wajibpajak', 'mst_wajibpajak.id=trx_skpdreklame.idwp', 'left');
-        
+
         $fetch_data = $this->Datatables->make_datatables();
         $data = array();
         $no   = 1;
-        
+
         foreach ($fetch_data as $row) {
             $sub_array = array();
             if ($row->isbayar != 0) {
                 foreach ($row as $key => $value) {
-                    if ($key == 'isbayar') continue; 
+                    if ($key == 'isbayar') continue;
                     $sub_array[$key] = $value;
                 }
             } else {
                 $sub_array = (array) $row;
                 $sub_array['DT_RowClass'] = 'bg-danger text-white';
             }
-            
+
             $check_delete = '<input type="checkbox" id="delete_check" class="delete-checkbox" data-id="' . $row->id_skpd . '">';
-            
+
             $sub_array[] = $no++;
             /* $sub_array[] = $check_delete; */
             $sub_array[] = $row->wajibpajak;
@@ -98,37 +101,38 @@ class SkpdReklame extends CI_Controller
             $sub_array[] = $row->tglbayar;
             $sub_array[] = $row->keterangan;
             $sub_array[] = implode('', $this->Datatables->tombol($row->id_skpd));
-            
+
             $data[] = $sub_array;
         }
-        
+
         $output = array(
             "draw" => intval($_POST["draw"]),
             "recordsTotal" => $this->Datatables->get_all_data(),
             "recordsFiltered" => $this->Datatables->get_filtered_data(),
             "data" => $data
         );
-        
+
         echo json_encode($output);
     }
-    
-    public function cetak() {
+
+    public function cetak()
+    {
         if ($this->input->server('REQUEST_METHOD') !== 'POST') {
             redirect('404');
         }
-        $base 			  = $this->Msetup->setup();
-        $setpage 		  = $this->Msetup->get_title($base['halaman'] . '/' . $base['fungsi']);
-        $template 		  = $this->Msetup->loadTemplate($setpage->title);
-    
+        $base               = $this->Msetup->setup();
+        $setpage           = $this->Msetup->get_title($base['halaman'] . '/' . $base['fungsi']);
+        $template           = $this->Msetup->loadTemplate($setpage->title);
+
         $tgl_cetak = $this->input->post('tgl_cetak');
-    
+
         $tanda_tangan_1 = $this->input->post('tanda_tangan_1');
         $tanda_tangan_2 = $this->input->post('tanda_tangan_2');
-    
+
         $blnpajak =  $this->input->post('blnpajak');
         $thnpajak = $this->input->post('thnpajak');
-    
-       /*  $cek = $this->MSkpd->getSkpdData($thnpajak, $blnpajak);
+
+        /*  $cek = $this->MSkpd->getSkpdData($thnpajak, $blnpajak);
         echo "<pre>";
         var_dump($cek);
         echo "</pre>";
@@ -142,26 +146,26 @@ class SkpdReklame extends CI_Controller
             'format_bulan' => strftime('%B', strtotime("$thnpajak-$blnpajak")),
             'format_tahun' => $thnpajak,
             'tablenya' => $this->MSkpd->getSkpdData($thnpajak, $blnpajak),
-            'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tgl_cetak)),
-    
+            'tgl_cetak_format' => strftime('%d %B %Y', strtotime($tgl_cetak)),
+
         ];
-        
+
         $tanda_tangan_data_1 = $this->Msetup->get_tanda_tangan_skpd_1($tanda_tangan_1);
         $tanda_tangan_data_2 = $this->Msetup->get_tanda_tangan_skpd_2($tanda_tangan_2);
-    
+
         if ($tanda_tangan_data_1) {
             $data['tanda_tangan_1'] = $tanda_tangan_data_1;
         }
         if ($tanda_tangan_data_2) {
             $data['tanda_tangan_2'] = $tanda_tangan_data_2;
         }
- 
+
         /* $this->load->view('transaksi/printskpd', $data); */
         ob_start();
         $html = $this->load->view('transaksi/printskpd', $data, true);
         ob_get_clean();
-        
-    
+
+
         $dompdf = new Dompdf();
         $dompdf->set_option('isRemoteEnabled', true);
         $dompdf->loadHtml($html);
@@ -169,9 +173,10 @@ class SkpdReklame extends CI_Controller
         $dompdf->render();
         $dompdf->stream("skpd_reklame.pdf", array("Attachment" => 0));
     }
-    
 
-    public function get_wp_data() {
+
+    public function get_wp_data()
+    {
         $limit = $this->input->get('limit') ?: 10;
         $offset = $this->input->get('offset') ?: 0;
         $search = $this->input->get('search') ?: '';
@@ -188,7 +193,7 @@ class SkpdReklame extends CI_Controller
         echo json_encode($wpdata);
     }
 
-    
+
     public function myModal()
     {
         $wadi = isset($_POST['WADI']) ? $_POST['WADI'] : header('location:' . site_url('404'));
@@ -196,13 +201,13 @@ class SkpdReklame extends CI_Controller
             case 'Edit':
                 $idnya = $this->input->post('idnya');
                 $idreklame = $this->Crud->ambilSatu('trx_skpdreklame', ['id' => $idnya]);
-    
+
                 $wpdata = $this->db
                     ->select('mst_wajibpajak.id, mst_wajibpajak.nama, mst_wajibpajak.nomor, mst_wajibpajak.tgljthtmp, mst_wajibpajak.tglskp')
                     ->from('mst_wajibpajak')
                     ->get()
                     ->result();
-    
+
                 $selectedWp = null;
                 foreach ($wpdata as $wp) {
                     if ($wp->id == $idreklame->idwp) {
@@ -210,7 +215,7 @@ class SkpdReklame extends CI_Controller
                         break;
                     }
                 }
-    
+
                 $form[] = '
                 <script>
                 $(document).ready(function() {
@@ -224,7 +229,7 @@ class SkpdReklame extends CI_Controller
                     }
                     $("#idwp2").select2({
                         ajax: {
-                            url: \'SkpdReklame/get_wp_data\',
+                            url: \'' . site_url('transaksi/SkpdReklame/get_wp_data') . '\',
                             dataType: "json",
                             delay: 250,
                             data: function (params) {
@@ -300,7 +305,7 @@ class SkpdReklame extends CI_Controller
                     <div class="col-md-12">' . implode($this->Form->inputText('keterangan', 'Keterangan', $idreklame->keterangan)) . '</div>
                 </div>' . implode($this->Form->hiddenText('kode', $idreklame->id)) . '
                 </div>';
-    
+
                 break;
             case 'Delete':
                 $form[] = '
@@ -317,7 +322,7 @@ class SkpdReklame extends CI_Controller
         }
         echo implode('', $form);
     }
-    
+
     public function aksi()
     {
         $aksi = isset($_POST['AKSI']) ? $_POST['AKSI'] : header('location:' . site_url('404'));
