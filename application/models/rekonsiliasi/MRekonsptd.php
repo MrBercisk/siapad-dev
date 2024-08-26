@@ -68,47 +68,25 @@ class MRekonsptd extends CI_Model {
                         </div>
                     </div>
 
-               
+                <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="ttd">Tanda Tangan:</label>
+                              <select id="tanda_tangan" name="tanda_tangan" class="form-control select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;">
+                                      '.$opsittd.'
+                              </select>
+                        </div>
+                    </div>
         
                 </div>
                 <div class="row">
-					
-					<div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
-							<h5>Kabid Buklap</h5>
-					</div>
-					<div class="col-md-8">
-                        <div class="form-group">
-                            <label for="ttd">Tanda Tangan:</label>
-                              <select id="tanda_tangan_2" name="tanda_tangan_2" class="form-control tanda_tangan_2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
-                                      '.$opsittd.'
-                              </select>
-                        </div>
-                    </div>
-				</div>
-				<div class="row">
-					
-					<div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;" >
-							<h5>Kabid Akuntansi</h5>
-					</div>
-					<div class="col-md-8">
-                        <div class="form-group">
-                            <label for="ttd">Tanda Tangan:</label>
-                              <select id="tanda_tangan_1" name="tanda_tangan_1" class="form-control tanda_tangan_1 " data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
-                                      '.$opsittd.'
-                              </select>
-                        </div>
-                    </div>
-				</div>
-                  <div class="col-md-1 mt-3">
-                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="apbdp_checkbox" name="apbdp_checkbox" >
-                            <label class="form-check-label" for="apbdp">APBDP</label>
-                        </div>
+				    <div class="col-md-1 mt-3">
                         <div class="button-group mt-2">
                             <button type="submit" class="btn btn-primary">Cetak Laporan</button>
                         </div>
                     </div>
-                    </div>
+                
+                </div>
+                      
                 </form>
             </div>
         </div>';

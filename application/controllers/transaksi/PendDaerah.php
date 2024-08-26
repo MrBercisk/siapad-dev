@@ -396,13 +396,13 @@ class PendDaerah extends CI_Controller {
             $idstsmaster = $this->input->post('idstsmaster');
             $jumlah = $this->input->post('jumlah');
             $prs_denda = $this->input->post('prs_denda');
-               
+        /*        
             if (!is_numeric($jumlah) || !is_numeric($prs_denda)) {
                 $respon = ['success' => false, 'message' => 'harus angka.'];
                 echo json_encode($respon);
                 return;
             }
-        
+         */
             /* Hitung denda rp */
             $nil_denda = ($jumlah * $prs_denda) / 100;
             
@@ -711,22 +711,29 @@ class PendDaerah extends CI_Controller {
             $limit = $this->input->get('limit') ?: 10;
             $offset = $this->input->get('offset') ?: 0;
             $search = $this->input->get('search') ?: '';
+        
+            $this->db->from('mst_wajibpajak a');
+            $this->db->select('a.id, a.nama, a.tgljthtmp, a.tglskp, a.idrekening, b.nmrekening, a.idkelurahan, c.idkecamatan, d.iduptd, MAX(f.id) as idrapbd');
+            
+            $this->db->join('mst_rekening b', 'b.id=a.idrekening');
+            $this->db->join('mst_kelurahan c', 'c.id=a.idkelurahan', 'left');
+            $this->db->join('mst_kecamatan d', 'd.id=c.idkecamatan', 'left');
+            $this->db->join('mst_uptd e', 'e.id=d.iduptd', 'left');
+            $this->db->join('trx_rapbd f', 'f.idrekening=b.id', 'left');
+        
+            $this->db->group_by('a.idrekening');
     
-            $this->db->select('id, nama, tgljthtmp, tglskp');
-            $this->db->from('mst_wajibpajak');
-    /*         $this->db->join('mst_rekening', 'mst_rekening.id=mst_wajibpajak.idrekening');
-            $this->db->join('mst_kelurahan', 'mst_kelurahan.id=mst_rekening.idkelurahan', 'left');
-            $this->db->join('mst_kecamatan', 'mst_kecamatan.id=mst_kelurahan.idkecamatan', 'left');
-            $this->db->join('mst_uptd', 'mst_uptd.id=mst_kecamatan.iduptd', 'left'); */
             if (!empty($search)) {
-                $this->db->like('nama', $search);
-                $this->db->or_like('nomor', $search);
+                $this->db->like('a.nama', $search);
+                $this->db->or_like('a.nomor', $search);
             }
+        
             $this->db->limit($limit, $offset);
             $wpdata = $this->db->get()->result();
-    
+        
             echo json_encode($wpdata);
         }
+        
           public function get_namarekening_by_iddinas() {
             $iddinas = $this->input->post('iddinas');
         
@@ -738,7 +745,7 @@ class PendDaerah extends CI_Controller {
                 ->get()
                 ->result();
             
-            $options = '<option disabled selected></option>';
+            $options = '<option disabled selected>Pilih Rekening</option>';
             foreach ($apbdData as $apbd) {
                 $options .= '<option value="'.$apbd->id.'">'.$apbd->nmrekening.'('.$apbd->kdrekview.')</option>'; 
             }

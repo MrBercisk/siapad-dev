@@ -32,71 +32,7 @@ class SyncSkpd extends CI_Controller
 
         $this->load->view('transaksi/syncskpd', $data);
     }
-  
-
- /* 
-    public function selectBySKPD()
-    {
-        // Get parameters from input
-        $query = $this->input->get('query'); // Assuming 'query' is the parameter to search with
-        $npwpd = $this->input->get('npwpd');
-        $nmwp = $this->input->get('nmwp');
-        $alamat = $this->input->get('alamat');
-        $noskpd = $this->input->get('noskpd');
-        $kodebayar = $this->input->get('kodebayar');
-        $nosptpd = $this->input->get('nosptpd');
-        $kecamatan = $this->input->get('kecamatan');
-        $kelurahan = $this->input->get('kelurahan');
-        $masapajak = $this->input->get('masapajak');
-        $tgljthtmp = $this->input->get('tgljthtmp');
-        $teks = $this->input->get('teks');
-        $blnpajak = $this->input->get('blnpajak');
-        $thnpajak = $this->input->get('thnpajak');
-        $jumlah = $this->input->get('jumlah');
-        $bunga = $this->input->get('bunga');
-        $total = $this->input->get('total');
-        $tglbayar = $this->input->get('tglbayar');
-        $keterangan = $this->input->get('keterangan');
-    
-        // Perform the query to get records based on the search criteria
-        $this->db
-            ->select("a.id, a.nama, CONCAT(a.nama, ' - ', a.nomor) AS nmwp, a.alamat, a.idkelurahan, b.nama AS kelurahan, 
-                b.idkecamatan, c.nama AS kecamatan, a.nomor, a.notype, a.tglskp, a.tgljthtmp, 
-                a.idrekening, d.nmrekening, d.jenis,
-                c.iduptd, e.nama AS nmuptd, e.singkat AS nmuptdsingkat,
-                a.awalpajakbln, a.awalpajakthn, a.akhirpajakbln, a.akhirpajakthn, a.isclosed, f.keterangan", false)
-            ->join('mst_rekening d', 'd.id=a.idrekening')
-            ->join('mst_kelurahan b', 'b.id=a.idkelurahan', 'left')
-            ->join('mst_kecamatan c', 'c.id=b.idkecamatan', 'left')
-            ->join('mst_uptd e', 'e.id=c.iduptd', 'left')
-            ->join('trx_skpdreklame f', 'f.idwp=a.id', 'left')
-            ->where('a.notype', 'No. SKP');
-    
-        // Apply filter based on 'NamaObjekPajak'
-        if (!empty($nmwp)) {
-            $this->db->where('a.nama', $nmwp);
-        }
-    
-        $query_result = $this->db->get('mst_wajibpajak a');
-    
-        $result = [];
-        if ($query_result->num_rows() > 0) {
-            $result = $query_result->result_array();
-            
-            // Add idwp to each record
-            foreach ($result as &$record) {
-                $record['idwp'] = $record['id'];
-            }
-        }
-    
-        $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode([
-                'total' => count($result),
-                'data' => $result
-            ]));
-    }
-     */
+ 
     public function getSkpd()
     {
         $tanggal = $this->input->post('tanggal');
@@ -241,61 +177,6 @@ class SyncSkpd extends CI_Controller
         curl_close($curl);
     }
 
-// public function getapisimpadareklame()
-// {
-//     $tanggal = empty($this->input->get('tanggal')) ? 0 : $this->input->get('tanggal');
-//     $urlApi = ENDPOINT_API_SIMPATDA_REKLAME . "?tanggal=$tanggal";
-//     $data = [
-//         'tanggal' => $tanggal
-//     ];
-
-//     $payload = json_encode($data);
-//     $curl = curl_init($urlApi);
-    
-//     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-//     curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-//     curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-//     curl_setopt($curl, CURLOPT_HTTPGET, true);
-
-//     $response = curl_exec($curl);
-
-//     if (curl_errno($curl)) {
-//         echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
-//     } else {
-//         $respondatanya = json_decode($response, true);
-        
-//         if (isset($respondatanya['data']) && is_array($respondatanya['data'])) {
-//             $this->load->database();
-            
-//             $keyunik = array_column($respondatanya['data'], 'nop');
-            
-//             if (!empty($keyunik)) {
-//                 $this->db->select('nop');
-//                 $this->db->from('mst_wajibpajak');
-//                 $this->db->where_in('nop', $keyunik);
-//                 $query = $this->db->get();
-//                 $nopcek = $query->result_array();
-                
-//                 $nomorMap = array_column($nopcek, 'nop', 'nop');
-//                 /* $nopMap = array_column($kohir, 'nop', 'NOSKPDN'); */
-                
-//                 foreach ($respondatanya['data'] as &$item) {
-//                     $opnomor = $item['nop'];
-//                     $nokohir = isset($nomorMap[$opnomor]) ? $nomorMap[$opnomor] : '';
-//                    /*  $nop = isset($nopMap[$noskpd]) ? $nopMap[$noskpd] : ''; */
-                    
-//                     $item['nomor'] = substr($nokohir, 0, 4);
-//                     /* $item['nop'] = $nop;  */
-//                 }
-//             }
-//         }
-
-//         $prettyResponse = json_encode($respondatanya, JSON_PRETTY_PRINT);
-//         echo $prettyResponse;
-//     }
-
-//     curl_close($curl);
-// }
 
     public function cekData($data){
         $cek = $this->db->select('id AS idrwp','nomor')
@@ -326,6 +207,7 @@ class SyncSkpd extends CI_Controller
         $tgljatuhtempo = $this->input->post('tgljatuhtempo');
         $npwpd = $this->input->post('npwpd');
         $nokohir = $this->input->post('nokohir');
+        $kodebayar = $this->input->post('kodebayar');
 
         $isbayar = ($statusbayar === 'LUNAS') ? 1 : 0;
         $tgljatuhtempo = date('Y-m-d', strtotime(str_replace('-', '/', $tgljatuhtempo)));
@@ -377,6 +259,7 @@ class SyncSkpd extends CI_Controller
                     'teks' => $nama,
                     'isbayar' => $isbayar,
                     'nomor' => $nokohir,
+                    'kodebayar' => $kodebayar
                 ]);
                 $this->db->trans_complete();
     

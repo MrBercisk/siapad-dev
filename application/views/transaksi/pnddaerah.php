@@ -98,9 +98,6 @@ $datatables 	  = '<script type="text/javascript">
           ->from('trx_stsmaster')
           ->get()
           ->result();
-        /*   $this->db->select('id, nomor');
-          $recData = $this->db->get('trx_stsmaster')->result(); */
-
           $opsiRec = '<option disabled selected></option>';
           foreach ($recordData as $record) {
               $opsiRec .= '<option value="'.$record->id.'">'.$record->nomor.'</option>';
@@ -379,7 +376,6 @@ $theme['main'][] =
                                   <div class="form-group">
                                     <label for="idrekening">Rekening</label>
                                      <select id="kdrekening" name="idrapbd" class="form-control select2" data-placeholder="Pilih Rekening" style="width: 100%;" >
-                                     <option disabled selected></option>
                                     </select>
                                   </div>
                                 </div>

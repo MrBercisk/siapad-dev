@@ -575,124 +575,6 @@ $theme['main'][] =
             </div>
         </div>
     </div>
-
-
-      <div class="modal" id="searchModal">
-        <div class="modal-dialog">
-          <div class="modal-content">
-          
-            <!-- Modal Header -->
-            <div class="modal-header">
-              <h4 class="modal-title">Cari SKPD</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            
-            <!-- Modal Body -->
-            <div class="modal-body">
-                   <form id="getApiForm" >
-                     <div class="row">
-                                 <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
-                                  <input type="hidden" class="form-control" id="nourut" name="nourut">
-                                  <input type="hidden" class="form-control" id="nopelaporan" name="nopelaporan">
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="nosptpd">No. SKPD</label>
-                                     <input type="text" id="nosptpd" class="form-control" name="nosptpd"  placeholder="Ketik No SPTPD / No Formulir lalu tekan Enter..." required>                       
-                                  </div>
-                                </div>
-                            
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="NoSSPD">No SSPD</label>
-                                     <input type="text" id="NoSSPD" class="form-control" name="nobukti" readonly>                       
-                                  </div>
-                                </div>
-
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="TGLKirim">Tgl Bayar</label>
-                                     <input type="text" id="TGLKirim" class="form-control" name="tgl_input" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="statusbayar">Status Bayar</label>
-                                     <input type="text" id="statusbayar" class="form-control" name="statusbayar" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="jumlahbayar">Jumlah Bayar</label>
-                                     <input type="text" id="jumlahbayar" class="form-control" name="jumlah" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="denda">Denda</label>
-                                     <input type="text" id="denda" class="form-control" name="nil_denda" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="totalbayar">Total Bayar</label>
-                                     <input type="text" id="totalbayar" class="form-control" name="total" readonly>                       
-                                  </div>
-                                </div>
-                            
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="masapajak">Masa Pajak</label>
-                                     <input type="text" id="masapajak" class="form-control" name="blnpajak" readonly>                       
-                                  </div>
-                                </div>
-                            
-                              <div class="col-md-6">
-                                  <div class="form-group">
-                                    <label for="tahunpajak">Tahun Pajak</label>
-                                     <input type="text" id="tahunpajak" class="form-control" name="thnpajak" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="namaop">Nama WP</label>
-                                     <input type="text" id="namaop" class="form-control" name="idwp" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="jenisop">Jenis Pajak</label>
-                                     <input type="text" id="jenisop" class="form-control" name="jenisop" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="alamatop">Alamat</label>
-                                     <input type="text" id="alamatop" class="form-control" name="alamatop" readonly>                       
-                                  </div>
-                                </div>
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="npwpd">NPWPD</label>
-                                     <input type="text" id="npwpd" class="form-control" name="npwpd" readonly>                       
-                                  </div>
-                                </div>
-                     
-                                    
-                          </div>
-                          <div class="modal-footer">
-                              <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
-                              <button type="button" class="btn btn-success" id="fetchDataButton">Ok</button>
-                          </div>
-                          </form>
-                  </div>
-                  
-            
-            <!-- Modal Footer -->
-         
-          
-          </div>
-        </div>
-      </div>
       <div class="modal" id="searchTableModal">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -705,94 +587,91 @@ $theme['main'][] =
             
             <!-- Modal Body -->
             <div class="modal-body">
-                   <form id="getTableForm" >
+                   <form id="getTableFormBayar" >
                      <div class="row">
                                  <input type="hidden" class="form-control" id="idstsmaster" name="idstsmaster">
                                   <input type="hidden" class="form-control" id="nourut" name="nourut">
                                   <input type="hidden" class="form-control" id="idrapbd" name="idrapbd">
                                   <input type="hidden" class="form-control" id="iduptd" name="iduptd">
-                                  <input type="hidden" class="form-control" id="nopelaporan2" name="nopelaporan">
-
-                              <div class="col-md-12">
+                                  <input type="hidden" class="form-control" id="idwpnya" name="idwp">
+                                  <input type="hidden" class="form-control" id="idskpdnya" name="idskpd">
+                                
+                                <div class="col-md-12">
                                   <div class="form-group">
-                                    <label for="nosptpd">No. SPTPD/No Formulir</label>
-                                     <input type="text" id="nosptpd2" class="form-control" name="kodebayar"  placeholder="Ketik No SPTPD / No Formulir lalu tekan Enter..." required>                       
+                                    <label for="nosptpd">Kode Bayar</label>
+                                     <input type="text" id="kodebayarskpd" class="form-control" name="kodebayar"  placeholder="Ketik Kode Bayar lalu tekan Enter..." required>                       
                                   </div>
                                 </div>
                             
+                            
                               <div class="col-md-12">
                                   <div class="form-group">
-                                    <label for="NoSSPD">No SSPD</label>
-                                     <input type="text" id="NoSSPD2" class="form-control" name="nobukti" readonly>                       
+                                    <label for="NoSSPD">No SKPD</label>
+                                     <input type="text" id="noskpdnya" class="form-control" name="nobukti" readonly>                       
                                   </div>
                                 </div>
 
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="TGLKirim">Tgl Bayar</label>
-                                     <input type="text" id="TGLKirim2" class="form-control" name="tgl_input" readonly>                       
+                                     <input type="text" id="tglbayarnya" class="form-control" name="tgl_input" readonly>                       
                                   </div>
                                 </div>
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="statusbayar">Status Bayar</label>
-                                     <input type="text" id="statusbayar2" class="form-control" name="statusbayar" readonly>                       
+                                     <input type="text" id="statusbayarnya" class="form-control" name="statusbayar" readonly>                       
                                   </div>
                                 </div>
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="jumlahbayar">Jumlah Bayar</label>
-                                     <input type="text" id="jumlahbayar2" class="form-control" name="jumlah" readonly>                       
+                                     <input type="text" id="jumlahbayarnya" class="form-control" name="jumlah" readonly>                       
                                   </div>
                                 </div>
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="denda">Denda</label>
-                                     <input type="text" id="denda2" class="form-control" name="nil_denda" readonly>                       
+                                     <input type="text" id="dendanya" class="form-control" name="bunga" readonly>                       
                                   </div>
                                 </div>
                               <div class="col-md-12">
                                   <div class="form-group">
                                     <label for="totalbayar">Total Bayar</label>
-                                     <input type="text" id="totalbayar2" class="form-control" name="total" readonly>                       
+                                     <input type="text" id="totalnya" class="form-control" name="total" readonly>                       
                                   </div>
                                 </div>
                             
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="masapajak">Masa Pajak</label>
-                                     <input type="text" id="blnpajak2" class="form-control" name="blnpajak" readonly>                       
+                                     <input type="text" id="bulannya" class="form-control" name="blnpajak" readonly>                       
                                   </div>
                                 </div>
                             
                               <div class="col-md-6">
                                   <div class="form-group">
                                     <label for="tahunpajak">Tahun Pajak</label>
-                                     <input type="text" id="thnpajak2" class="form-control" name="thnpajak" readonly>                       
+                                     <input type="text" id="tahunnya" class="form-control" name="thnpajak" readonly>                       
                                   </div>
                                 </div>
                               <div class="col-md-12">
                                   <div class="form-group">
                                     <label for="namaop">Nama WP</label>
-                                     <input type="text" id="namaop2" class="form-control" name="nama" readonly>                       
+                                     <input type="text" id="namawpnya" class="form-control" name="idwp" readonly>                       
                                   </div>
                                 </div>
-                              <div class="col-md-12">
-                                  <div class="form-group">
-                                    <label for="jenisop">Jenis Pajak</label>
-                                     <input type="text" id="jenisop2" class="form-control" name="nmrekening" readonly>                       
-                                  </div>
-                                </div>
+                          
                               <div class="col-md-12">
                                   <div class="form-group">
                                     <label for="alamatop">Alamat</label>
-                                     <input type="text" id="alamatop2" class="form-control" name="alamatop" readonly>                       
+                                     <input type="text" id="alamatnya" class="form-control" name="alamatop" readonly>                       
                                   </div>
                                 </div>
                               <div class="col-md-12">
                                   <div class="form-group">
                                     <label for="npwpd">NPWPD</label>
-                                     <input type="text" id="npwpd2" class="form-control" name="npwpd" readonly>                       
+                                     <input type="text" id="npwpdnya" class="form-control" name="npwpd" readonly>                       
                                   </div>
                                 </div>
                      
@@ -800,7 +679,7 @@ $theme['main'][] =
                           </div>
                           <div class="modal-footer">
                               <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
-                              <button type="button" class="btn btn-success" id="fetchTableButton">Ok</button>
+                              <button type="button" class="btn btn-success" id="fetchTableButtonNya">Ok</button>
                           </div>
                           </form>
                   </div>

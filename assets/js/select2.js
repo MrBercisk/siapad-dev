@@ -78,7 +78,10 @@ $(document).ready(function() {
                             id: item.id,
                             text: item.nama,
                             nomor: item.nomor, 
-                            tgljthtmp: item.tgljthtmp, 
+                            idrekening: item.idrekening,
+                            nmrekening: item.nmrekening,
+                            idrapbd: item.idrapbd,
+                            iduptd: item.iduptd
                         };
                     }),
                     pagination: {
@@ -92,6 +95,30 @@ $(document).ready(function() {
         templateResult: formatWp,
         templateSelection: formatWpSelection
 
+    });
+    function formatWp(wp) {
+        if (wp.loading) {
+            return wp.text; 
+        }
+        var $container = $('<div>' + wp.text + '</div>'); 
+        return $container;
+    }
+    
+    function formatWpSelection(wp) {
+        return wp.text || wp.id; 
+    }
+    $('#idwp').on('select2:select', function (e) {
+        var data = e.params.data;
+        console.log(data);
+        $('#kdrekening').val(data.idrapbd || ''); 
+        $('#iduptd').val(data.iduptd || ''); 
+    });
+    $('#idwp').on('select2:select', function (e) {
+        var data = e.params.data;
+    
+        $('#kdrekening').html('<option value="' + data.idrapbd + '">' + data.nmrekening + '</option>').trigger('change');
+        
+        $('#iduptd').val(data.iduptd || '');
     });
     $('#opsiwp').select2({
         ajax: {

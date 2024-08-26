@@ -106,7 +106,7 @@ class PembayaranSkpd extends CI_Controller
             "trx_skpdreklame.keterangan",
             "mst_wajibpajak.id",
             "mst_wajibpajak.nama as wajibpajak",
-            "mst_wajibpajak.nomor as noskpd",
+            "mst_wajibpajak.nomor as nop",
             "mst_wajibpajak.tgljthtmp",
             "mst_wajibpajak.tglskp",
         ]);
@@ -549,7 +549,8 @@ class PembayaranSkpd extends CI_Controller
             'mst_rekening.kdrekview',
             'trx_stsmaster.id as idmaster',
             'trx_stsmaster.iddinas',
-            'trx_stsmaster.nomor'
+            'trx_stsmaster.nomor',
+            'trx_skpdreklame.nomor as noskpd'
         ]);
         $datatables->addJoin('trx_stsmaster', 'trx_stsmaster.id = trx_stsdetail.idstsmaster', 'left');
         $datatables->addJoin('mst_wajibpajak', 'mst_wajibpajak.id = trx_stsdetail.idwp', 'left');
@@ -888,6 +889,105 @@ class PembayaranSkpd extends CI_Controller
           
               curl_close($curl);
           }
-          
-          
+      
+        
+        public function getapireklame()
+        {
+            $kodebayar = $this->input->get('kodebayar') ?: 0;
+            $urlApi = ENDPOINT_API_SIAPAD_REKLAMEBAYAR . "?kodebayar=$kodebayar";
+    
+            $data = [
+                'kodebayar' => $kodebayar
+            ];
+            $payload = json_encode($data);
+           
+            $curl = curl_init($urlApi);
+        
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+            curl_setopt($curl, CURLOPT_HTTPGET, true);
+        
+            $response = curl_exec($curl);
+        
+            if (curl_errno($curl)) {
+                echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
+            } else {
+                $responseData = json_decode($response, true);
+                $prettyResponse = json_encode($responseData, JSON_PRETTY_PRINT); 
+                echo $prettyResponse;
+            }
+        
+            curl_close($curl);
+        }
+        public function checkAndAddWp() {
+            $idstsmaster = $this->input->post('idstsmaster');
+            $kodebayar = $this->input->post('kodebayar');
+            $bulan = $this->input->post('blnpajak');
+            $tahun = $this->input->post('thnpajak');
+            $jumlah = $this->input->post('jumlah');
+            $bunga = $this->input->post('nil_denda');
+            $total = $this->input->post('total');
+            $tglbayar = $this->input->post('tgl_input');
+            $formulir = $this->input->post('formulir');
+            $idwp = base64_decode($this->input->post('idwp'));
+            $idskpd = base64_decode($this->input->post('idskpd'));
+            $idrapbd = $this->input->post('idrapbd');
+
+            $nomor_data = $this->Mbyrskpd->ambilnomornyaMaster($idstsmaster);
+            $nomor = $nomor_data ? $nomor_data->nomor : NULL;
+        
+            // Ambil nourut terakhir
+            $last_nourut = $this->Mbyrskpd->ambilnourut($idstsmaster);
+            $last_nourut = $last_nourut ? $last_nourut : '0000';
+        
+            $next_nourut = str_pad((intval($last_nourut) + 1), 4, '0', STR_PAD_LEFT);
+            $nobukti = $next_nourut . '/' . $nomor;
+
+            /* Jika apbd tidak diisi */
+            if (empty($idrapbd)) {
+                $idrapbd = 93;
+            }
+
+            
+            $check_duplicate = $this->Mbyrskpd->check_duplicate_data($idstsmaster, $kodebayar);
+            
+            if ($check_duplicate) {
+                echo json_encode(['exists' => true, 'message' => 'Data sudah pernah diinput.']);
+            } else {
+               /*  
+                $this->db->trans_start(); */
+    
+                $data = [
+                    'idstsmaster' => $idstsmaster,
+                    'nourut' => $next_nourut,
+                    'idwp' => $idwp,
+                    'idskpd' => $idskpd,
+                    'idrapbd' => $idrapbd,
+                    'blnpajak' => $bulan,
+                    'thnpajak' => $tahun,
+                    'tgl_input' => $tglbayar,
+                    'jumlah' => $jumlah,
+                    'nil_denda' => $bunga,
+                    'total' => $total,
+                    'nobukti' => $nobukti,
+                    'kodebayar' => $kodebayar,
+                    'formulir' => $formulir
+                ];
+        
+/*                 $this->db->trans_complete(); */
+                $insert = $this->Mbyrskpd->insertdata($data);
+    
+                if ($insert) {
+                    $this->db->where('id', $idskpd);
+                    $this->db->update('trx_skpdreklame', ['isbayar' => 1]);
+            
+                    $response = ['success' => true, 'message' => 'Record telah disimpan!'];
+                } else {
+                    $response = ['success' => false, 'message' => 'Gagal Tambah Record'];
+                }
+            
+                echo json_encode($response);
+            }
+        }
 }

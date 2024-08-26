@@ -887,9 +887,9 @@ $(document).ready(function() {
                     tgljatuhtempo: inidataygdipilih.TglJatuhTempo,
                     npwpd: inidataygdipilih.NPWPD,
                     kelurahan: inidataygdipilih.kelurahan,
-                    paymentcode: paymentCode,
+                    kodebayar: inidataygdipilih.payment_code,
                     nop:inidataygdipilih.nop,
-                    nokohir: '' 
+                    nokohir: '' ,
                 },
                 success: function(response) {
                     if (response.exists) {
@@ -934,7 +934,7 @@ $(document).ready(function() {
                                         npwpd: inidataygdipilih.NPWPD,
                                         kelurahan: inidataygdipilih.kelurahan,
                                         nop: inidataygdipilih.nop,
-                                        paymentcode: paymentCode,
+                                        kodebayar: inidataygdipilih.payment_code,
                                         nokohir: nokohirnya 
                                     },
                                     success: function(response) {
@@ -1024,181 +1024,7 @@ $(document).ready(function() {
 
     // End script sync skpd reklame
 
-   /*  var table = $('#syncTable').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "order" : [],
-        "ajax": {
-            "url": "SyncSkpd/getSkpd",
-            "type": "POST",
-            "data": function(d) {
-                var tanggal = $('#tanggal').val();
-                if (tanggal) {
-                    d.tanggal = tanggal;
-                } else {
-                    return {};
-                }
-            }
-        },
-        "searching": false,
-        "ordering": false,
-        "info": false,
-        "lengthChange": false,
-        "paging": false,
-        "scrollX": true,
-        "columnDefs": [
-            {
-                "targets": 0,
-                "orderable": false,
-                "width": "1%",
-                "render": function(data, type, row) {
-                    return '<input type="checkbox" class="submit-checkbox" ' +
-                        'data-id="' + row.id + '" ' +
-                        'data-idwp="' + row.idwp + '" ' +
-                        'data-tanggal="' + row.tanggal + '" ' +
-                        'data-blnpajak="' + row.blnpajak + '" ' +
-                        'data-thnpajak="' + row.thnpajak + '" ' +
-                        'data-jumlah="' + row.jumlah + '" ' +
-                        'data-keterangan="' + row.keterangan + '">';
-                }
-            },
-            {
-                "targets": -1,
-                "width": "10%"
-            }
-        ],
-        "buttons": [
-            "copyHtml5",
-            "excelHtml5",
-            "csvHtml5",
-            "pdfHtml5"
-        ],
-        "initComplete": function(settings, json) {
-            table.clear().draw();
-        }
-    });
  
-    $('#cari').on('click', function() {
-        var tanggal = $('#tanggal').val();
-        if (tanggal) {
-            $.ajax({
-                url: "SyncSkpd/getapisimpadareklame",
-                type: "GET",
-                data: { tanggal: tanggal },
-                success: function(response) {
-                    var data = JSON.parse(response);
-                    if (data && data.length > 0) {
-                        table.clear().rows.add(data).draw(); 
-                    } else {
-                        table.clear().draw();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching data from API: " + error);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Terjadi kesalahan saat mengambil data dari API',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                    table.clear().draw();
-                    Swal.fire({
-                        title: 'Warning',
-                        text: 'Data SIMPADA Tidak Ditemukan',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Perhatian',
-                text: 'Silahkan pilih tanggal',
-                icon: 'warning',
-                confirmButtonText: 'OK'
-            });
-        }
-    });
-     */
-  
-    /* let selectedRows = [];
-    $('#syncTable').on('change', '.submit-checkbox', function() {
-        let rowData = {
-            id: $(this).data('id'),
-            idwp: $(this).data('idwp'),
-            tanggal: $(this).data('tanggal'),
-            blnpajak: $(this).data('blnpajak'),
-            thnpajak: $(this).data('thnpajak'),
-            jumlah: $(this).data('jumlah'),
-            keterangan: $(this).data('keterangan')
-        };
-    
-        if ($(this).is(':checked')) {
-            selectedRows.push(rowData);
-        } else {
-            selectedRows = selectedRows.filter(row => row.id !== rowData.id);
-        }
-        console.log(selectedRows);
-    });
-  
-  
-$('#submit').on('click', function() {
-    if (selectedRows.length > 0) {
-        Swal.fire({
-            title: 'Konfirmasi',
-            text: 'Anda akan mengirim ' + selectedRows.length + ' data. Lanjutkan?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, kirim!',
-            cancelButtonText: 'Tidak, batalkan'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: 'SyncSkpd/submit',
-                    type: 'POST',
-                    data: { selectedRows: selectedRows },
-                    success: function(response) {
-                        var res = JSON.parse(response);
-                        console.log("Response from server: ", res); 
-                        if (res.success) {
-                            Swal.fire({
-                                title: 'Berhasil',
-                                text: res.message,
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            });
-                            table.ajax.reload();
-                            selectedRows = [];
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: res.message,
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error submitting data: " + error);
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Terjadi kesalahan saat mengirim data.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                });
-            }
-        });
-    } else {
-        Swal.fire({
-            title: 'Perhatian',
-            text: 'Anda belum mengisi item data!',
-            icon: 'warning',
-            confirmButtonText: 'OK'
-        });
-    }
-}); */
 $('#delete').on('click', function() {
     var selectedData = [];
     $('.delete-checkbox:checked').each(function() {
@@ -1294,5 +1120,158 @@ $("#opsirekbapop").change(function() {
         $('#wajib_pajak').empty();
     }
 });  */
+
+
+$('#kodebayarskpd').keypress(function(event) {
+    if (event.which === 13) { 
+        event.preventDefault(); 
+
+        var kodebayar = $('#kodebayarskpd').val();
+
+        $.ajax({
+            url: 'PembayaranSkpd/getapireklame', 
+            type: 'GET',
+            data: {
+                kodebayar: kodebayar
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response && response.success && response.data.length > 0) {
+                    var data = response.data[0]; 
+
+                    $('#kodebayarskpd').val(data.kodebayar);
+                    $('#noskpdnya').val(data.noskpd); 
+                    $('#tglbayarnya').val(data.tglbayar);
+                    $('#jumlahbayarnya').val(data.jumlah);
+                    $('#statusbayarnya').val(data.statusbayar);
+                    $('#dendanya').val(data.bunga);
+                    $('#totalnya').val(data.total);
+                    $('#bulannya').val(data.bulan);
+                    $('#tahunnya').val(data.tahun);
+                    $('#namawpnya').val(data.namawp); 
+                    $('#alamatnya').val(data.alamatwp); 
+                    $('#npwpdnya').val(data.npwpd); 
+                    $('#idwpnya').val(data.idwp); 
+                    $('#idskpdnya').val(data.idskpd); 
+
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Koneksi Berhasil, Data Wajib Pajak Pada Server SIAPAD Ditemukan',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+
+                    $('#submitDataButton').removeClass('d-none');
+                } else {
+                    clearFormFields();
+                    Swal.fire({
+                        title: 'Warning',
+                        text: 'Data SIMPADA tidak ditemukan',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Terjadi kesalahan saat menghubungi server.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    }
+});
+
+function clearFormFields() {
+    $('#kodebayarskpd').val('');
+    $('#noskpdnya').val('');
+    $('#tglbayarnya').val('');
+    $('#jumlahbayarnya').val('');
+    $('#statusbayarnya').val('');
+    $('#dendanya').val('');
+    $('#totalnya').val('');
+    $('#bulannya').val('');
+    $('#tahunnya').val('');
+    $('#namawpnya').val('');
+    $('#alamatnya').val('');
+    $('#npwpdnya').val('');
+    $('#submitDataButton').addClass('d-none');
+}
+
+$('#fetchTableButtonNya').on('click', function(e) {
+    e.preventDefault();
+    var idstsmaster = $('#idstsmaster').val(); 
+    var kodebayar = $('#kodebayarskpd').val();
+    var noskpd = $('#noskpdnya').val();
+    var tglbayar = $('#tglbayarnya').val();
+    var statusbayar = $('#statusbayarnya').val();
+    var jumlah = $('#jumlahbayarnya').val();
+    var bunga = $('#dendanya').val();
+    var total = $('#totalnya').val();
+    var blnpajak = $('#bulannya').val();
+    var thnpajak = $('#tahunnya').val();
+    var nama = $('#namawpnya').val();
+    var alamat = $('#alamatnya').val();
+    var idskpd = $('#idskpdnya').val();
+    var idwp = $('#idwpnya').val();
+    var formulir = kodebayar.substring(4, 14);
+    var npwpd = $('#npwpdnya').val();
+    
+
+    $.ajax({
+        url: 'PembayaranSkpd/checkAndAddWp',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            idstsmaster: idstsmaster,
+            kodebayar: kodebayar,
+            nobukti: noskpd,
+            tgl_input: tglbayar,
+            statusbayar: statusbayar,
+            jumlah: jumlah,
+            nil_denda: bunga,
+            total: total,
+            blnpajak: blnpajak,
+            thnpajak: thnpajak,
+            namawp: nama,
+            alamatwp: alamat,
+            npwpd: npwpd,
+            formulir: formulir,
+            idskpd : idskpd,
+            idwp : idwp,
+        },
+        success: function(response) {
+            if (response.exists) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: response.message,
+                    icon: 'error'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Data berhasil disimpan ',
+                    icon: 'success'
+                }).then(() => {
+                    $('#searchTableModal').modal('hide');
+                    $('#SKPD').DataTable().ajax.reload();
+                });
+            } 
+        },
+     
+        error: function(xhr) {
+            console.error(xhr.responseText);
+            Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while processing your request.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
 
 });

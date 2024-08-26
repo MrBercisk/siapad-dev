@@ -1,5 +1,90 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class Mbukuuptdbap extends CI_Model {
+    public function get_sts_data($tanggal, $iduptd)
+    {
+        $year = date('Y', strtotime($tanggal));
+    
+        $sql1 = "
+            SELECT SUM(a.total) AS total
+            FROM trx_stsdetail a
+            INNER JOIN trx_stsmaster b ON b.id = a.idstsmaster
+            INNER JOIN trx_rapbd c ON c.id = a.idrapbd
+            INNER JOIN mst_rekening d ON d.id = c.idrekening
+            INNER JOIN mst_wajibpajak e ON e.id = a.idwp
+            WHERE b.tanggal < ?
+            AND YEAR(b.tanggal) = ?
+            AND a.iduptd = ?
+            AND d.jenis <> 'BPHTB';
+        ";
+        $query1 = $this->db->query($sql1, array($tanggal, $year, $iduptd));
+        $result1 = $query1->row_array();
+        $jmllalu = $result1['total'] ?? 0;
+    
+        $sql2 = "
+            SELECT a.*
+            FROM trx_stsdetail a
+            INNER JOIN trx_stsmaster b ON b.id = a.idstsmaster
+            INNER JOIN trx_rapbd c ON c.id = a.idrapbd
+            INNER JOIN mst_rekening d ON d.id = c.idrekening
+            INNER JOIN mst_wajibpajak e ON e.id = a.idwp
+            WHERE b.tanggal = ?
+            AND YEAR(b.tanggal) = ?
+            AND a.iduptd = ?
+            AND d.jenis <> 'BPHTB';
+        ";
+        $query2 = $this->db->query($sql2, array($tanggal, $year, $iduptd));
+        
+        if ($query2->num_rows() > 0) {
+            $sql3 = "
+                SELECT 
+                    ? AS tahun, 
+                    b.nomor, 
+                    d.kdrekview AS kdrekening, 
+                    d.nmrekening, 
+                    e.nama AS nmwp,
+                    CASE 
+                        WHEN (NOT a.tglpajak IS NULL AND a.tglpajak <> '') 
+                        THEN CONCAT(a.tglpajak, '-', a.blnpajak, '-', a.thnpajak)
+                        WHEN NOT a.blnpajak IS NULL 
+                        THEN CONCAT(a.blnpajak, '-', a.thnpajak)
+                        ELSE '-' 
+                    END AS masapajak, 
+                    a.total, 
+                    a.keterangan, 
+                    ? AS saldoawal, 
+                    1 AS isexists
+                FROM trx_stsdetail a
+                INNER JOIN trx_stsmaster b ON b.id = a.idstsmaster
+                INNER JOIN trx_rapbd c ON c.id = a.idrapbd
+                INNER JOIN mst_rekening d ON d.id = c.idrekening
+                INNER JOIN mst_wajibpajak e ON e.id = a.idwp
+                WHERE b.tanggal = ?
+                AND YEAR(b.tanggal) = ?
+                AND a.iduptd = ?
+                AND d.jenis <> 'BPHTB';
+            ";
+            $query3 = $this->db->query($sql3, array($year, $jmllalu, $tanggal, $year, $iduptd));
+        } else {
+            $sql3 = "
+                SELECT 
+                    ? AS tahun, 
+                    NULL AS nomor, 
+                    NULL AS kdrekening, 
+                    NULL AS nmrekening, 
+                    NULL AS nmwp,
+                    NULL AS masapajak, 
+                    0.00 AS total, 
+                    NULL AS keterangan, 
+                    ? AS saldoawal, 
+                    0 AS isexists;
+            ";
+            $query3 = $this->db->query($sql3, array($year, $jmllalu));
+        }
+    
+        $results = $query3->result_array();
+        return $results;
+    }
+    
     public function ambildata($tanggal,$iduptd) {
         $mysqli = $this->db->conn_id; 
  
@@ -45,7 +130,7 @@ class Mbukuuptdbap extends CI_Model {
         $form[] = '
         <div class="card">
             <div class="card-body">
-                <form id="reportForm" action="' . site_url('pembukuan/bukuuptd/cetak') . '" class="form-row" method="post" onsubmit="printForm(); return false;">
+                <form id="reportForm"  action="' . site_url('pembukuan/bukuuptd/cetak') . '" class="form-row" method="post" onsubmit="printForm(); return false;">
                     <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                     </div>
@@ -76,7 +161,7 @@ class Mbukuuptdbap extends CI_Model {
                             <div class="col-md-4">
                                  <div class="form-group">
                                     <label for="ttd">Tanda Tangan:</label>
-                                    <select id="tanda_tangan" name="tanda_tangan" class="form-control tanda_tangan " data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
+                                    <select id="tanda_tangan" name="tanda_tangan" class="form-control tanda_tangan select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                             '.$opsittd.'
                                     </select>
                                 </div>

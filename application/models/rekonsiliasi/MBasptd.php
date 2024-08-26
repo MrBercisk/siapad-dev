@@ -2,15 +2,16 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class MBasptd extends CI_Model {
    
-    public function cetaktotal($tahun, $bulan, $bulanakhir)
+    public function cetaktotal($tahun, $bulan, $bulanakhir, $kdrekening)
     {
-        $this->db->select("
+        $query = $this->db->select("
             a.thnpajak AS thnpajak,
             a.nomor,
             a.tgl_input,
             b.nama,
             b.alamat,
             b.nomor AS npwpd,
+            b.pemilik as namawp,
             a.blnpajak AS masabulan,
             a.thnpajak AS thnpajak,
             a.pokok AS pokok,
@@ -18,22 +19,25 @@ class MBasptd extends CI_Model {
             a.jumlah AS total,
             a.keterangan AS keterangan,
             d.nobukti AS sspd,
+            d.nopelaporan,
+            d.kodebayar,
             a.tanggal AS tgl_bayar", false)
             ->join('mst_wajibpajak b', 'b.id=a.idwp', 'INNER')
             ->join('mst_rekening c', 'c.id=a.idrekening', 'INNER')
-            ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak ', 'left')
+            ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'left')
             ->where('a.thnpajak', $tahun)
             ->where('a.blnpajak >=', $bulan)
             ->where('a.blnpajak <=', $bulanakhir)
-            ->group_start()
-                ->where('a.tanggal !=', '0000-00-00')
-                ->or_where('a.tanggal', '0000-00-00')
-            ->group_end();
+            ->where('MONTH(a.tgl_input) >=', $bulan)
+            ->where('MONTH(a.tgl_input) <=', $bulanakhir)
+            ->where("c.kdrekening LIKE", "{$kdrekening}%")
+            ->order_by("b.nama")
+            ->get('trx_sptpd a');
+            
+        $result = $query->result_array();
+        return $result;
+    }
     
-        $query = $this->db->get('trx_sptpd a');
-    
-        return $query->result_array();
-    }    
 
    
     public function formInsert() {
@@ -48,11 +52,11 @@ class MBasptd extends CI_Model {
             $opsittd .= '<option value="'.$ttd->id.'">'.$ttd->nama.'</option>';
         }
 
-       
+        $opsiRek = $this->iniopsirekening();
         $form[] = '
         <div class="card">
             <div class="card-body">
-                <form action="' . site_url('rekonsiliasi/basptd/cetak') . '" class="form-row" method="post" target="printFrame">
+                <form action="' . site_url('rekonsiliasi/basptd/cetak') . '" class="form-row" method="post">
                     <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                     </div>
@@ -105,6 +109,14 @@ class MBasptd extends CI_Model {
                             </select>
                         </div>
                     </div>
+                      <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="dinas">Rekening:</label>
+                                    <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Jenis Pajak" style="width: 100%;">
+                                        '.$opsiRek.'
+                                    </select>
+                                </div>
+                            </div>
     
                             <script>
                                 document.getElementById("tahun").value = new Date().getFullYear();
@@ -174,6 +186,50 @@ class MBasptd extends CI_Model {
         ';
         return $form;
     }
+    public function iniopsirekening() {
+        $hotelRestoranHiburanParkir = array(
+            '4.1.1.01' => 'Pajak Hotel',
+            '4.1.1.02' => 'Pajak Restoran',
+            '4.1.1.03' => 'Pajak Hiburan',
+            '4.1.1.07' => 'Pajak Parkir'
+        );
     
-   
+        $reklameAirTanahMineralBatuan = array(
+            '4.1.1.04' => 'Pajak Reklame',
+            '4.1.1.08' => 'Pajak Air Tanah',
+            '4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam'
+        );
+    
+        $rekeningCumaIni = array_merge($hotelRestoranHiburanParkir, $reklameAirTanahMineralBatuan);
+    
+        $rekData = $this->db
+            ->select('mst_rekening.id, mst_rekening.kdrekening, mst_rekening.nmrekening')
+            ->from('mst_rekening')
+            ->where_in('kdrekening', array_keys($rekeningCumaIni))
+            ->get()
+            ->result();
+
+        $opsiRek = '<option></option>';
+
+        $opsiRek .= '<optgroup label="Pajak Hotel, Restoran, Hiburan, Parkir">';
+        foreach ($rekData as $rek) {
+            if (isset($hotelRestoranHiburanParkir[$rek->kdrekening])) {
+                $namaRek = $hotelRestoranHiburanParkir[$rek->kdrekening];
+                $opsiRek .= '<option value="'.$rek->kdrekening.'">'.$rek->kdrekening.' - '.$namaRek.'</option>';
+            }
+        }
+        $opsiRek .= '</optgroup>';
+        
+        $opsiRek .= '<optgroup label="Pajak Reklame, Air Tanah, Mineral Batuan">';
+        foreach ($rekData as $rek) {
+            if (isset($reklameAirTanahMineralBatuan[$rek->kdrekening])) {
+                $namaRek = $reklameAirTanahMineralBatuan[$rek->kdrekening];
+                $opsiRek .= '<option value="'.$rek->kdrekening.'">'.$rek->kdrekening.' - '.$namaRek.'</option>';
+            }
+        }
+        $opsiRek .= '</optgroup>';
+        
+        return $opsiRek;
+    }
+    
 }

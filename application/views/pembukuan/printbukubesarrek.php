@@ -106,7 +106,7 @@
         <thead>
         <tr>
             <th rowspan="2">NO</th>
-            <th rowspan="2">Tanggal</th>
+            <th rowspan="2" colspan="2">Tanggal</th>
             <th rowspan="2">Nama Wajib Pajak</th>
             <th rowspan="2">Masa Pajak</th>
             <th rowspan="2">Jumlah (Rp)</th>
@@ -119,7 +119,7 @@
         </tr>
         <tr>
             <th>1</th>
-            <th>2</th>
+            <th colspan="2">2</th>
             <th>3</th>
             <th>4</th>
             <th>5</th>
@@ -150,18 +150,18 @@
 
         function bulanKeIndonesia2($bulan) {
             $bulanIndo = [
-                '01' => 'Januari',
-                '02' => 'Februari',
-                '03' => 'Maret',
-                '04' => 'April',
+                '01' => 'Jan',
+                '02' => 'Feb',
+                '03' => 'Mar',
+                '04' => 'Apr',
                 '05' => 'Mei',
-                '06' => 'Juni',
-                '07' => 'Juli',
-                '08' => 'Agustus',
-                '09' => 'September',
-                '10' => 'Oktober',
-                '11' => 'November',
-                '12' => 'Desember'
+                '06' => 'Jun',
+                '07' => 'Jul',
+                '08' => 'Agu',
+                '09' => 'Sep',
+                '10' => 'Okt',
+                '11' => 'Nov',
+                '12' => 'Des'
             ];
             return isset($bulanIndo[$bulan]) ? $bulanIndo[$bulan] : $bulan;
         }
@@ -169,84 +169,97 @@
         if (!empty($tablenya)): ?>
             <?php
             $no = 1;
-            $total_hari_ini = 0;
-            $data_by_nrekening = [];
-            $saldo_awal_data = [];
-        
+            $data_by_month = [];
+            $previous_month = [];
+            $total_hari_ini_per_month = [];
+
             foreach ($tablenya as $row) {
                 $tahun = substr($row['tanggal'], 0, 4);
                 $bulan = date('m', strtotime($row['tanggal']));
-                $data_by_nrekening[$row['nmrekening']][$tahun][$bulan][] = $row;
-                if ($row['issaldoawal'] == 1) {
-                    $saldo_awal_data[$row['nmrekening']][$tahun][$bulan] = $row['jumlah'];
-                }
+                $data_by_month[$tahun][$bulan][$row['nmrekening']][] = $row;
             }
-        
-            ksort($data_by_nrekening);
-        
-            foreach ($data_by_nrekening as $nmrekening => $years):
-                foreach ($years as $tahun => $months):
-                    $saldo_awal_data_bulan = $saldo_awal_data[$nmrekening][$tahun] ?? [];
-                    $saldo_kumulatif = 0;
+
+            ksort($data_by_month);
+
+            foreach ($data_by_month as $tahun => $months):
+                $saldo_kumulatif = 0;
+                $previous_month[$tahun]['12'] = 0; 
+                foreach ($months as $bulan => $nmrekening_data):
+                    $saldo_awal_bulan_ini = $previous_month[$tahun][$bulan] ?? 0;
+                    $saldo_kumulatif = $saldo_awal_bulan_ini;
+
                     $total_hari_ini = 0;
-        
-                    foreach ($months as $bulan => $rows):
-                        $saldo_awal = isset($saldo_awal_data_bulan[$bulan]) ? $saldo_awal_data_bulan[$bulan] : 0;
-                        $saldo_kumulatif += $saldo_awal;
-        
-                        $bulan_saat_ini = bulanKeIndonesia2($bulan);
-                        $tanggal = date('d', strtotime($rows[0]['tanggal']));
-    
-                        $saldo_awal_displayed = false;
-        
+                    foreach ($nmrekening_data as $nmrekening => $rows):
                         foreach ($rows as $row):
-                            if ($row['issaldoawal'] == 1):
-                                if (!$saldo_awal_displayed):
-                                    $saldo_awal_displayed = true;
-                                    ?>
-                                    <tr>
-                                        <td style="text-align: center;"></td>
-                                        <td style="text-align: right;"><?= htmlspecialchars($bulan_saat_ini) ?></td>
-                                        <td style="text-align: left;">Saldo Awal</td>
-                                        <td style="text-align: center;"></td>
-                                        <td style="text-align: right;"></td>
-                                        <td style="text-align: right;"><?= number_format($saldo_kumulatif, 2) ?></td>
-                                        <td style="text-align: right;"><?= number_format(($total_apbd != 0) ? ($saldo_kumulatif / $total_apbd) * 100 : 0, 2) ?>%</td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                <?php
-                                endif;
+                            if ($row['issaldoawal'] == 1) {
                                 continue;
-                            endif;
-        
-                            $saldo_kumulatif += $row['jumlah'];
+                            }
                             $total_hari_ini += $row['jumlah'];
+                        endforeach;
+                    endforeach;
+
+                    $bulan_saat_ini = bulanKeIndonesia2($bulan);
+
+                    ?>
+                    <tr style="font-weight: bold;">
+                        <td style="text-align: center;"></td>
+                        <td style="text-align: left;"><?= htmlspecialchars($bulan_saat_ini) ?></td>
+                        <td style="text-align: right;">01</td>
+                        <td style="text-align: left;">Saldo Awal</td>
+                        <td style="text-align: center;"></td>
+                        <td style="text-align: right;"><?= number_format($total_hari_ini, 2) ?></td> 
+                        <td style="text-align: right;"><?= number_format($saldo_kumulatif, 2) ?></td>
+                        <td style="text-align: right;"><?= number_format(($total_apbd != 0) ? ($saldo_kumulatif / $total_apbd) * 100 : 0, 2) ?>%</td>
+                        <td></td>
+                    </tr>
+                    
+                    <?php
+                    $row_number = 1;
+                    foreach ($nmrekening_data as $nmrekening => $rows):
+                        foreach ($rows as $row):
+                            if ($row['issaldoawal'] == 1) {
+                                continue;
+                            }
+
+                            $saldo_kumulatif += $row['jumlah'];
                             $persentase = ($total_apbd != 0) ? ($saldo_kumulatif / $total_apbd) * 100 : 0;
-        
+
                             $bulan_pajak = substr($row['masapajak'], 0, 2);
                             $tahun_pajak = substr($row['masapajak'], 2);
-                            $masapajak_format = bulanKeIndonesia($bulan_pajak) . ' ' . $tahun_pajak;
+                            $masapajak_format = bulanKeIndonesia($bulan_pajak) . '' . $tahun_pajak;
                             ?>
                             <tr>
-                                <td style="text-align: center;"><?= $no++ ?></td>
-                                <td style="text-align: right;"><?= htmlspecialchars(date('d', strtotime($row['tanggal']))) ?></td>
+                                <td style="text-align: center;"><?= $row_number++ ?></td>
+                                <td colspan="2" style="text-align: right;"><?= htmlspecialchars(date('d', strtotime($row['tanggal']))) ?></td>
                                 <td style="text-align: left;"><?= htmlspecialchars($row['nmwp']) ?></td>
                                 <td style="text-align: center;"><?= $masapajak_format ?></td>
                                 <td style="text-align: right;"><?= number_format($row['jumlah'], 2) ?></td>
                                 <td style="text-align: right;"><?= number_format($saldo_kumulatif, 2) ?></td>
                                 <td style="text-align: right;"><?= number_format($persentase, 2) ?>%</td>
-                                <td colspan="2" style="text-align: left;"><?= htmlspecialchars($row['keterangan']) ?></td>
+                                <td style="text-align: left;"><?= htmlspecialchars($row['keterangan']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endforeach; ?>
-                <?php endforeach; ?>
-            <?php endforeach; ?>
+
+                    <?php
+                    $total_hari_ini_per_month[$tahun][$bulan] = $total_hari_ini;
+
+                    $next_month = str_pad($bulan + 1, 2, '0', STR_PAD_LEFT);
+                    if ($next_month <= '12') {
+                        $previous_month[$tahun][$next_month] = $saldo_kumulatif;
+                    }
+                endforeach;
+            endforeach;
+
+            $total_hari_ini_keseluruhan = array_sum(array_map('array_sum', $total_hari_ini_per_month));
+            ?>
+            
             <tr style="font-weight: bold;">
                 <td></td>
-                <td></td>
+                <td colspan="2"></td>
                 <td style="text-align: right;">Jumlah</td>
                 <td></td>
-                <td><?= number_format($total_hari_ini, 2) ?></td>
+                <td><?= number_format($total_hari_ini_keseluruhan, 2) ?></td>
                 <td><?= number_format($saldo_kumulatif, 2) ?></td>
                 <td style="text-align: right;"><?= number_format(($total_apbd != 0) ? ($saldo_kumulatif / $total_apbd) * 100 : 0, 2) ?>%</td>
                 <td></td>
@@ -256,6 +269,7 @@
                 <td colspan="9" style="text-align: center;">Tidak Ada Data</td>
             </tr>
         <?php endif; ?>
+
 
         </tbody>
     </table>

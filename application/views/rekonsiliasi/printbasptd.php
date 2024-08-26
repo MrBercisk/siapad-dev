@@ -6,6 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            padding: 10px;
         }
         .header {
             text-align: center;
@@ -51,6 +52,8 @@
         tbody td {
             text-align: right;
             padding: 5px;
+            text-wrap: nowrap;
+
         }
         tbody td:first-child,
         tbody td:nth-child(2) {
@@ -266,7 +269,7 @@ function hari_ini($hari)
     <thead>
         <tr>
             <th rowspan="2">N0</th>
-            <th colspan="14">KODE SPTPD DITERBITKAN BULAN <?= strtoupper($format_bulan); ?> s.d. <?= strtoupper($format_bulan_akhir); ?> <?= $format_tahun;?></th>
+            <th colspan="14">SPTPD DITERBITKAN BULAN <?= strtoupper($format_bulan); ?> s.d. <?= strtoupper($format_bulan_akhir); ?> <?= $format_tahun;?></th>
             <th colspan="8">SSPD/STS TERBAYAR BULAN <?= strtoupper($format_bulan); ?> s.d. <?= strtoupper($format_bulan_akhir); ?> <?= $format_tahun;?></th>
             <th colspan="3">SELISIH SPTPD DENGAN SSPD/STS</th>
             <th rowspan="2">KETERANGAN</th>
@@ -302,25 +305,29 @@ function hari_ini($hari)
     </thead>
     <tbody>
 
-           
-    <tr>
-            <th colspan="12">Data SPTPD Terbit</th>
-        </tr>
-        <?php if (!empty($data_terbit)): ?>
-            <?php foreach ($data_terbit as $row): ?>
+        <?php if (!empty($tablenya)): 
+            $no = 1;
+            ?>
+            <?php foreach ($tablenya as $row):
+                
+                ?>
                 <tr>
-                    <td><?php echo $row['nomor']; ?></td>
-                    <td><?php echo $row['nama']; ?></td>
-                    <td><?php echo $row['alamat']; ?></td>
-                    <td><?php echo $row['npwpd']; ?></td>
-                    <td><?php echo $row['masabulan']; ?></td>
-                    <td><?php echo $row['thnpajak']; ?></td>
-                    <td><?php echo $row['pokok']; ?></td>
-                    <td><?php echo $row['denda']; ?></td>
-                    <td><?php echo $row['total']; ?></td>
-                    <td><?php echo $row['keterangan']; ?></td>
-                    <td><?php echo $row['sspd']; ?></td>
-                    <td><?php echo $row['tgl_bayar']; ?></td>
+                    <td><?= $no++ ?></td>
+                    <td style="text-align: left;"><?= $row['nopelaporan']; ?></td>
+                    <td style="text-align: left;"><?= $row['npwpd']; ?></td>
+                    <td style="text-align: left;"><?= $row['nama']; ?></td>
+                    <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                    <td style="text-align: left;"><?= $row['alamat']; ?></td>
+                    <td><?= $row['thnpajak']; ?></td>
+                    <td><?= bulan_tanggal($row['masabulan']); ?></td>
+                   
+                    <td><?= $row['tgl_input']; ?></td>
+                    <td><?= number_format($row['pokok'], 2); ?></td>
+                    <td><?= number_format($row['denda'], 2); ?></td>
+                    <td><?= number_format($row['total'], 2); ?></td> 
+                    <td><?= $row['kodebayar']; ?></td> 
+                    <td><?= $row['tgl_bayar']; ?></td>
+                    <td><?= ($row['tgl_bayar'] == '0000-00-00' ? 'Belum Lunas' : 'Lunas') ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>

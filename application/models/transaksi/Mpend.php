@@ -167,21 +167,18 @@ class Mpend extends CI_Model
     }
 
     public function get_idwp_by_namaop($namaop) {
-        // Query untuk mencari idwp berdasarkan namaop
-        $this->db->select('id'); // Ganti 'id' sesuai dengan kolom yang menyimpan idwp
-        $this->db->from('mst_wajibpajak'); // Ganti 'mst_wajibpajak' sesuai dengan nama tabel yang benar
-        $this->db->where('nama', $namaop); // Ganti 'namawp' sesuai dengan kolom yang menyimpan nama WP
+        $this->db->select('id'); 
+        $this->db->from('mst_wajibpajak'); 
+        $this->db->where('nama', $namaop);
 
-        // Lakukan query dan ambil hasilnya
         $query = $this->db->get();
-        
-        // Periksa apakah hasil query mengembalikan baris data
+
         if ($query->num_rows() > 0) {
-            // Ambil idwp dari hasil query
+
             $row = $query->row();
-            return $row->id; // Mengembalikan nilai idwp
+            return $row->id; 
         } else {
-            return NULL; // Mengembalikan NULL jika tidak ditemukan idwp
+            return NULL; 
         }
     }
     public function databyid($id)

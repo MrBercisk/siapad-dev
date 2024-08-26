@@ -16,6 +16,8 @@ define('ENDPOINT_API_SIMPATDA_REKLAME', 'http://103.140.188.162:7073/GetReklame'
 define('ENDPOINT_API_SIMPATDA_SKPD_REKLAME', 'http://192.168.1.98/DevDispendaApi/BPPRDPayment/GetSIAPAD');
 define('ENDPOINT_API_SIMPATDA_SVR', 'http://192.168.1.98/DevDispendaApi/BPPRDPayment/GetSIAPAD');
 define('ENDPOINT_API_SIMPATDA_BPHTB', 'http://192.168.1.98/DevDispendaApi/BPPRDPayment/GetBPHTB/');
+define('ENDPOINT_API_SIAPAD_REKLAMEBAYAR', 'http://localhost/siapad-dev/api/apiReklame/GetReklame');
+
 
 
 defined('SHOW_DEBUG_BACKTRACE') OR define('SHOW_DEBUG_BACKTRACE', TRUE);

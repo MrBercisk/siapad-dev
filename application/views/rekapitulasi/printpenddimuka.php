@@ -169,7 +169,7 @@ if (!empty($tablenya)): ?>
             <td style="text-align: left;"><?= htmlspecialchars($row['nmwp']) ?></td>
             <td style="text-align: center;"><?= htmlspecialchars($row['uptd']) ?></td>
             <td style="text-align: center;"><?= htmlspecialchars($row['masapajak']) ?></td>
-            <td style="text-align: left;"><?= htmlspecialchars($row['nosspd']) ?></td>
+            <td style="text-align: center;"><?= htmlspecialchars($row['nosspd']) ?></td>
             <td style="text-align: right;" ><?= number_format($row['jumlah'],2) ?></td>
             <td style="text-align: right;" ><?= number_format($row['denda'],2)  ?></td>
             <td style="text-align: right;" ><?= number_format($row['total'],2)  ?></td>

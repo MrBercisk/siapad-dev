@@ -37,6 +37,19 @@ class Basptd extends CI_Controller {
         $tahun = $this->input->post('tahun');
         $bulan = $this->input->post('bulan');
         $bulanakhir = $this->input->post('bulanakhir');
+        $kdrekening = $this->input->post('kdrekening');
+
+        
+        $rekeningCumaIni = array(
+            '4.1.1.01' => 'Pajak Hotel',
+            '4.1.1.02' => 'Pajak Restoran',
+            '4.1.1.03' => 'Pajak Hiburan',
+            '4.1.1.07' => 'Pajak Parkir',
+            '4.1.1.08' => 'Pajak Air Tanah',
+            '4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam'
+        );
+    
+        $nmrekening = isset($rekeningCumaIni[$kdrekening]) ? $rekeningCumaIni[$kdrekening] : 'Unknown';
 
         $tanda_tangan_1 = $this->input->post('tanda_tangan_1');
         $tanda_tangan_2 = $this->input->post('tanda_tangan_2');
@@ -44,20 +57,20 @@ class Basptd extends CI_Controller {
         $tanda_tangan_4 = $this->input->post('tanda_tangan_4');
         $tanda_tangan_5 = $this->input->post('tanda_tangan_5');
         
-        $tablenya = $this->MBasptd->cetaktotal($tahun, $bulan, $bulanakhir);
+        $tablenya = $this->MBasptd->cetaktotal($tahun, $bulan, $bulanakhir, $kdrekening);
 
-        $data_terbit = array_filter($tablenya, function($row) {
+     /*    $data_terbit = array_filter($tablenya, function($row) {
             return $row['tgl_bayar'] !== '0000-00-00';
         });
     
         $data_belum_kembali = array_filter($tablenya, function($row) {
             return $row['tgl_bayar'] === '0000-00-00';
-        });
+        }); */
 
-        echo '<pre>';
-        var_dump($tablenya);
+       /*  echo '<pre>';
+        var_dump($data_terbit);
         die();
-        echo '</pre>';
+        echo '</pre>'; */
         $tanda_tangan_data_1 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_1);
         $tanda_tangan_data_2 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_2);
         $tanda_tangan_data_3 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_3);
@@ -74,9 +87,10 @@ class Basptd extends CI_Controller {
             'format_bulan_akhir' => strftime('%B', strtotime("$tahun-$bulanakhir")),
             'format_tahun' => $tahun,
             'tglcetak' => $tglcetak,
-            'data_terbit' => $data_terbit,
-            'data_belum_kembali' => $data_belum_kembali,
-           /*  'tablenya' => $tablenya, */
+            'nmrekening' => $nmrekening ,
+           /*  'data_terbit' => $data_terbit,
+            'data_belum_kembali' => $data_belum_kembali, */
+            'tablenya' => $tablenya,
             'tgl_cetak_format' => strftime('%d %B %Y', strtotime($tglcetak)),
             'nama_1' => isset($tanda_tangan_data_1['nama']) ? $tanda_tangan_data_1['nama'] : '',
             'nip_1' => isset($tanda_tangan_data_1['nip']) ? $tanda_tangan_data_1['nip'] : '',

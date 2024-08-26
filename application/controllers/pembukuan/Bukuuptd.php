@@ -40,7 +40,7 @@ class Bukuuptd extends CI_Controller {
 		$iduptd = $this->input->post('iduptd');
 		
 		$tanda_tangan = $this->input->post('tanda_tangan');
-		$tablenya = $this->MBukuuptdbap->ambildata($tanggal,$iduptd);
+		$tablenya = $this->MBukuuptdbap->get_sts_data($tanggal,$iduptd);
 		
 		/* echo"<pre>";
 		var_dump($tablenya);

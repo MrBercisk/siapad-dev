@@ -29,7 +29,6 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed;
         }
         table, th, td {
             border: 1px solid black;
@@ -41,10 +40,12 @@
         }
         td {
             font-size: 10px;
+            text-wrap: nowrap;
+            padding: 2px;
         }
-        th {
+       /*  th {
             background-color: #f2f2f2;
-        }
+        } */
         tbody td {
             text-align: right;
         }
@@ -55,7 +56,7 @@
         .tgl_cetak p {
             text-align: center;
             margin-top: 50px;
-            margin-bottom: 110px;
+            margin-bottom: 20px;
             margin-right: 70px;
             position: relative;
             float: right;
@@ -64,19 +65,19 @@
         .signature {
             font-weight: bold;
             text-align: center;
-            margin-top: 60px;
+            margin-top: 30px;
             margin-right: 30px;
             position: relative;
             float: right;
             clear: both;
         }
         .signature .jabatan1 {
-            margin-top: 30px;
+            margin-top: 20px;
         }
         .signature .name {
             text-decoration: underline;
             font-weight: bold;
-            margin-top: 70px;
+            margin-top: 60px;
         }
     </style>
 </head>
@@ -94,7 +95,7 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
     <?php if(!empty($iduptd)) :?>
         <h3>UPT <?= $iduptd['nama']?></h3>
     <?php endif; ?>
-    <h3>PER TANGGAL : <?= $tgl_format; ?></h3>
+    <h3>PER TANGGAL <?= $tgl_format; ?></h3>
 </div>
 <table>
     <thead>
@@ -130,32 +131,32 @@ $tanggal_sebelumnya = strftime('%d %B %Y', strtotime('-1 day'));
             ?>
                     
             <tr>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['nomor']) ?></td>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['kdrekening']) ?></td>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['nmrekening']) ?></td>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['nmwp']) ?></td>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['masapajak']) ?></td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($row['total'],2) ?></td>
-                <td style="text-align: left; padding:5px;" ><?= htmlspecialchars($row['keterangan']) ?></td>
+                <td style="text-align: left; "><?= htmlspecialchars($row['nomor']) ?></td>
+                <td style="text-align: left; "><?= htmlspecialchars($row['kdrekening']) ?></td>
+                <td style="text-align: left; "><?= htmlspecialchars($row['nmrekening']) ?></td>
+                <td style="text-align: left; "><?= htmlspecialchars($row['nmwp']) ?></td>
+                <td style="text-align: center; "><?= htmlspecialchars($row['masapajak']) ?></td>
+                <td style="text-align: right; "><?= number_format($row['total'],2) ?></td>
+                <td style="text-align: left; "><?= htmlspecialchars($row['keterangan']) ?></td>
             </tr>
             <?php endforeach; ?>
             <tr>
-                <td colspan="5" style="font-weight: bold;">JUMLAH PER </td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($total_jmlhariini) ?></td>
+                <td colspan="5" style="font-weight: bold;">PENERIMAAN HARI INI</td>
+                <td style="text-align: right; font-weight: bold;" ><?= number_format($total_jmlhariini, 2) ?></td>
                 <td></td>
 
                
             </tr>
             <tr>
-                <td colspan="5" style="font-weight: bold;">JUMLAH S.D  </td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($total_sampai_bulan) ?></td>
+                <td colspan="5" style="font-weight: bold;">PENERIMAAN HARI LALU  </td>
+                <td style="text-align: right; font-weight: bold;" ><?= number_format($total_sampai_bulan, 2) ?></td>
                 <td></td>
            
             
             </tr>
             <tr>
-                <td colspan="5" style="font-weight: bold;">JUMLAH PER  </td>
-                <td style="text-align: right; padding:5px;" ><?= number_format($total_seluruh) ?></td>
+                <td colspan="5" style="font-weight: bold;">PENERIMAAN S.D HARI INI  </td>
+                <td style="text-align: right; font-weight: bold;" ><?= number_format($total_seluruh, 2) ?></td>
                 <td></td>
                
            

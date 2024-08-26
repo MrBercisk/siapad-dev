@@ -245,5 +245,5 @@ class Mbyrskpd extends CI_Model {
                         ->row();
     }
     
-    
+   
 }
