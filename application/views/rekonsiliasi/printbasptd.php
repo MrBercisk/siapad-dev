@@ -305,11 +305,50 @@ function hari_ini($hari)
     </thead>
     <tbody>
 
-        <?php if (!empty($tablenya)): 
+        <?php 
+        function bulan_indonesia($bulan)
+        {
+            $bulan_arr = array(
+                '01' => 'Januari',
+                '02' => 'Februari',
+                '03' => 'Maret',
+                '04' => 'April',
+                '05' => 'Mei',
+                '06' => 'Juni',
+                '07' => 'Juli',
+                '08' => 'Agustus',
+                '09' => 'September',
+                '10' => 'Oktober',
+                '11' => 'November',
+                '12' => 'Desember'
+            );
+        
+            return $bulan_arr[$bulan] ?? $bulan;  
+        }
+        if (!empty($tablenya)): 
             $no = 1;
+            $totalpokok = 0;
+            $totaldenda = 0;
+            $totalseluruh = 0;
+            $totalpokoksts = 0;
+            $totaldendasts = 0;
+            $totalseluruhsts = 0;
             ?>
             <?php foreach ($tablenya as $row):
-                
+                   $selisihpokok = $row['pokok'] - $row['pokok_sts'];
+                   $selisihdenda = $row['denda'] - $row['denda_sts'];
+                   $selisihtotal = $row['total'] - $row['jumlah_sts'];
+                   $totalpokok += $row['pokok'];
+                   $totaldenda += $row['denda'];
+                   $totalseluruh += $row['total'];
+       
+                   $totalpokoksts += $row['pokok_sts'];
+                   $totaldendasts += $row['denda_sts'];
+                   $totalseluruhsts += $row['jumlah_sts'];
+       
+                   $totalselisihpokok =  $totalpokok - $totalpokoksts;
+                   $totalselisihdenda =  $totaldenda - $totaldendasts;
+                   $totalselisihseluruh =  $totalseluruh - $totalseluruhsts;
                 ?>
                 <tr>
                     <td><?= $no++ ?></td>
@@ -319,15 +358,26 @@ function hari_ini($hari)
                     <td style="text-align: left;"><?= $row['namawp']; ?></td>
                     <td style="text-align: left;"><?= $row['alamat']; ?></td>
                     <td><?= $row['thnpajak']; ?></td>
-                    <td><?= bulan_tanggal($row['masabulan']); ?></td>
-                   
-                    <td><?= $row['tgl_input']; ?></td>
+                    <td><?= bulan_indonesia($row['masapajak']); ?></td>
+                    <td><?= $row['tglsts']; ?></td>
                     <td><?= number_format($row['pokok'], 2); ?></td>
                     <td><?= number_format($row['denda'], 2); ?></td>
                     <td><?= number_format($row['total'], 2); ?></td> 
                     <td><?= $row['kodebayar']; ?></td> 
-                    <td><?= $row['tgl_bayar']; ?></td>
-                    <td><?= ($row['tgl_bayar'] == '0000-00-00' ? 'Belum Lunas' : 'Lunas') ?></td>
+                    <td><?= $row['tglsts']; ?></td>
+                    <td><?= ($row['tglsts'] == '0000-00-00' ? 'Belum Lunas' : 'Lunas') ?></td>
+                    <td style="text-align: center;"><?= $row['tgl_bayar']; ?></td>
+                    <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                    <td style="text-align: center;"><?= $row['namauptd']; ?></td>
+                    <td style="text-align: left;"><?= $row['blnpajak']; ?>-<?= $row['thnpajak']; ?></td>
+                    <td style="text-align: left;"><?= $row['sspd']; ?></td>
+                    <td style="text-align: right;"><?= number_format($row['pokok_sts'], 2); ?></td>
+                    <td style="text-align: right;"><?= number_format($row['denda_sts'], 2); ?></td>
+                    <td style="text-align: right;"><?= number_format($row['jumlah_sts'], 2); ?></td>
+                    <td style="text-align: right;"><?= number_format($selisihpokok, 2); ?></td>
+                    <td style="text-align: right;"><?= number_format($selisihdenda, 2); ?></td>
+                    <td style="text-align: right;"><?= number_format($selisihtotal, 2); ?></td>
+                    <td style="text-align: left;"><?= $row['keterangan']; ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
@@ -335,40 +385,35 @@ function hari_ini($hari)
                 <td colspan="12">Tidak ada data yang terbit.</td>
             </tr>
         <?php endif; ?>
-
-        <!-- Data yang belum kembali -->
         <tr>
-            <th colspan="12">Data SPTPD Belum Kembali</th>
-        </tr>
-        <?php if (!empty($data_belum_kembali)): ?>
-            <?php foreach ($data_belum_kembali as $row): ?>
-                <tr>
-                    <td><?php echo $row['nomor']; ?></td>
-                    <td><?php echo $row['nama']; ?></td>
-                    <td><?php echo $row['alamat']; ?></td>
-                    <td><?php echo $row['npwpd']; ?></td>
-                    <td><?php echo $row['masabulan']; ?></td>
-                    <td><?php echo $row['thnpajak']; ?></td>
-                    <td><?php echo $row['pokok']; ?></td>
-                    <td><?php echo $row['denda']; ?></td>
-                    <td><?php echo $row['total']; ?></td>
-                    <td><?php echo $row['keterangan']; ?></td>
-                    <td><?php echo $row['sspd']; ?></td>
-                    <td><?php echo $row['tgl_bayar']; ?></td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="12">Tidak ada data yang belum kembali.</td>
-            </tr>
-        <?php endif; ?>
+        <td colspan=9" style="font-weight: bold;">JUMLAH</td>
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokok, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldenda, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruh, 2); ?></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokoksts, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldendasts, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruhsts, 2); ?></td>
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihpokok, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihdenda, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihseluruh, 2); ?></td>
+        <td></td>
+    </tr>
+    
 
 
      </tbody>
 
 
 </table>
-<table  width="900" cellpadding="2">
+<table  width="800" cellpadding="2" border="0">
     <tr>
         <td width="900">
             <table align="center">

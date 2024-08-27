@@ -57,7 +57,7 @@ class Basptd extends CI_Controller {
         $tanda_tangan_4 = $this->input->post('tanda_tangan_4');
         $tanda_tangan_5 = $this->input->post('tanda_tangan_5');
         
-        $tablenya = $this->MBasptd->cetaktotal($tahun, $bulan, $bulanakhir, $kdrekening);
+        $tablenya = $this->MBasptd->ambildata($tahun, $bulan, $bulanakhir, $kdrekening);
 
      /*    $data_terbit = array_filter($tablenya, function($row) {
             return $row['tgl_bayar'] !== '0000-00-00';
@@ -123,7 +123,7 @@ class Basptd extends CI_Controller {
         $dompdf->render();
         $dompdf->stream("basptdsspd.pdf", array("Attachment" => 0)); */
     }
-    
+
 
 }
 

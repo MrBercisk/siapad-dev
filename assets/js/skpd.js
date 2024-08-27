@@ -1275,3 +1275,45 @@ $('#fetchTableButtonNya').on('click', function(e) {
 });
 
 });
+
+$('#forminput').on('submit', function(e) {
+    e.preventDefault();
+
+    $.ajax({
+        type: 'POST',
+        url: 'PendDaerah/add_record_data',
+        data: $(this).serialize(),
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#addDataModal').modal('hide');
+                        window.location.href = 'PendDaerah';
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: response.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Something went wrong. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
+/* End add */

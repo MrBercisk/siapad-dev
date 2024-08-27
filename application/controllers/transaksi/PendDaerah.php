@@ -352,7 +352,7 @@ class PendDaerah extends CI_Controller {
         public function update_record_data() {
             
             $idrecord = $this->input->post('id');
-            $isnonkas = $this->input->post('isnonkas') ? 1 : 0;
+            $isnonkas = $this->input->post('isnonkas') ? $this->input->post('isnonkas') : 0;
             $iddinas = $this->input->post('iddinas');
             $tanggal = $this->input->post('tanggal');
             $tahun = date('Y', strtotime($tanggal));
@@ -362,12 +362,8 @@ class PendDaerah extends CI_Controller {
             $this->db->where('id', $iddinas);
             $isdispenda_result = $this->db->get()->row();
         
-            if ($isdispenda_result) {
-                $isdispenda = $isdispenda_result->isdispenda;
-            } else {
-                $isdispenda = 0; 
-            }
-        
+            $isdispenda = $isdispenda_result ? $isdispenda_result->isdispenda : 0;
+            
             $data = [
                 'iddinas' => $iddinas,
                 'nomor' => $this->input->post('nomor'),
@@ -800,40 +796,69 @@ class PendDaerah extends CI_Controller {
                   echo $prettyResponse;
               }
           
-              // Menutup koneksi Curl
               curl_close($curl);
           }
-          
-          
-          public function getapisimpadabphtb()
-          {
-               $noformulir = empty($this->input->get('noformulir')) ? 0 : $this->input->get('noformulir');
-               
-               $urlApi = ENDPOINT_API_SIMPATDA_BPHTB . "?noformulir=$noformulir";
-
-               $data = [
-                'kodebayar' => $noformulir
-                ];
-                $payload = json_encode($data);
-                $curl = curl_init($urlApi);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-                curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-
-                $response = curl_exec($curl);
-                if (curl_errno($curl)) {
-                    echo "Terjadi Kesalahan pada Curl: " . curl_error($curl);
+          public function check_nobukti() {
+            if ($this->input->is_ajax_request() && $this->input->method() == 'post') {
+                $nobukti = $this->input->post('nobukti');
+                $kodebayar = $this->input->post('kodebayar');
+        
+                $this->db->where('nobukti', $nobukti);
+                $this->db->where('kodebayar', $kodebayar);
+                $query = $this->db->get('trx_stsdetail');
+        
+                if ($query->num_rows() > 0) {
+                    $response = ['exists' => true];
                 } else {
-                    $responseData = json_decode($response, true);
-                    $prettyResponse = json_encode($responseData, JSON_PRETTY_PRINT); 
-                    echo $prettyResponse;
+                    $response = ['exists' => false];
                 }
-
-                // Menutup koneksi Curl
-                curl_close($curl);     
-                
+                echo json_encode($response);
+            } else {
+                echo json_encode(['error' => 'Rquest gagal']);
             }
+        }
+        
+          
+        public function getapisimpadabphtb()
+        {
+            $noformulir = $this->input->get('noformulir', TRUE);
+        
+            $data = array(
+                'kodebayar' => $noformulir
+            );
+        
+            $payload = json_encode($data);
+        
+            $ch = curl_init('http://192.168.1.98/DevDispendaApi/BPPRDPayment/GetBPHTB/');
+
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_error($ch);
+        
+            $result = curl_exec($ch);
+    
+            if (curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+        
+                echo json_encode(array('success' => false, 'message' => 'cURL Error: ' . $error_msg));
+                return;
+            }
+        
+            curl_close($ch);
+
+            $response = json_decode($result, true);
+        
+            if ($response === null) {
+                echo json_encode(array('success' => false, 'message' => 'Invalid JSON response from API'));
+                return;
+            }
+
+            echo json_encode(array('success' => true, 'data' => $response));
+        }
+        
             
 
 }

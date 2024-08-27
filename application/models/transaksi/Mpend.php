@@ -158,6 +158,13 @@ class Mpend extends CI_Model
         
         return $query->num_rows() > 0; 
     }
+    public function checkNobukti($nobukti)
+    {
+        $this->db->where('nobukti', $nobukti);
+        $query = $this->db->get('trx_stsdetail'); 
+        
+        return $query->num_rows() > 0; 
+    }
     public function check_duplicate_record($nomor) {
         $this->db->from('trx_stsmaster');
         $this->db->where('nomor', $nomor);

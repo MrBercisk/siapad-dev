@@ -1,6 +1,47 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class MRekonsptd extends CI_Model {
-    public function ambildata($tahun,$bulan) {
+    public function ambildata($tahun, $kdrekening)
+    {
+        $query = $this->db
+            ->select("
+                a.thnpajak AS thnpajak,
+                a.nomor,
+                a.tgl_input,
+                b.nama AS namawp,
+                b.alamat,
+                b.nomor AS npwpd,
+                a.blnpajak AS masapajak,
+                a.pokok AS pokok,
+                a.denda AS denda,
+                a.jumlah AS total,
+                a.keterangan AS keterangan,
+                d.nobukti AS sspd,
+                d.nopelaporan,
+                d.kodebayar,
+                d.tgl_input AS tgl_bayar,
+                d.jumlah AS pokok_sts,
+                d.nil_denda AS denda_sts,
+                d.total AS jumlah_sts,
+                d.iduptd,
+                d.blnpajak,
+                d.thnpajak,
+                e.singkat as namauptd,
+                d.keterangan AS keterangan_sts", false)
+            ->join('mst_wajibpajak b', 'b.id = a.idwp', 'INNER')
+            ->join('mst_rekening c', 'c.id = a.idrekening', 'INNER')
+            ->join('trx_stsdetail d', 'd.idwp = a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'LEFT')
+            ->join('mst_uptd e', 'e.id = d.iduptd', 'LEFT')
+            ->where('a.thnpajak', $tahun)
+            ->where("c.kdrekening LIKE", "{$kdrekening}%")
+            ->order_by("namawp")
+            ->get('trx_sptpd a');
+        
+        $result = $query->result_array();
+        return $result;
+    }
+
+    
+  /*   public function ambildata($tahun,$bulan) {
         $mysqli = $this->db->conn_id; 
  
         $statment = $mysqli->prepare("CALL spRptRekonBPKADLampiran(?, ?)");
@@ -20,7 +61,7 @@ class MRekonsptd extends CI_Model {
     
         return $data;
    
-    }
+    } */
 
 
     public function formInsert() {
@@ -39,7 +80,7 @@ class MRekonsptd extends CI_Model {
         
         <div class="card">
             <div class="card-body">
-                <form action="' . site_url('rekonsiliasi/rekonsptd/cetak') . '" class="form-row" method="post">
+                <form  id="reportForm" action="' . site_url('rekonsiliasi/rekonsptd/cetak') . '" class="form-row" method="post"  onsubmit="printForm(); return false;">
                 <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                 </div>
@@ -68,7 +109,7 @@ class MRekonsptd extends CI_Model {
                         </div>
                     </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                         <div class="form-group">
                             <label for="ttd">Tanda Tangan:</label>
                               <select id="tanda_tangan" name="tanda_tangan" class="form-control select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;">
@@ -79,6 +120,15 @@ class MRekonsptd extends CI_Model {
         
                 </div>
                 <div class="row">
+                  <div class="col-md-2">
+                        <label class="form-check-label" for="ttd">Penandatangan</label>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="ttd_checkbox" name="ttd_checkbox">
+                                <label class="form-check-label" for="ttd">Ttd</label>
+                            </div>
+                        </div>
+                    </div>
 				    <div class="col-md-1 mt-3">
                         <div class="button-group mt-2">
                             <button type="submit" class="btn btn-primary">Cetak Laporan</button>
@@ -88,8 +138,71 @@ class MRekonsptd extends CI_Model {
                 </div>
                       
                 </form>
+                  <div id="loadingSpinner" style="display:none; text-align:center; margin-top: 20px;">
+                <img src="' . base_url('/assets/img/load2.gif') . '" alt="Loading..." />
+                 <p>Silahkan tunggu...</p>
             </div>
-        </div>';
+            </div>
+        </div>
+         <style>
+        #loadingSpinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            text-align: center;
+            width: 200px;
+        }
+        #loadingSpinner img {
+            width: 120px; 
+            height: 120px; 
+        }
+        #loadingSpinner p {
+            margin-top: 20px;
+            font-size: 16px;
+            color: black; 
+        }
+    </style>
+      <script>
+       function printForm() {
+        var form = document.getElementById("reportForm");
+        var formData = new FormData(form);
+        var loadingSpinner = document.getElementById("loadingSpinner");
+        var printWindow;
+
+        loadingSpinner.style.display = "block";
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", form.action, true);
+        xhr.onload = function () {
+            loadingSpinner.style.display = "none";
+
+            if (xhr.status === 200) {
+                if (printWindow && !printWindow.closed) {
+                    printWindow.focus();
+                    printWindow.document.open();
+                    printWindow.document.write(xhr.responseText);
+                    printWindow.document.close();
+                } else {
+                    printWindow = window.open("", "", "width=800,height=600");
+                    printWindow.document.open();
+                    printWindow.document.write("<html><head><title>SIAPAD - Rekonsiliasi SPTD & SSPD Per Pajak </title>");
+                    printWindow.document.write("<style>body{font-family:Arial,sans-serif; padding: 20px;} table{width: 100%; border-collapse: collapse;} th, td{border: 1px solid black; padding: 8px; text-align: left;}</style>");
+                    printWindow.document.write("</head><body>");
+                    printWindow.document.write(xhr.responseText);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                }
+            } else {
+                alert("An error occurred during the request.");
+            }
+        };
+        xhr.send(formData);
+    }
+    </script>
+        ';
         return $form;
     }
 

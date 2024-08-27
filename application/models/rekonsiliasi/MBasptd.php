@@ -37,7 +37,90 @@ class MBasptd extends CI_Model {
         $result = $query->result_array();
         return $result;
     }
+    public function ambildata($tahun, $bulan, $bulanakhir, $kdrekening)
+    {
+        $query = $this->db
+            ->select("
+                a.thnpajak AS thnpajak,
+                a.nomor,
+                a.tgl_input as tglsts,
+                b.pemilik as nama,
+                b.nama AS namawp,
+                b.alamat,
+                b.nomor AS npwpd,
+                a.blnpajak AS masapajak,
+                a.pokok AS pokok,
+                a.denda AS denda,
+                a.jumlah AS total,
+                a.keterangan AS keterangan,
+                d.nobukti AS sspd,
+                d.nopelaporan,
+                d.kodebayar,
+                d.tgl_input AS tgl_bayar,
+                d.jumlah AS pokok_sts,
+                d.nil_denda AS denda_sts,
+                d.total AS jumlah_sts,
+                d.iduptd,
+                d.blnpajak,
+                d.thnpajak,
+                e.singkat as namauptd,
+                d.keterangan AS keterangan_sts", false)
+            ->join('mst_wajibpajak b', 'b.id = a.idwp', 'INNER')
+            ->join('mst_rekening c', 'c.id = a.idrekening', 'INNER')
+            ->join('trx_stsdetail d', 'd.idwp = a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'LEFT')
+            ->join('mst_uptd e', 'e.id = d.iduptd', 'LEFT')
+            ->where('a.thnpajak', $tahun)
+            ->where('a.blnpajak >=', $bulan)
+            ->where('a.blnpajak <=', $bulanakhir)
+            ->where("c.kdrekening LIKE", "{$kdrekening}%")
+           /* Hanya data yang ada selisih */
+            ->group_start()
+                ->where('a.pokok != d.jumlah')
+                ->or_where('a.denda != d.nil_denda')
+                ->or_where('a.jumlah != d.total')
+            ->group_end()
+            ->order_by("namawp")
+            ->get('trx_sptpd a');
+        
+        $result = $query->result_array();
+        return $result;
+    }
     
+
+       public function getdata($tahun, $bulan, $bulanakhir, $kdrekening)
+    {
+        $query = $this->db->select("
+            b.tanggal as tgl_bayar,
+            a.nopelaporan,
+            c.npwpd,
+            c.pemilik as namawp,
+            c.alamat,
+            a.tgl_input,
+            c.nama,
+            a.total,
+            a.nil_denda AS denda,
+            a.jumlah AS pokok,
+            a.blnpajak AS masabulan,
+            a.thnpajak AS thnpajak,
+            a.kodebayar,
+            b.keterangan AS keterangan,
+   
+          ", false)
+            ->join('trx_stsmaster b', 'b.id=a.idstsmaster', 'INNER')
+            ->join('mst_wajibpajak c', 'c.id=a.idwp', 'INNER')
+            ->join('trx_rapbd d', 'd.id=a.idrapbd', 'INNER')
+            ->join('mst_rekening e', 'e.id=d.idrekening', 'INNER')
+            ->join('trx_sptpd f', 'f.idwp=a.idwp AND f.blnpajak = a.blnpajak AND f.thnpajak = a.thnpajak', 'left')
+            ->where('YEAR(a.tgl_input)', $tahun)
+            ->where('MONTH(f.tanggal) >=', $bulan)
+            ->where('MONTH(f.tanggal) <=', $bulanakhir)
+            ->where("e.kdrekening LIKE", "{$kdrekening}%")
+            ->order_by('namawp')
+            ->get('trx_stsdetail a');
+            
+        $result = $query->result_array();
+        return $result;
+    }
 
    
     public function formInsert() {

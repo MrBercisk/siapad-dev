@@ -9,7 +9,7 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 60px;
         }
         .header img {
             max-width: 100px;
@@ -41,9 +41,11 @@
         }
         th {
             background-color: #f2f2f2;
+            text-wrap: nowrap;
         }
         tbody td {
             text-align: right;
+            text-wrap: nowrap;
             padding: 5px;
         }
         tbody td:first-child,
@@ -56,48 +58,27 @@
    
         }
         .tgl_cetak p {
-            font-size: 12px;
             text-align: center;
             margin-top: 50px;
             margin-bottom: 50px;
-            margin-right: 50px;
+            margin-right: 70px;
             position: relative;
             float: right;
             clear: both;
-        }
-        .footer-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-         }
-     
-        .signature2 {
             font-size: 12px;
+        }
+        .signature {
             font-weight: bold;
             text-align: center;
             margin-top: 60px;
-            margin-right: 30px;
+            margin-right: 20px;
             position: relative;
             float: right;
             clear: both;
-        }
-        .signature2 .jabatan1 {
-            margin-top: 10px;
-        }
-        .signature2 .name {
-            text-decoration: underline;
-            font-weight: bold;
-            margin-top: 70px;
-        }
-        .signature {
             font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 40px;
-            margin-left: 30px;
-            position: relative;
-            float: left;
-            clear: both;
+        }
+        .signature .jabatan1 {
+            margin-top: 30px;
         }
         .signature .name {
             text-decoration: underline;
@@ -154,7 +135,7 @@ function terbilang($nilai)
 function bulan_indo($tanggal)
 {
     $bulan = array(
-        1 =>   'Januari',
+        '01' =>   'Januari',
         'Februari',
         'Maret',
         'April',
@@ -243,240 +224,213 @@ function hari_ini($hari)
 <div class="header">
     <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo">
     <h2>PEMERINTAH KOTA BANDAR LAMPUNG</h2>
-    <h3>BERITA ACARA REKONSILIASI BIDANG PEMBUKUAN DAN PELAPORAN DENGAN BIDANG PAJAK</h3>
-    <h3>PEMBAYARAN SURAT PEMBERITAHUAN PAJAK DAERAH (SPTPD) PAJAK HOTEL, RESTORAN, HIBURAN DAN PARKIR</h3>
-    <h3>BULAN: <?= $format_bulan; ?> s.d. <?= $format_bulan_akhir; ?> <?= $format_tahun;?></h3>
-   
+    <h3>REKONSILIASI SURAT PEMBERITAHUAN PAJAK DAERAH (SPTPD) DAN SURAT SETORAN PAJAK DAERAH (SSPD)/SURAT TANDA SETORAN (STS)</h3>
+    <?php if (!empty($kdrekening)) : ?>
+        <h3> <?= strtoupper($kdrekening['nmrekening']) ?></h3>
+    <?php endif; ?>
 </div>
-<div class="sub-header">
-    <h3>Pada hari ini, <?= hari_ini($tglcetak) ?>, tanggal <?= tanggal_hari_ini($tglcetak) ?> , bulan <?= bulan_tanggal($tglcetak) ?> , 
-    <?= terbilang($format_tahun) ?>, telah dilakukan Rekonsiliasi Data Pembayaran Surat Pemberitahuan Pajak Daerah (SPTPD) Pajak Reklame, Air Tanah dan Mineral Bukan Logam dan Batuan yang Diterbitkan pada Bidang Pajak dengan Surat Setoran Pajak Daerah/Surat Tanda Setoran (SSPD/STS) Pajak Pajak Reklame, Air Tanah dan Mineral Bukan Logam dan Batuan Yang Diterima pada Bidang Bidang Pembukuan dan Pelaporan (Buklap) Badan Pendapatan Daerah (BAPENDA) Kota Bandar Lampung Bulan 
-    <?= $format_bulan; ?> s.d. <?= $format_bulan_akhir; ?> Tahun <?= terbilang($format_tahun) ?> dan diperoleh data Selisih SPTPD dan SSPD/STS, sebagai berikut :
-</h3>
-</div>
+
 
 <table>
   
     <thead>
         <tr>
             <th rowspan="2">N0</th>
-            <th colspan="14">KODE SPTPD DITERBITKAN BULAN <?= strtoupper($format_bulan); ?> s.d. <?= strtoupper($format_bulan_akhir); ?> <?= $format_tahun;?></th>
-            <th colspan="8">SSPD/STS TERBAYAR BULAN <?= strtoupper($format_bulan); ?> s.d. <?= strtoupper($format_bulan_akhir); ?> <?= $format_tahun;?></th>
+            <th colspan="11">SPTPD TERBAYAR S.D. BULAN DESEMBER <?= $format_tahun;?></th>
             <th colspan="3">SELISIH SPTPD DENGAN SSPD/STS</th>
+            <th colspan="8">SSPD/STS TERBAYAR S.D. BULAN DESEMBER 2024</th>
             <th rowspan="2">KETERANGAN</th>
         </tr>
         <tr>
+            <!-- <th>Jenis Pajak</th> -->
             <th>No. Pelaporan</th>
             <th>NPWPD</th>
             <th>Nama Pajak</th>
-            <th>Nama WP</th>
-            <th>Alamat OP</th>
             <th>Tahun Pajak</th>
             <th>Masa Pajak</th>
-            <th>Tanggal Disetujui</th>
             <th>Pokok</th>
             <th>Denda</th>
             <th>Total</th>
             <th>Kode Bayar</th>
             <th>Tanggal Bayar</th>
             <th>Status</th>
-            <th>TANGGAL TRANSAKSI</th>
-            <th>NAMA OBJEK PAJAK</th>
+            <th>Pokok</th>
+            <th>Denda</th>
+            <th>Jumlah</th>
+            <th>Tanggal Transaksi</th>
+            <th>Nama Objek Pajak</th>
             <th>UPTD</th>
-            <th>MASA PAJAK</th>
+            <th>Masa Pajak</th>
             <th>NO. SSPD/STS</th>
-            <th>POKOK</th>
-            <th>DENDA</th>
-            <th>JUMLAH</th>
-            <th>POKOK</th>
-            <th>DENDA</th>
-            <th>JUMLAH</th>
+            <th>Pokok</th>
+            <th>Denda</th>
+            <th>Jumlah</th>
    
         </tr>
     </thead>
     <tbody>
     <?php
-    $totalApbd = 0;
-    $totalApbdp = 0;
-    $totalBap = 0;
-    $totalBpkad = 0;
-    $totalSelisih = 0;
-    $groupedData = [];
-
-    if (!empty($tablenya)) {
-        foreach ($tablenya as $tbl) {
-            $selisihnya = $tbl['dipenda'] - $tbl['bpkad'];
-            if (!isset($groupedData[$tbl['nmrek2']])) {
-                $groupedData[$tbl['nmrek2']] = [
-                    'kdrek2' => $tbl['kdrek2'],
-                    'totalApbd' => 0,
-                    'totalApbdp' => 0,
-                    'totalBap' => 0,
-                    'totalBpkad' => 0,
-                    'totalSelisih' => 0,
-                    'subTotals' => []
-                ];
-            }
+    function bulan_indonesia($bulan)
+    {
+        $bulan_arr = array(
+            '01' => 'Januari',
+            '02' => 'Februari',
+            '03' => 'Maret',
+            '04' => 'April',
+            '05' => 'Mei',
+            '06' => 'Juni',
+            '07' => 'Juli',
+            '08' => 'Agustus',
+            '09' => 'September',
+            '10' => 'Oktober',
+            '11' => 'November',
+            '12' => 'Desember'
+        );
     
-            if (!isset($groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']])) {
-                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']] = [
-                    'kdrek3' => $tbl['kdrek3'],
-                    'totalApbd' => 0,
-                    'totalApbdp' => 0,
-                    'totalBap' => 0,
-                    'totalBpkad' => 0,
-                    'totalSelisih' => 0,
-                    'subTotals' => []
-                ];
-            }
-    
-            if (!isset($groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']])) {
-                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']] = [
-                    'kdrek4' => $tbl['kdrek4'],
-                    'nmrek4' => $tbl['nmrek4'],
-                    'totalApbd' => 0,
-                    'totalApbdp' => 0,
-                    'totalBap' => 0,
-                    'totalBpkad' => 0,
-                    'totalSelisih' => 0,
-                    'subSubTotals' => []
-                ];
-            }
-            if (!isset($groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']])) {
-                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']] = [
-                    'kdrek5' => $tbl['kdrek5'],
-                    'nmrek5' => $tbl['nmrek5'],
-                    'apbd' => 0,
-                    'apbdp' => 0,
-                    'dipenda' => 0,
-                    'bpkad' => 0,
-                    'selisih' => 0
-                ];
-            }
-
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['apbd'] += $tbl['apbd'];
-            if ($apbdp_checkbox) {
-                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['apbdp'] += $tbl['apbdp'];
-            }
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['dipenda'] += $tbl['dipenda'];
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['bpkad'] += $tbl['bpkad'];
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['subSubTotals'][$tbl['kdrek5']]['selisih'] += $selisihnya;
-    
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['totalApbd'] += $tbl['apbd'];
-            if ($apbdp_checkbox) {
-                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['totalApbdp'] += $tbl['apbdp'];
-            }
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['totalBap'] += $tbl['dipenda'];
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['totalBpkad'] += $tbl['bpkad'];
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['subTotals'][$tbl['kdrek4']]['totalSelisih'] += $selisihnya;
-    
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['totalApbd'] += $tbl['apbd'];
-            if ($apbdp_checkbox) {
-                $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['totalApbdp'] += $tbl['apbdp'];
-            }
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['totalBap'] += $tbl['dipenda'];
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['totalBpkad'] += $tbl['bpkad'];
-            $groupedData[$tbl['nmrek2']]['subTotals'][$tbl['nmrek3']]['totalSelisih'] += $selisihnya;
-    
-            $groupedData[$tbl['nmrek2']]['totalApbd'] += $tbl['apbd'];
-            if ($apbdp_checkbox) {
-                $groupedData[$tbl['nmrek2']]['totalApbdp'] += $tbl['apbdp'];
-            }
-            $groupedData[$tbl['nmrek2']]['totalBap'] += $tbl['dipenda'];
-            $groupedData[$tbl['nmrek2']]['totalBpkad'] += $tbl['bpkad'];
-            $groupedData[$tbl['nmrek2']]['totalSelisih'] += $selisihnya;
-    
-            $totalApbd += $tbl['apbd'];
-            if ($apbdp_checkbox) {
-                $totalApbdp += $tbl['apbdp'];
-            }
-            $totalBap += $tbl['dipenda'];
-            $totalBpkad += $tbl['bpkad'];
-            $totalSelisih += $selisihnya;
-        }
+        return $bulan_arr[$bulan] ?? $bulan;  
     }
+    $bulan_indonesia = array(
+        'January' => 'Januari',
+        'February' => 'Februari',
+        'March' => 'Maret',
+        'April' => 'April',
+        'May' => 'Mei',
+        'June' => 'Juni',
+        'July' => 'Juli',
+        'August' => 'Agustus',
+        'September' => 'September',
+        'October' => 'Oktober',
+        'November' => 'November',
+        'December' => 'Desember'
+    );
 
-    if (!empty($groupedData)) {
-        foreach ($groupedData as $nmrek2 => $data) {
+    if (!empty($tablenya)):
+        $no = 1;
+        $v = [];
+        $baristanpdabeda = [];
+        $totalpokok = 0;
+        $totaldenda = 0;
+        $totalseluruh = 0;
+        $totalpokoksts = 0;
+        $totaldendasts = 0;
+        $totalseluruhsts = 0;
+      
+        foreach ($tablenya as $row):
+            $selisihpokok = $row['pokok'] - $row['pokok_sts'];
+            $selisihdenda = $row['denda'] - $row['denda_sts'];
+            $selisihtotal = $row['total'] - $row['jumlah_sts'];
+            $totalpokok += $row['pokok'];
+            $totaldenda += $row['denda'];
+            $totalseluruh += $row['total'];
+
+            $totalpokoksts += $row['pokok_sts'];
+            $totaldendasts += $row['denda_sts'];
+            $totalseluruhsts += $row['jumlah_sts'];
+
+            $totalselisihpokok =  $totalpokok - $totalpokoksts;
+            $totalselisihdenda =  $totaldenda - $totaldendasts;
+            $totalselisihseluruh =  $totalseluruh - $totalseluruhsts;
+    
+            if ($selisihpokok != 0 || $selisihdenda != 0 || $selisihtotal != 0) {
+                $v[] = $row;
+            } else {
+                $baristanpdabeda[] = $row;
+            }
+        endforeach;
+    
+      
+        foreach ($baristanpdabeda as $row):
+            $selisihpokok = $row['pokok'] - $row['pokok_sts'];
+            $selisihdenda = $row['denda'] - $row['denda_sts'];
+            $selisihtotal = $row['total'] - $row['jumlah_sts'];
             ?>
             <tr>
-                <td><?= htmlspecialchars($data['kdrek2']) ?></td>
-                <td><strong><?= htmlspecialchars($nmrek2) ?></strong></td>
-                <td><b><?= number_format($data['totalApbd'], 2) ?></b></td>
-                <?php if ($apbdp_checkbox): ?>
-                    <td><b><?= number_format($data['totalApbdp'], 2) ?></b></td>
-                <?php endif; ?>
-                <td><b><?= number_format($data['totalBap'], 2) ?></b></td>
-                <td><b><?= number_format($data['totalBpkad'], 2) ?></b></td>
-                <td><b><?= number_format($data['totalSelisih'], 2) ?></b></td>
-                <td><?= htmlspecialchars($tbl['keterangan']) ?></td>
-                <td></td>
+                <td><?= $no++ ?></td>
+                <td style="text-align: left;"><?= $row['nopelaporan']; ?></td>
+                <td style="text-align: left;"><?= $row['npwpd']; ?></td>
+                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: center;"><?= $row['thnpajak']; ?></td>
+                <td style="text-align: center;"><?= bulan_indonesia($row['masapajak']); ?></td>
+                <td style="text-align: right;"><?= number_format($row['pokok'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['denda'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['total'], 2); ?></td> 
+                <td style="text-align: center;"><?= $row['kodebayar']; ?></td> 
+                <td style="text-align: center;"><?= $row['tgl_input']; ?></td>
+                <td style="text-align: left;"><?= ($row['tgl_bayar'] == '0000-00-00' ? 'Belum Lunas' : 'Lunas') ?></td>
+                <td style="text-align: right;">-</td>
+                <td style="text-align: right;">-</td>
+                <td style="text-align: right;">-</td>
+                <td style="text-align: center;"><?= $row['tgl_bayar']; ?></td>
+                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: center;"><?= $row['namauptd']; ?></td>
+                <td style="text-align: left;"><?= $row['blnpajak']; ?>-<?= $row['thnpajak']; ?></td>
+                <td style="text-align: left;"><?= $row['sspd']; ?></td>
+                <td style="text-align: right;"><?= number_format($row['pokok_sts'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['denda_sts'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['jumlah_sts'], 2); ?></td> 
+                <td style="text-align: left;"><?= $row['keterangan']; ?></td>
             </tr>
+        <?php endforeach;
 
-            <?php foreach ($data['subTotals'] as $nmrek3 => $subData) { ?>
-                <tr>
-                    <td><?= htmlspecialchars($subData['kdrek3']) ?></td>
-                    <td><strong><?= htmlspecialchars($nmrek3) ?></strong></td>
-                    <td><b><?= number_format($subData['totalApbd'], 2) ?></b></td>
-                    <?php if ($apbdp_checkbox): ?>
-                        <td><b><?= number_format($subData['totalApbdp'], 2) ?></b></td>
-                    <?php endif; ?>
-                    <td><b><?= number_format($subData['totalBap'], 2) ?></b></td>
-                    <td><b><?= number_format($subData['totalBpkad'], 2) ?></b></td>
-                    <td><b><?= number_format($subData['totalSelisih'], 2) ?></b></td>
-                    <td><?= htmlspecialchars($tbl['keterangan']) ?></td>
-                    <td></td>
-                </tr>
-            <?php foreach ($subData['subTotals'] as $kdrek4 => $subSubData) { 
-                if (!empty($subSubData['nmrek4'])) { ?>
-                    <tr>
-                        <td><?= htmlspecialchars($kdrek4) ?></td>
-                        <td><?= htmlspecialchars($subSubData['nmrek4']) ?></td>
-                        <td><?= number_format($subSubData['totalApbd'], 2) ?></td>
-                        <?php if ($apbdp_checkbox): ?>
-                            <td><?= number_format($subSubData['totalApbdp'], 2) ?></td>
-                        <?php endif; ?>
-                        <td><?= number_format($subSubData['totalBap'], 2) ?></td>
-                        <td><?= number_format($subSubData['totalBpkad'], 2) ?></td>
-                        <td><?= number_format($subSubData['totalSelisih'], 2) ?></td>
-                        <td><?= htmlspecialchars($tbl['keterangan']) ?></td>
-                        <td><?= htmlspecialchars($tbl['nmdinas']) ?></td>
-                    </tr>
-                    <?php foreach ($subSubData['subSubTotals'] as $kdrek5 => $subSubSubData) { 
-                        if (!empty($subSubSubData['nmrek5'])) { ?>
-                            <tr>
-                                <td><?= htmlspecialchars($kdrek5) ?></td>
-                                <td><?= htmlspecialchars($subSubSubData['nmrek5']) ?></td>
-                                <td><?= number_format($subSubSubData['apbd'], 2) ?></td>
-                                <?php if ($apbdp_checkbox): ?>
-                                    <td><?= number_format($subSubSubData['apbdp'], 2) ?></td>
-                                <?php endif; ?>
-                                <td><?= number_format($subSubSubData['dipenda'], 2) ?></td>
-                                <td><?= number_format($subSubSubData['bpkad'], 2) ?></td>
-                                <td><?= number_format($subSubSubData['selisih'], 2) ?></td>
-                                <td><?= htmlspecialchars($tbl['keterangan']) ?></td>
-                                <td><?= htmlspecialchars($tbl['nmdinas']) ?></td>
-                            </tr>
-                        <?php }
-                    }
-                }
-            } ?>
-        <?php } ?>
-    <?php } ?>
-    <tr style="  background-color: #f2f2f2;">
-        <td colspan="2"><b>JUMLAH PENDAPATAN + PEMBIAYAAN</b></td>
-        <td><b><?= number_format($totalApbd, 2) ?></b></td>
-        <?php if ($apbdp_checkbox): ?>
-            <td><b><?= number_format($totalApbdp, 2) ?></b></td>
-        <?php endif; ?>
-        <td><b><?= number_format($totalBap, 2) ?></b></td>
-        <td><b><?= number_format($totalBpkad, 2) ?></b></td>
-        <td><b><?= number_format($totalSelisih, 2) ?></b></td>
+        foreach ($v as $row):
+            $selisihpokok = $row['pokok'] - $row['pokok_sts'];
+            $selisihdenda = $row['denda'] - $row['denda_sts'];
+            $selisihtotal = $row['total'] - $row['jumlah_sts'];
+            ?>
+            <tr style="background-color: yellow;">
+                <td><?= $no++ ?></td>
+                <td style="text-align: left;"><?= $row['nopelaporan']; ?></td>
+                <td style="text-align: left;"><?= $row['npwpd']; ?></td>
+                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: center;"><?= $row['thnpajak']; ?></td>
+                <td style="text-align: center;"><?= bulan_indonesia($row['masapajak']); ?></td>
+                <td style="text-align: right;"><?= number_format($row['pokok'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['denda'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['total'], 2); ?></td> 
+                <td style="text-align: center;"><?= $row['kodebayar']; ?></td> 
+                <td style="text-align: center;"><?= $row['tgl_input']; ?></td>
+                <td style="text-align: left;"><?= ($row['tgl_bayar'] == '0000-00-00' ? 'Belum Lunas' : 'Lunas') ?></td>
+                <td style="text-align: right;"><?= number_format($selisihpokok, 2); ?></td>
+                <td style="text-align: right;"><?= number_format($selisihdenda, 2); ?></td>
+                <td style="text-align: right;"><?= number_format($selisihtotal, 2); ?></td>
+                <td style="text-align: center;"><?= $row['tgl_bayar']; ?></td>
+                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: center;"><?= $row['namauptd']; ?></td>
+                <td style="text-align: left;"><?= $row['blnpajak']; ?>-<?= $row['thnpajak']; ?></td>
+                <td style="text-align: left;"><?= $row['sspd']; ?></td>
+                <td style="text-align: right;"><?= number_format($row['pokok_sts'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['denda_sts'], 2); ?></td>
+                <td style="text-align: right;"><?= number_format($row['jumlah_sts'], 2); ?></td> 
+                <td style="text-align: left;"><?= $row['keterangan']; ?></td>
+            </tr>
+        <?php endforeach;
+    
+    else: ?>
+        <tr>
+            <td colspan="15" style="text-align: center;">Tidak Ada Data</td>
+        </tr>
+    <?php endif; ?>  
+    <tr>
+        <td colspan=6" style="font-weight: bold;">JUMLAH</td>
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokok, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldenda, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruh, 2); ?></td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihpokok, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihdenda, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihseluruh, 2); ?></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokoksts, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldendasts, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruhsts, 2); ?></td>
         <td></td>
     </tr>
-
-<?php } ?>
 
 </tbody>
 
@@ -487,22 +441,15 @@ function hari_ini($hari)
         <p>Bandar Lampung, <?= $tgl_cetak_format ?></p>
     </div>
 </div>
-<?php if (!empty($tanda_tangan_1)) : ?>
+<?php if (!empty($tanda_tangan)) : ?>
     <div class="signature">
-        <p><?= htmlspecialchars($tanda_tangan_1['jabatan1']) ?></p>
-        <p><?= htmlspecialchars($tanda_tangan_1['jabatan2']) ?>,</p>
-        <p class="name"><?= htmlspecialchars($tanda_tangan_1['nama']) ?></p>
-        <p>NIP. <?= htmlspecialchars($tanda_tangan_1['nip']) ?></p>
+        <p><?= htmlspecialchars($tanda_tangan['jabatan1']) ?></p>
+        <p><?= htmlspecialchars($tanda_tangan['jabatan2']) ?>,</p>
+        <p class="name"><?= htmlspecialchars($tanda_tangan['nama']) ?></p>
+        <p>NIP. <?= htmlspecialchars($tanda_tangan['nip']) ?></p>
     </div>
 <?php endif; ?>
-<?php if (!empty($tanda_tangan_2)) : ?>
-    <div class="signature2">
-        <p><?= htmlspecialchars($tanda_tangan_2['jabatan1']) ?></p>
-        <p><?= htmlspecialchars($tanda_tangan_2['jabatan2']) ?>,</p>
-        <p class="name"><?= htmlspecialchars($tanda_tangan_2['nama']) ?></p>
-        <p>NIP. <?= htmlspecialchars($tanda_tangan_2['nip']) ?></p>
-    </div>
-<?php endif; ?>
+</div>
 
 </body>
 </html>

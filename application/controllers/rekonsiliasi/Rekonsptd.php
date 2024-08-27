@@ -37,13 +37,12 @@ class Rekonsptd extends CI_Controller {
 	
 		$tglcetak = $this->input->post('tglcetak');
         $tahun = $this->input->post('tahun');
-		$bulan = $this->input->post('bulan');
-		$bulanakhir = $this->input->post('bulanakhir');
+		$kdrekening = $this->input->post('kdrekening');
 
-		$tanda_tangan_1 = $this->input->post('tanda_tangan_1');
-        $tanda_tangan_2 = $this->input->post('tanda_tangan_2');
-
-		/* $tablenya = $this->MRekonsptd->ambildata($tahun,$bulan,$bulanakhir); */
+		$tanda_tangan = $this->input->post('tanda_tangan');
+		$ttd_checkbox = $this->input->post('ttd_checkbox') ? true : false;
+	
+		$tablenya = $this->MRekonsptd->ambildata($tahun,$kdrekening);
 		/* echo '<pre>';
 		var_dump($tablenya);
 		die();
@@ -55,24 +54,21 @@ class Rekonsptd extends CI_Controller {
 			'link' => $setpage->link,
 			'topbar' => $template['topbar'],
 			'sidebar' => $template['sidebar'],
-		/* 	'format_bulan' => $format_bulan, */
-            'format_bulan' => strftime('%B', strtotime("$tahun-$bulan")),
-            'format_bulan_akhir' => strftime('%B', strtotime("$tahun-$bulanakhir")),
+			'ttd_checkbox' => $ttd_checkbox,
 			'format_tahun' => $tahun,
 			'tglcetak' => $tglcetak,
-			/* 'tablenya' => $tablenya, */
+			'tablenya' => $tablenya,
 			'tgl_cetak_format' =>strftime('%d %B %Y', strtotime($tglcetak)),
 		];
-	
-	 	$tanda_tangan_data_1 = $this->Msetup->get_tanda_tangan_skpd_1($tanda_tangan_1);
-        $tanda_tangan_data_2 = $this->Msetup->get_tanda_tangan_skpd_2($tanda_tangan_2);
-    
-        if ($tanda_tangan_data_1) {
-            $data['tanda_tangan_1'] = $tanda_tangan_data_1;
-        }
-        if ($tanda_tangan_data_2) {
-            $data['tanda_tangan_2'] = $tanda_tangan_data_2;
-        }
+		$tanda_tangan_data = $this->Msetup->get_tanda_tangan($ttd_checkbox, $tanda_tangan);
+
+		if ($tanda_tangan_data) {
+			$data['tanda_tangan'] = $tanda_tangan_data;
+		}
+		$rek_data = $this->Msetup->get_rekening($kdrekening);
+	if ($rek_data) {
+		$data['kdrekening'] = $rek_data;
+	}
  
 		$this->load->view('rekonsiliasi/printrekonsptd', $data);
 
