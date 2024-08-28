@@ -9,7 +9,7 @@ class MSyncSkpd extends CI_Model
                  <div class="row mt-3">
                     <form  class="form-row" method="post">
                     <div class="col-md-2">
-                        <label for="tanggal">Cari:</label> 
+                        <label for="tanggal">Tanggal:</label> 
                     </div>                         
                       <div class="col-md-6">
                                 <div class="form-group">
@@ -20,13 +20,17 @@ class MSyncSkpd extends CI_Model
                 
                         <div class="col-md-2">
                             <div class="button-group">
-                                <button type="button" class="btn btn-sm btn-secondary fa fa-binoculars cari-data" id="cari"> Cari</button>
+                                <button class="btn btn-outline-primary cari-data mr-4" type="button" id="cari">
+									<i class="fas fa-search"></i> Cari
+								</button>
                             </div>
                         </div>
                       
                         <div class="col-md-2">
                             <div class="button-group">
-                                <button type="button" class="btn btn-sm btn-success fa fa-save add-data" id="btnCheckData"> Simpan</button>
+                                <button class="btn btn-outline-success add-data ml-2" type="button" id="btnCheckData" name="AKSI" value="Save">
+									<i class="fas fa-print"></i> Simpan
+								</button>
                             </div>
                         </div>
                     </form>

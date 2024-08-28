@@ -31,9 +31,14 @@ class MRekonsptd extends CI_Model {
             ->join('mst_rekening c', 'c.id = a.idrekening', 'INNER')
             ->join('trx_stsdetail d', 'd.idwp = a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'LEFT')
             ->join('mst_uptd e', 'e.id = d.iduptd', 'LEFT')
-            ->where('a.thnpajak', $tahun)
+            ->where('YEAR(a.tgl_input)', $tahun)
             ->where("c.kdrekening LIKE", "{$kdrekening}%")
-            ->order_by("namawp")
+            ->group_start()
+             ->where('d.kodebayar IS NOT NULL')
+             ->where('a.tgl_input IS NOT NULL')
+             ->where('a.tgl_input !=', '0000-00-00')
+             ->group_end()
+            ->order_by("namawp", "asc")
             ->get('trx_sptpd a');
         
         $result = $query->result_array();

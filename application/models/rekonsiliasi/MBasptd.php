@@ -69,15 +69,16 @@ class MBasptd extends CI_Model {
             ->join('mst_rekening c', 'c.id = a.idrekening', 'INNER')
             ->join('trx_stsdetail d', 'd.idwp = a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'LEFT')
             ->join('mst_uptd e', 'e.id = d.iduptd', 'LEFT')
-            ->where('a.thnpajak', $tahun)
-            ->where('a.blnpajak >=', $bulan)
-            ->where('a.blnpajak <=', $bulanakhir)
+            ->where('YEAR(a.tgl_input)', $tahun)
+            ->where('MONTH(a.tgl_input) >=', $bulan)
+            ->where('MONTH(a.tgl_input) <=', $bulanakhir)
             ->where("c.kdrekening LIKE", "{$kdrekening}%")
            /* Hanya data yang ada selisih */
             ->group_start()
-                ->where('a.pokok != d.jumlah')
-                ->or_where('a.denda != d.nil_denda')
-                ->or_where('a.jumlah != d.total')
+                ->where('a.jumlah != d.total')
+                ->where('d.kodebayar IS NOT NULL')
+                ->where('a.tgl_input IS NOT NULL')
+                ->where('a.tgl_input !=', '0000-00-00')
             ->group_end()
             ->order_by("namawp")
             ->get('trx_sptpd a');
@@ -143,36 +144,36 @@ class MBasptd extends CI_Model {
                     <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                     </div>
-                    <div class="col-md-10">
+                
                         <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="tahun">Tahun:</label>
                                     <input type="number" class="form-control" id="tahun" name="tahun" min="1900" max="9999" value="2024" required>
                                 </div>
                             </div>
-                         <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="bulan">Bulan Awal:</label>
-                            <select class="form-control select2" id="bulan" name="bulan" required>
-                                <option value="" disabled selected>Pilih Bulan</option>
-                                <option value="01">Januari</option>
-                                <option value="02">Februari</option>
-                                <option value="03">Maret</option>
-                                <option value="04">April</option>
-                                <option value="05">Mei</option>
-                                <option value="06">Juni</option>
-                                <option value="07">Juli</option>
-                                <option value="08">Agustus</option>
-                                <option value="09">September</option>
-                                <option value="10">Oktober</option>
-                                <option value="11">November</option>
-                                <option value="12">Desember</option>
-                            </select>
+                         <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="bulan">Bulan Awal:</label>
+                                <select class="form-control select2" id="bulan" name="bulan" required>
+                                    <option value="" disabled selected>Pilih Bulan</option>
+                                    <option value="01">Januari</option>
+                                    <option value="02">Februari</option>
+                                    <option value="03">Maret</option>
+                                    <option value="04">April</option>
+                                    <option value="05">Mei</option>
+                                    <option value="06">Juni</option>
+                                    <option value="07">Juli</option>
+                                    <option value="08">Agustus</option>
+                                    <option value="09">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
     
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
                             <label for="bulan">Bulan Akhir:</label>
                             <select class="form-control select2" id="bulanakhir" name="bulanakhir" required>
@@ -192,7 +193,7 @@ class MBasptd extends CI_Model {
                             </select>
                         </div>
                     </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="dinas">Rekening:</label>
                                     <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Jenis Pajak" style="width: 100%;">
@@ -205,62 +206,62 @@ class MBasptd extends CI_Model {
                                 document.getElementById("tahun").value = new Date().getFullYear();
                             </script>
     
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="tgl_cetak">Tgl. Cetak:</label>
                                     <input type="date" class="form-control" id="tglcetak" name="tglcetak" required>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                  <div class="form-group">
-                                    <label for="ttd">Penandatangan 1:</label>
-                                    <select id="tanda_tangan_1" name="tanda_tangan_1" class="form-control tanda_tangan_1 " data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
+                                    <label for="ttd">Kepala Bidang Pembukuan</label>
+                                    <select id="tanda_tangan_1" name="tanda_tangan_1" class="form-control tanda_tangan_1 select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                             '.$opsittd.'
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="ttd">Penandatangan 2:</label>
-                                    <select id="tanda_tangan_2" name="tanda_tangan_2" class="form-control tanda_tangan_2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
+                                    <label for="ttd">Kassubid Pembukuan:</label>
+                                    <select id="tanda_tangan_2" name="tanda_tangan_2" class="form-control tanda_tangan_2 select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                             '.$opsittd.'
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="ttd">Penandatangan 3:</label>
-                                    <select id="tanda_tangan_3" name="tanda_tangan_3" class="form-control tanda_tangan_3" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
+                                    <label for="ttd">Kepala Bidang Pajak:</label>
+                                    <select id="tanda_tangan_3" name="tanda_tangan_3" class="form-control tanda_tangan_3 select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                             '.$opsittd.'
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="ttd">Penandatangan 4:</label>
-                                    <select id="tanda_tangan_4" name="tanda_tangan_4" class="form-control tanda_tangan_4" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
+                                    <label for="ttd">Kassubid Pajak Hotel, Dan Lainnya:</label>
+                                    <select id="tanda_tangan_4" name="tanda_tangan_4" class="form-control tanda_tangan_4 select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                             '.$opsittd.'
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="ttd">Penandatangan 5:</label>
-                                    <select id="tanda_tangan_5" name="tanda_tangan_5" class="form-control tanda_tangan_5" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
+                                    <label for="ttd">Kepala BAPENDA Bandar Lampung:</label>
+                                    <select id="tanda_tangan_5" name="tanda_tangan_5" class="form-control tanda_tangan_5 select2" data-placeholder="Pilih Tanda Tangan" style="width: 100%;" required>
                                             '.$opsittd.'
                                     </select>
                                 </div>
                             </div>
                             
                         </div>
-                    </div>
-    
-                    <div class="col-md-1 mt-3">
-                        <div class="button-group">
-                          <button type="submit" class="btn btn-primary">Cetak Laporan</button>
-                           
+                        <div class="col-md-12 mt-3 d-flex justify-content-between">
+                            <div class="button-group ">
+                                <button type="submit" class="btn btn-primary">Cetak Laporan</button>
+                            </div>
                         </div>
-                    </div>
+                    
+    
+                
                 </form>
             </div>
         </div>

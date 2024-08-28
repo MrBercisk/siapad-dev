@@ -33,7 +33,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-        
+            margin-bottom : 20px;
         }
         table, th, td {
             border: 1px solid black;
@@ -413,60 +413,54 @@ function hari_ini($hari)
 
 
 </table>
-<table  width="800" cellpadding="2" border="0">
-    <tr>
-        <td width="900">
-            <table align="center">
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>Bandar Lampung, <?= $tgl_cetak_format; ?><br></td>
-                </tr>
-                <tr>
-                    <td>
-                        KEPALA BIDANG PEMBUKUAN DAN PELAPORAN,<br><br><br><br>
-                        <?= isset($nama_1) ? $nama_1 : '' ?><br>
-                        NIP. <?= isset($nip_1) ? $nip_1 : '' ?><br>
-                    </td>
-                    <td></td>
-                    <td>
-                        KASUBBID PEMBUKUAN,<br><br><br><br>
-                        <?= isset($nama_2) ? $nama_2 : '' ?><br>
-                        NIP. <?= isset($nip_2) ? $nip_2 : '' ?><br>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        KEPALA BIDANG PAJAK,<br><br><br><br>
-                        <?= isset($nama_3) ? $nama_3 : '' ?><br>
-                        NIP. <?= isset($nip_3) ? $nip_3 : '' ?><br>
-                    </td>
-                    <td></td>
-                    <td>
-                        KASUBBID PAJAK HOTEL, HIBURAN dan PAJAK LAINNYA<br><br><br>
-                        <?= isset($nama_4) ? $nama_4 : '' ?><br>
-                        NIP. <?= isset($nip_4) ? $nip_4 : '' ?><br>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Mengetahui,</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        KEPALA BPPRD,<br>KOTA BANDAR LAMPUNG,<br><br><br><br>
-                        <?= isset($nama_5) ? $nama_5 : '' ?><br>
-                        NIP. <?= isset($nip_5) ? $nip_5 : '' ?><br>
-                    </td>
-                    <td></td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+<div style="width: 1000px; margin: 0 auto;">
+    <div style="text-align: right;">
+        Bandar Lampung, <?= $tgl_cetak_format; ?>
+    </div>
 
+    <div style="display: flex; justify-content: space-between;  margin-top: 60px;">
+        <div style="width: 50%;">
+            <p>KEPALA BIDANG PEMBUKUAN DAN PELAPORAN,</p>
+            <br><br>
+            <p><?= isset($nama_1) ? $nama_1 : '' ?><br>
+            NIP. <?= isset($nip_1) ? $nip_1 : '' ?></p>
+        </div>
+
+        <div style="width: 50%; text-align: right;">
+            <p>KASUBBID PEMBUKUAN,</p>
+            <br><br>
+            <p><?= isset($nama_2) ? $nama_2 : '' ?><br>
+            NIP. <?= isset($nip_2) ? $nip_2 : '' ?></p>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-top: 60px;">
+        <div style="width: 48%;">
+            <p>KEPALA BIDANG PAJAK,</p>
+            <br><br>
+            <p><?= isset($nama_3) ? $nama_3 : '' ?><br>
+            NIP. <?= isset($nip_3) ? $nip_3 : '' ?></p>
+        </div>
+
+        <div style="width: 48%; text-align: right;">
+            <p>KASUBBID PAJAK HOTEL, HIBURAN dan PAJAK LAINNYA</p>
+            <br><br>
+            <p><?= isset($nama_4) ? $nama_4 : '' ?><br>
+            NIP. <?= isset($nip_4) ? $nip_4 : '' ?></p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px;">
+        <p>Mengetahui,</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <p>KEPALA BAPENDA,<br>KOTA BANDAR LAMPUNG,</p>
+        <br><br>
+        <p><?= isset($nama_5) ? $nama_5 : '' ?><br>
+        NIP. <?= isset($nip_5) ? $nip_5 : '' ?></p>
+    </div>
+</div>
 
 </body>
 </html>

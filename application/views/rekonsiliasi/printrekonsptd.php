@@ -6,6 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            padding: 30px;
         }
         .header {
             text-align: center;
@@ -29,15 +30,15 @@
         
         }
         table, th, td {
-            border: 1px solid black;
+            border: 2px solid black;
         }
         th {
-            padding: 5px;
+            padding: 4px;
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
         }
         td {
-            font-size: 10px;
+            font-size: 8px;
         }
         th {
             background-color: #f2f2f2;
@@ -46,17 +47,13 @@
         tbody td {
             text-align: right;
             text-wrap: nowrap;
-            padding: 5px;
+            /* padding: 2px; */
         }
         tbody td:first-child,
         tbody td:nth-child(2) {
             text-align: left;
         }
-        tbody td:nth-child(2) {
-            text-wrap: nowrap;
-        
-   
-        }
+      
         .tgl_cetak p {
             text-align: center;
             margin-top: 50px;
@@ -246,18 +243,18 @@ function hari_ini($hari)
             <th>No. Pelaporan</th>
             <th>NPWPD</th>
             <th>Nama Pajak</th>
-            <th>Tahun Pajak</th>
+            <th>Thn Pajak</th>
             <th>Masa Pajak</th>
             <th>Pokok</th>
             <th>Denda</th>
             <th>Total</th>
             <th>Kode Bayar</th>
-            <th>Tanggal Bayar</th>
+            <th>Tgl Bayar</th>
             <th>Status</th>
             <th>Pokok</th>
             <th>Denda</th>
             <th>Jumlah</th>
-            <th>Tanggal Transaksi</th>
+            <th>Tgl Transaksi</th>
             <th>Nama Objek Pajak</th>
             <th>UPTD</th>
             <th>Masa Pajak</th>
@@ -348,7 +345,7 @@ function hari_ini($hari)
                 <td><?= $no++ ?></td>
                 <td style="text-align: left;"><?= $row['nopelaporan']; ?></td>
                 <td style="text-align: left;"><?= $row['npwpd']; ?></td>
-                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: left; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= $row['namawp']; ?></td>
                 <td style="text-align: center;"><?= $row['thnpajak']; ?></td>
                 <td style="text-align: center;"><?= bulan_indonesia($row['masapajak']); ?></td>
                 <td style="text-align: right;"><?= number_format($row['pokok'], 2); ?></td>
@@ -361,7 +358,7 @@ function hari_ini($hari)
                 <td style="text-align: right;">-</td>
                 <td style="text-align: right;">-</td>
                 <td style="text-align: center;"><?= $row['tgl_bayar']; ?></td>
-                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: left; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= $row['namawp']; ?></td>
                 <td style="text-align: center;"><?= $row['namauptd']; ?></td>
                 <td style="text-align: left;"><?= $row['blnpajak']; ?>-<?= $row['thnpajak']; ?></td>
                 <td style="text-align: left;"><?= $row['sspd']; ?></td>
@@ -381,7 +378,7 @@ function hari_ini($hari)
                 <td><?= $no++ ?></td>
                 <td style="text-align: left;"><?= $row['nopelaporan']; ?></td>
                 <td style="text-align: left;"><?= $row['npwpd']; ?></td>
-                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: left; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= $row['namawp']; ?></td>
                 <td style="text-align: center;"><?= $row['thnpajak']; ?></td>
                 <td style="text-align: center;"><?= bulan_indonesia($row['masapajak']); ?></td>
                 <td style="text-align: right;"><?= number_format($row['pokok'], 2); ?></td>
@@ -394,7 +391,7 @@ function hari_ini($hari)
                 <td style="text-align: right;"><?= number_format($selisihdenda, 2); ?></td>
                 <td style="text-align: right;"><?= number_format($selisihtotal, 2); ?></td>
                 <td style="text-align: center;"><?= $row['tgl_bayar']; ?></td>
-                <td style="text-align: left;"><?= $row['namawp']; ?></td>
+                <td style="text-align: left; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= $row['namawp']; ?></td>
                 <td style="text-align: center;"><?= $row['namauptd']; ?></td>
                 <td style="text-align: left;"><?= $row['blnpajak']; ?>-<?= $row['thnpajak']; ?></td>
                 <td style="text-align: left;"><?= $row['sspd']; ?></td>
@@ -411,24 +408,24 @@ function hari_ini($hari)
         </tr>
     <?php endif; ?>  
     <tr>
-        <td colspan=6" style="font-weight: bold;">JUMLAH</td>
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokok, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldenda, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruh, 2); ?></td>
+        <td colspan=6" style="font-weight: bold;  background-color: #f2f2f2;">JUMLAH</td>
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totalpokok, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totaldenda, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totalseluruh, 2); ?></td>
+        <td colspan="3"></td>
+    <!--     <td></td>
+        <td></td> -->
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totalselisihpokok, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totalselisihdenda, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totalselisihseluruh, 2); ?></td>
+        <td colspan="5"></td>
+    <!--     <td></td>
         <td></td>
         <td></td>
-        <td></td>
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihpokok, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihdenda, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihseluruh, 2); ?></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokoksts, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldendasts, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruhsts, 2); ?></td>
+        <td></td> -->
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totalpokoksts, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totaldendasts, 2); ?></td> 
+        <td style="text-align: right; font-weight: bold;  background-color: #f2f2f2;"><?= number_format($totalseluruhsts, 2); ?></td>
         <td></td>
     </tr>
 
