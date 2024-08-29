@@ -1,5 +1,26 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 class MRekonsptd extends CI_Model {
+    public function ambildatasptd($tahun,$bulan,$kdrekening) {
+        $mysqli = $this->db->conn_id; 
+ 
+        $statment = $mysqli->prepare("CALL spRptRekonSTS(?, ?, ?)");
+        $statment->bind_param('sss', $tahun,$bulan,$kdrekening);  
+    
+        $statment->execute();
+        $result = $statment->get_result();  
+    
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        while ($mysqli->more_results()) {
+            $mysqli->next_result(); 
+        }
+    
+        return $data;
+   
+    }
     public function ambildata($tahun, $kdrekening)
     {
         $query = $this->db
@@ -80,12 +101,11 @@ class MRekonsptd extends CI_Model {
             $opsittd .= '<option value="'.$ttd->id.'">'.$ttd->nama.'</option>';
         }
         $opsiRek = $this->iniopsirekening();
-
+    
         $form[] = '
-        
         <div class="card">
             <div class="card-body">
-                <form  id="reportForm" action="' . site_url('rekonsiliasi/rekonsptd/cetak') . '" class="form-row" method="post"  onsubmit="printForm(); return false;">
+                <form id="reportForm" action="' . site_url('rekonsiliasi/rekonsptd/cetak') . '" class="form-row" method="post">
                 <div class="col-md-12 border-bottom border-secondary" style="border-bottom: 2px solid #dee2e6 !important;">
                         <h5>Parameters</h5>
                 </div>
@@ -97,15 +117,34 @@ class MRekonsptd extends CI_Model {
                             <input type="number" class="form-control" id="tahun" name="tahun" min="1900" max="9999" value="2024" required>
                         </div>
                     </div>
-                    
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="dinas">Jenis Pajak:</label>
-                                    <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Jenis Pajak" style="width: 100%;">
-                                        '.$opsiRek.'
-                                    </select>
-                                </div>
+                     <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="bulan">Bulan:</label>
+                                <select class="form-control select2" id="bulan" name="bulan" required>
+                                    <option value="" disabled selected>Pilih Bulan</option>
+                                    <option value="01">Januari</option>
+                                    <option value="02">Februari</option>
+                                    <option value="03">Maret</option>
+                                    <option value="04">April</option>
+                                    <option value="05">Mei</option>
+                                    <option value="06">Juni</option>
+                                    <option value="07">Juli</option>
+                                    <option value="08">Agustus</option>
+                                    <option value="09">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="dinas">Jenis Pajak:</label>
+                                <select id="kdrekening" name="kdrekening" class="form-control select2" data-placeholder="Pilih Jenis Pajak" style="width: 100%;">
+                                    '.$opsiRek.'
+                                </select>
+                            </div>
+                        </div>
                 
                     <div class="col-md-3">
                         <div class="form-group">
@@ -113,7 +152,7 @@ class MRekonsptd extends CI_Model {
                             <input type="date" class="form-control" id="tglcetak" name="tglcetak" required>
                         </div>
                     </div>
-
+    
                 <div class="col-md-3">
                         <div class="form-group">
                             <label for="ttd">Tanda Tangan:</label>
@@ -134,19 +173,18 @@ class MRekonsptd extends CI_Model {
                             </div>
                         </div>
                     </div>
-				    <div class="col-md-1 mt-3">
+                    <div class="col-md-1 mt-3">
                         <div class="button-group mt-2">
-                            <button type="submit" class="btn btn-primary">Cetak Laporan</button>
+                            <button type="submit" class="btn btn-primary">Cetak Laporan PDF</button>
                         </div>
                     </div>
-                
+                   
                 </div>
-                      
                 </form>
-                  <div id="loadingSpinner" style="display:none; text-align:center; margin-top: 20px;">
-                <img src="' . base_url('/assets/img/load2.gif') . '" alt="Loading..." />
-                 <p>Silahkan tunggu...</p>
-            </div>
+                <div id="loadingSpinner" style="display:none; text-align:center; margin-top: 20px;">
+                    <img src="' . base_url('/assets/img/load2.gif') . '" alt="Loading..." />
+                    <p>Silahkan tunggu...</p>
+                </div>
             </div>
         </div>
          <style>
@@ -169,20 +207,26 @@ class MRekonsptd extends CI_Model {
             color: black; 
         }
     </style>
-      <script>
-       function printForm() {
+    <script>
+    function submitExcelForm() {
+        var form = document.getElementById("reportForm");
+        form.action = "' . site_url('rekonsiliasi/rekonsptd/cetakexcel') . '";
+        form.submit();
+    }
+    
+    function printForm() {
         var form = document.getElementById("reportForm");
         var formData = new FormData(form);
         var loadingSpinner = document.getElementById("loadingSpinner");
         var printWindow;
-
+    
         loadingSpinner.style.display = "block";
-
+    
         var xhr = new XMLHttpRequest();
         xhr.open("POST", form.action, true);
         xhr.onload = function () {
             loadingSpinner.style.display = "none";
-
+    
             if (xhr.status === 200) {
                 if (printWindow && !printWindow.closed) {
                     printWindow.focus();
@@ -210,6 +254,7 @@ class MRekonsptd extends CI_Model {
         ';
         return $form;
     }
+    
 
     public function iniopsirekening() {
         $rekeningCumaIni = array(

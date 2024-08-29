@@ -1,8 +1,42 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class MBasptd extends CI_Model {
-   
-    public function cetaktotal($tahun, $bulan, $bulanakhir, $kdrekening)
+    public function cetakblmbayar($tahun, $bulan, $kdrekening)
+    {
+        $query = $this->db
+            ->select("
+                a.thnpajak AS thnpajak, 
+                a.nomor as nosptpd, 
+                a.tgl_input, 
+                b.nama as nmwp, 
+                b.alamat, 
+                b.nomor AS npwpd,
+                a.blnpajak AS masabulan, 
+                a.thnpajak AS thnpajak, 
+                a.pokok AS pokok, 
+                a.denda AS denda,
+                a.jumlah AS total, 
+                a.keterangan AS keterangan, 
+                d.nobukti AS sspd, 
+                CASE 
+                    WHEN a.tanggal = '0000-00-00' THEN NULL 
+                    ELSE a.tanggal 
+                END AS tgl_bayar", false)
+            ->join('mst_wajibpajak b', 'b.id=a.idwp', 'INNER')
+            ->join('mst_rekening c', 'c.id=a.idrekening', 'INNER')
+            ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'left')
+            ->where('a.thnpajak', $tahun)
+            ->where("DATE_FORMAT(a.tgl_input, '%Y-%m') =", "{$tahun}-{$bulan}")
+            ->where("c.kdrekening LIKE", "{$kdrekening}%")
+            ->where("a.tanggal = '0000-00-00'")
+            ->where("a.keterangan = 'Belum Lunas'")
+            ->get('trx_sptpd a');
+            
+        $result = $query->result_array();
+        return $result;
+    }
+    
+    public function cetaktotal($tahun, $bulan, $kdrekening)
     {
         $query = $this->db->select("
             a.thnpajak AS thnpajak,
@@ -25,11 +59,8 @@ class MBasptd extends CI_Model {
             ->join('mst_wajibpajak b', 'b.id=a.idwp', 'INNER')
             ->join('mst_rekening c', 'c.id=a.idrekening', 'INNER')
             ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'left')
-            ->where('a.thnpajak', $tahun)
-            ->where('a.blnpajak >=', $bulan)
-            ->where('a.blnpajak <=', $bulanakhir)
-            ->where('MONTH(a.tgl_input) >=', $bulan)
-            ->where('MONTH(a.tgl_input) <=', $bulanakhir)
+            ->where('YEARS(a.tgl_input)', $tahun)
+            ->where('MONTH(a.tgl_input)', $bulan)
             ->where("c.kdrekening LIKE", "{$kdrekening}%")
             ->order_by("b.nama")
             ->get('trx_sptpd a');
@@ -37,7 +68,7 @@ class MBasptd extends CI_Model {
         $result = $query->result_array();
         return $result;
     }
-    public function ambildata($tahun, $bulan, $bulanakhir, $kdrekening)
+    public function ambildata($tahun, $bulan, $kdrekening)
     {
         $query = $this->db
             ->select("
@@ -71,7 +102,6 @@ class MBasptd extends CI_Model {
             ->join('mst_uptd e', 'e.id = d.iduptd', 'LEFT')
             ->where('YEAR(a.tgl_input)', $tahun)
             ->where('MONTH(a.tgl_input) >=', $bulan)
-            ->where('MONTH(a.tgl_input) <=', $bulanakhir)
             ->where("c.kdrekening LIKE", "{$kdrekening}%")
            /* Hanya data yang ada selisih */
             ->group_start()
@@ -154,7 +184,7 @@ class MBasptd extends CI_Model {
                             </div>
                          <div class="col-md-3">
                             <div class="form-group">
-                                <label for="bulan">Bulan Awal:</label>
+                                <label for="bulan">Bulan :</label>
                                 <select class="form-control select2" id="bulan" name="bulan" required>
                                     <option value="" disabled selected>Pilih Bulan</option>
                                     <option value="01">Januari</option>
@@ -173,26 +203,7 @@ class MBasptd extends CI_Model {
                             </div>
                         </div>
     
-                      <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="bulan">Bulan Akhir:</label>
-                            <select class="form-control select2" id="bulanakhir" name="bulanakhir" required>
-                                <option value="" disabled selected>Pilih Bulan</option>
-                                <option value="01">Januari</option>
-                                <option value="02">Februari</option>
-                                <option value="03">Maret</option>
-                                <option value="04">April</option>
-                                <option value="05">Mei</option>
-                                <option value="06">Juni</option>
-                                <option value="07">Juli</option>
-                                <option value="08">Agustus</option>
-                                <option value="09">September</option>
-                                <option value="10">Oktober</option>
-                                <option value="11">November</option>
-                                <option value="12">Desember</option>
-                            </select>
-                        </div>
-                    </div>
+                     
                       <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="dinas">Rekening:</label>

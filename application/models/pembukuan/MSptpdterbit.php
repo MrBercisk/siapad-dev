@@ -5,20 +5,34 @@ class MSptpdterbit extends CI_Model {
     public function cetaktotal($tahun, $bulan, $kdrekening)
     {
         $query = $this->db
-            ->select("a.thnpajak AS thnpajak,a.nomor,a.tgl_input,b.nama,b.alamat,b.nomor AS npwpd,
-            a.blnpajak AS masabulan,a.thnpajak AS thnpajak,a.pokok AS pokok,a.denda AS denda,
-            a.jumlah AS total,a.keterangan AS keterangan,d.nobukti AS sspd,a.tanggal AS tgl_bayar", false)
+            ->select("
+                a.thnpajak AS thnpajak,
+                a.nomor,
+                a.tgl_input,
+                b.nama,
+                b.alamat,
+                b.nomor AS npwpd,
+                a.blnpajak AS masabulan,
+                a.thnpajak AS thnpajak,
+                a.pokok AS pokok,
+                a.denda AS denda,
+                a.jumlah AS total,
+                a.keterangan AS keterangan,
+                d.nobukti AS sspd,
+                a.tanggal AS tgl_bayar", false)
             ->join('mst_wajibpajak b', 'b.id=a.idwp', 'INNER')
             ->join('mst_rekening c', 'c.id=a.idrekening', 'INNER')
-            ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak ', 'left')
+            ->join('trx_stsdetail d', 'd.idwp=a.idwp AND d.blnpajak = a.blnpajak AND d.thnpajak = a.thnpajak', 'left')
             ->where('a.thnpajak', $tahun)
             ->where('a.blnpajak', $bulan)
             ->where("c.kdrekening LIKE", "{$kdrekening}%")
+           /*  ->limit(200) */
             ->get('trx_sptpd a');
             
         $result = $query->result_array();
         return $result;
     }
+    
     
     public function formInsert() {
       
@@ -102,10 +116,10 @@ class MSptpdterbit extends CI_Model {
     public function iniopsirekening() {
         $rekeningCumaIni = array(
             '4.1.1.01' => 'Pajak Hotel',
-            '4.1.1.02' => 'Pajak Restoran',
+            '4.1.1.02.01' => 'Pajak Restoran',
             '4.1.1.03' => 'Pajak Hiburan',
-            '4.1.1.07' => 'Pajak Parkir',
-            '4.1.1.08' => 'Pajak Air Tanah',
+            '4.1.1.07.01' => 'Pajak Parkir',
+            '4.1.1.08.01' => 'Pajak Air Tanah',
             '4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam'
         );
 

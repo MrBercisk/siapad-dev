@@ -50,8 +50,9 @@
      
         tbody td {
             text-align: center;
-            padding: 2px;
+            padding: 3px;
             font-size: 8px;
+            text-wrap: nowrap;
         }
       
         .tgl_cetak p {

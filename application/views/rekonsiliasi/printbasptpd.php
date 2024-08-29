@@ -267,42 +267,26 @@ function hari_ini($hari)
   
     <thead>
         <tr>
-            <th rowspan="2">N0</th>
-            <th colspan="12">SPTPD DITERBITKAN BULAN <?= strtoupper($format_bulan); ?> <?= $format_tahun;?></th>
-            <th colspan="8">SSPD/STS TERBAYAR BULAN <?= strtoupper($format_bulan); ?> <?= $format_tahun;?></th>
-            <th colspan="3">SELISIH SPTPD DENGAN SSPD/STS</th>
-            <th rowspan="2">KETERANGAN</th>
-        </tr>
-        <tr>
-            <th>No. Pelaporan</th>
-            <th>NPWPD</th>
-            <th>Nama WP</th>
-            <th>Tahun Pajak</th>
+            <th>No</th>
+            <th>Nama Wajib Pajak</th>
             <th>Masa Pajak</th>
-            <th>Tanggal Disetujui</th>
+            <th>Tgl Terbit</th>
+            <th>No SPTDP/SSPD/STS</th>
             <th>Pokok</th>
             <th>Denda</th>
-            <th>Total</th>
-            <th>Kode Bayar</th>
-            <th>Tanggal Bayar</th>
-            <th>Status</th>
-            <th>TANGGAL TRANSAKSI</th>
-            <th>NAMA OBJEK PAJAK</th>
-            <th>UPTD</th>
-            <th>MASA PAJAK</th>
-            <th>NO. SSPD/STS</th>
-            <th>POKOK</th>
-            <th>DENDA</th>
-            <th>JUMLAH</th>
-            <th>POKOK</th>
-            <th>DENDA</th>
-            <th>JUMLAH</th>
-   
+            <th>Discount(Potongan Pajak)</th>
+            <th>Jumlah</th>
+            <th>Keterangan</th>
         </tr>
+       
     </thead>
     <tbody>
 
-        <?php 
+    <?php 
+            $total_pokok = 0;
+            $total_denda = 0;
+            $total_seluruh = 0;
+            $hitungbaris = 0;  
         function bulan_indonesia($bulan)
         {
             $bulan_arr = array(
@@ -324,84 +308,48 @@ function hari_ini($hari)
         }
         if (!empty($tablenya)): 
             $no = 1;
-            $totalpokok = 0;
-            $totaldenda = 0;
-            $totalseluruh = 0;
-            $totalpokoksts = 0;
-            $totaldendasts = 0;
-            $totalseluruhsts = 0;
-            ?>
+            $total_pokok = 0;
+            $total_denda = 0;
+            $total_seluruh = 0;
+            $hitungbaris = 0;  // Initialize the counter for rows
+        ?>
             <?php foreach ($tablenya as $row):
-                   $selisihpokok = $row['pokok'] - $row['pokok_sts'];
-                   $selisihdenda = $row['denda'] - $row['denda_sts'];
-                   $selisihtotal = $row['total'] - $row['jumlah_sts'];
-                   $totalpokok += $row['pokok'];
-                   $totaldenda += $row['denda'];
-                   $totalseluruh += $row['total'];
-       
-                   $totalpokoksts += $row['pokok_sts'];
-                   $totaldendasts += $row['denda_sts'];
-                   $totalseluruhsts += $row['jumlah_sts'];
-       
-                   $totalselisihpokok =  $totalpokok - $totalpokoksts;
-                   $totalselisihdenda =  $totaldenda - $totaldendasts;
-                   $totalselisihseluruh =  $totalseluruh - $totalseluruhsts;
-                ?>
+                $total_pokok += $row['pokok'];
+                $total_denda += $row['denda'];
+                $total_seluruh +=  $row['total'];
+                $hitungbaris++; 
+            ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td style="text-align: left;"><?= $row['nopelaporan']; ?></td>
-                    <td style="text-align: left;"><?= $row['npwpd']; ?></td>
-        
-                    <td style="text-align: left;"><?= $row['namawp']; ?></td>
-                    <td><?= $row['thnpajak']; ?></td>
-                    <td><?= bulan_indonesia($row['masapajak']); ?></td>
-                    <td><?= $row['tglsts']; ?></td>
+                    <td style="text-align: left;"><?= $row['nmwp']; ?></td>
+                    <td style="text-align: center;"><?= bulan_indonesia($row['masabulan']); ?> <?= $row['thnpajak']; ?></td>
+                    <td style="text-align: center;"><?= $row['tgl_input']; ?></td>
+                    <td style="text-align: center;"><?= $row['nosptpd']; ?></td>
                     <td><?= number_format($row['pokok'], 2); ?></td>
                     <td><?= number_format($row['denda'], 2); ?></td>
+                    <td></td>
                     <td><?= number_format($row['total'], 2); ?></td> 
-                    <td><?= $row['kodebayar']; ?></td> 
-                    <td><?= $row['tglsts']; ?></td>
-                    <td><?= ($row['tglsts'] == '0000-00-00' ? 'Belum Lunas' : 'Lunas') ?></td>
-                    <td style="text-align: center;"><?= $row['tgl_bayar']; ?></td>
-                    <td style="text-align: left;"><?= $row['namawp']; ?></td>
-                    <td style="text-align: center;"><?= $row['namauptd']; ?></td>
-                    <td style="text-align: left;"><?= $row['blnpajak']; ?>-<?= $row['thnpajak']; ?></td>
-                    <td style="text-align: left;"><?= $row['sspd']; ?></td>
-                    <td style="text-align: right;"><?= number_format($row['pokok_sts'], 2); ?></td>
-                    <td style="text-align: right;"><?= number_format($row['denda_sts'], 2); ?></td>
-                    <td style="text-align: right;"><?= number_format($row['jumlah_sts'], 2); ?></td>
-                    <td style="text-align: right;"><?= number_format($selisihpokok, 2); ?></td>
-                    <td style="text-align: right;"><?= number_format($selisihdenda, 2); ?></td>
-                    <td style="text-align: right;"><?= number_format($selisihtotal, 2); ?></td>
-                    <td style="text-align: left;"><?= $row['keterangan']; ?></td>
+                    <td><?= $row['keterangan']; ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="12">Tidak ada data yang terbit.</td>
+                <td colspan="12" style="text-align: center;">Tidak ada data yang terbit.</td>
             </tr>
+            
         <?php endif; ?>
         <tr>
-        <td colspan=7" style="font-weight: bold;">JUMLAH</td>
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokok, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldenda, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruh, 2); ?></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalpokoksts, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totaldendasts, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalseluruhsts, 2); ?></td>
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihpokok, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihdenda, 2); ?></td> 
-        <td style="text-align: right; font-weight: bold;"><?= number_format($totalselisihseluruh, 2); ?></td>
-        <td></td>
-    </tr>
+            <td></td>
+            <td style="font-weight: bold;">JUMLAH</td>
+            <td></td>
+            <td></td>
+            <td style="font-weight: bold;"><?= $hitungbaris; ?> SPTPD</td> <!-- Display the count -->
+            <td style="font-weight:bold;"><?= number_format($total_pokok, 2); ?></td>
+            <td style="font-weight:bold;"><?= number_format($total_denda, 2); ?></td>
+            <td style="font-weight:bold;">0</td>
+            <td style="font-weight:bold;"><?= number_format($total_seluruh, 2); ?></td>
+        </tr>
+        
     
 
 

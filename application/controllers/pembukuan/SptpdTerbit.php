@@ -42,10 +42,10 @@ class SptpdTerbit extends CI_Controller {
     
         $rekeningCumaIni = array(
             '4.1.1.01' => 'Pajak Hotel',
-            '4.1.1.02' => 'Pajak Restoran',
+            '4.1.1.02.01' => 'Pajak Restoran',
             '4.1.1.03' => 'Pajak Hiburan',
             '4.1.1.07' => 'Pajak Parkir',
-            '4.1.1.08' => 'Pajak Air Tanah',
+            '4.1.1.08.01' => 'Pajak Air Tanah',
             '4.1.1.11' => 'Pajak Mineral Batuan Bukan Logam'
         );
     

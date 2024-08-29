@@ -225,6 +225,7 @@ function hari_ini($hari)
     <?php if (!empty($kdrekening)) : ?>
         <h3> <?= strtoupper($kdrekening['nmrekening']) ?></h3>
     <?php endif; ?>
+    <h3>BULAN :<?= $format_bulan; ?></h3>
 </div>
 
 

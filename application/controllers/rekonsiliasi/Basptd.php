@@ -36,7 +36,6 @@ class Basptd extends CI_Controller {
         $tglcetak = $this->input->post('tglcetak');
         $tahun = $this->input->post('tahun');
         $bulan = $this->input->post('bulan');
-        $bulanakhir = $this->input->post('bulanakhir');
         $kdrekening = $this->input->post('kdrekening');
 
         
@@ -57,7 +56,7 @@ class Basptd extends CI_Controller {
         $tanda_tangan_4 = $this->input->post('tanda_tangan_4');
         $tanda_tangan_5 = $this->input->post('tanda_tangan_5');
         
-        $tablenya = $this->MBasptd->ambildata($tahun, $bulan, $bulanakhir, $kdrekening);
+        $tablenya = $this->MBasptd->cetakblmbayar($tahun, $bulan, $kdrekening);
 
      /*    $data_terbit = array_filter($tablenya, function($row) {
             return $row['tgl_bayar'] !== '0000-00-00';
@@ -66,9 +65,9 @@ class Basptd extends CI_Controller {
         $data_belum_kembali = array_filter($tablenya, function($row) {
             return $row['tgl_bayar'] === '0000-00-00';
         }); */
-
-       /*  echo '<pre>';
-        var_dump($data_terbit);
+/* 
+        echo '<pre>';
+        var_dump($tablenya);
         die();
         echo '</pre>'; */
         $tanda_tangan_data_1 = $this->Msetup->get_tanda_tangan_skpd($tanda_tangan_1);
@@ -84,7 +83,6 @@ class Basptd extends CI_Controller {
             'topbar' => $template['topbar'],
             'sidebar' => $template['sidebar'],
             'format_bulan' => strftime('%B', strtotime("$tahun-$bulan")),
-            'format_bulan_akhir' => strftime('%B', strtotime("$tahun-$bulanakhir")),
             'format_tahun' => $tahun,
             'tglcetak' => $tglcetak,
             'nmrekening' => $nmrekening ,
@@ -112,7 +110,7 @@ class Basptd extends CI_Controller {
                 $data[str_replace('tanda_tangan_', 'nip_', $key)] = $value['nip'];
             }
         }
-        $this->load->view('rekonsiliasi/printbasptd', $data);
+        $this->load->view('rekonsiliasi/printbasptpd', $data);
        /*  ob_start();
         $html = $this->load->view('rekonsiliasi/printbasptd', $data, true);
         ob_get_clean();
